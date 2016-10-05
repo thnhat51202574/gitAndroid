@@ -20,8 +20,19 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.Status;
 
+import java.text.DateFormat;
+import java.util.Date;
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,LocationListener,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+
+    private static final int MILLISECONDS_PER_SECOND = 1000;
+
+    public static final int UPDATE_INTERVAL_IN_SECONDS = 5;
+    private static final long UPDATE_INTERVAL =  MILLISECONDS_PER_SECOND * UPDATE_INTERVAL_IN_SECONDS;
+
+    private static final int FASTEST_INTERVAL_IN_SECONDS = 1;
+    private static final long FASTEST_INTERVAL = MILLISECONDS_PER_SECOND * FASTEST_INTERVAL_IN_SECONDS;
 
     private GoogleMap mMap;
     LocationRequest mLocationRequest;
@@ -73,24 +84,32 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLocation,16));
 
         }
+        createLocationRequest();
 
     }
-
+    protected void createLocationRequest() {
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(10000);
+        mLocationRequest.setFastestInterval(5000);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        startLocationUpdates();
+    }
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
         Log.e("TAG", "Connection failed: " + connectionResult.toString());
     }
     protected void startLocationUpdates() {
-        PendingResult<Status> pendingResult = LocationServices.FusedLocationApi.requestLocationUpdates(
+        LocationServices.FusedLocationApi.requestLocationUpdates(
                 mGoogleApiClient, mLocationRequest, this);
         Log.e("TAG", "Location update started ..............: ");
     }
     @Override
     public void onLocationChanged(Location location) {
-        Log.e("TEST", "Firing onLocationChanged..............................................");
         mCurrentLocation = location;
+//        mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
         updateUI();
     }
+
     protected void onStart() {
         mGoogleApiClient.connect();
         super.onStart();
@@ -108,9 +127,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             Toast.makeText(getApplicationContext(), "Longitude: " + lng + "\nLatitude: "
                     + lat, Toast.LENGTH_LONG).show();
+            mMap.clear();
+            LatLng myLocation = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
+            mMap.addMarker(new MarkerOptions().position(myLocation).title("Marker in My location"));
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(myLocation));
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLocation,16));
         } else {
             Log.e("TAG", "location is null ...............");
             Toast.makeText(getApplicationContext(), "Location Null", Toast.LENGTH_LONG).show();
         }
     }
+
 }
