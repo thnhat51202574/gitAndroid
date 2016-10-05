@@ -1,8 +1,12 @@
 package com.example.a51202_000.testbug;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.location.Location;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -34,6 +38,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final int FASTEST_INTERVAL_IN_SECONDS = 1;
     private static final long FASTEST_INTERVAL = MILLISECONDS_PER_SECOND * FASTEST_INTERVAL_IN_SECONDS;
 
+    private static final String[] INITIAL_PERMS={
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+    };
+    private static final int INITIAL_REQUEST=1337;
     private GoogleMap mMap;
     LocationRequest mLocationRequest;
     GoogleApiClient mGoogleApiClient;
@@ -42,6 +51,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
         if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(this)
                     .addConnectionCallbacks(this)
@@ -71,21 +81,52 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onConnected(Bundle bundle) {
         Log.e("TAG", "onConnected - isConnected ...............: " + mGoogleApiClient.isConnected());
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                mGoogleApiClient);
-        if (mLastLocation != null) {
-            String lat = String.valueOf(mLastLocation.getLatitude());
-            String lng = String.valueOf(mLastLocation.getLongitude());
-            Log.e("TAG", "Latitude - ...............: " + lat);
-            Log.e("TAG", "Longitude - ...............: " + lng);
-            LatLng myLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-            mMap.addMarker(new MarkerOptions().position(myLocation).title("Marker in My location"));
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(myLocation));
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLocation,16));
-
+        Log.e("TAG", "haspermission ...............: " +canAccessLocation() );
+        if(!canAccessLocation()){
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    INITIAL_REQUEST);
         }
-        createLocationRequest();
 
+
+
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode,String permissions[], int[] grantResults) {
+        Log.e("TAG", "requestcode - ...............: " + grantResults[0]);
+        Log.e("TAG", "requestcode - ...............: " + PackageManager.PERMISSION_GRANTED);
+        switch (requestCode) {
+            case INITIAL_REQUEST: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                            mGoogleApiClient);
+                    if (mLastLocation != null) {
+                        String lat = String.valueOf(mLastLocation.getLatitude());
+                        String lng = String.valueOf(mLastLocation.getLongitude());
+                        Log.e("TAG", "Latitude - ...............: " + lat);
+                        Log.e("TAG", "Longitude - ...............: " + lng);
+                        LatLng myLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+                        mMap.addMarker(new MarkerOptions().position(myLocation).title("Marker in My location"));
+                        mMap.moveCamera(CameraUpdateFactory.newLatLng(myLocation));
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLocation,16));
+
+                    }
+                    createLocationRequest();
+
+                } else {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
     }
     protected void createLocationRequest() {
         mLocationRequest = new LocationRequest();
@@ -136,6 +177,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Log.e("TAG", "location is null ...............");
             Toast.makeText(getApplicationContext(), "Location Null", Toast.LENGTH_LONG).show();
         }
+    }
+    private boolean canAccessLocation() {
+        return(hasPermission(Manifest.permission.ACCESS_FINE_LOCATION));
+    }
+    private boolean hasPermission(String perm) {
+        int permissionCheck = ContextCompat.checkSelfPermission(getApplicationContext(),
+                Manifest.permission.WRITE_CALENDAR);
+        return (permissionCheck == PackageManager.PERMISSION_GRANTED);
     }
 
 }
