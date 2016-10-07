@@ -8,8 +8,11 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.Toast;
 
+import com.github.nkzawa.emitter.Emitter;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -20,12 +23,22 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.Status;
 
+import java.net.URISyntaxException;
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+
+import com.github.nkzawa.socketio.client.IO;
+import com.github.nkzawa.socketio.client.Socket;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,LocationListener,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
@@ -47,11 +60,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     LocationRequest mLocationRequest;
     GoogleApiClient mGoogleApiClient;
     Location mCurrentLocation,mLastLocation;
+    String UName;
+    HashMap<String,Marker> ListMarkerByUser = new HashMap<String,Marker>();
+    private Socket mSocket;
+    {
+        try {
+            mSocket = IO.socket("http://totnghiep.herokuapp.com/");
+            Log.e("TAG", "success ...............: ");
+        } catch (URISyntaxException e) {
+            Log.e("TAG", "erorsocket ...............: " + e.toString());
+        }
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-
+        final Bundle extras = getIntent().getExtras();
+        if(extras!= null) {
+            UName = extras.getString("username");
+            Log.e("TAG", "NAME ...............: " +UName);
+        }
         if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(this)
                     .addConnectionCallbacks(this)
@@ -63,6 +91,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        Log.e("TAG", "onCreatea");
+        mSocket.on("newmessageadd",onNewmessage);
+        mSocket.on("disMess",onUserdisconnect);
+        mSocket.connect();
+        //listening
+        //end listening socket
+
     }
 
     @Override
@@ -103,17 +138,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                             mGoogleApiClient);
-                    if (mLastLocation != null) {
-                        String lat = String.valueOf(mLastLocation.getLatitude());
-                        String lng = String.valueOf(mLastLocation.getLongitude());
-                        Log.e("TAG", "Latitude - ...............: " + lat);
-                        Log.e("TAG", "Longitude - ...............: " + lng);
-                        LatLng myLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-                        mMap.addMarker(new MarkerOptions().position(myLocation).title("Marker in My location"));
-                        mMap.moveCamera(CameraUpdateFactory.newLatLng(myLocation));
-                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLocation,16));
-
-                    }
+//                    if (mLastLocation != null) {
+//                        String lat = String.valueOf(mLastLocation.getLatitude());
+//                        String lng = String.valueOf(mLastLocation.getLongitude());
+//                        Log.e("TAG", "Latitude - ...............: " + lat);
+//                        Log.e("TAG", "Longitude - ...............: " + lng);
+//                        LatLng myLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+//                        mMap.addMarker(new MarkerOptions().position(myLocation).title("Marker in My location"));
+//                        mMap.moveCamera(CameraUpdateFactory.newLatLng(myLocation));
+//                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLocation,16));
+//
+//                    }
                     createLocationRequest();
 
                 } else {
@@ -150,12 +185,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //        mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
         updateUI();
     }
-
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mSocket.disconnect();
+    }
     protected void onStart() {
         mGoogleApiClient.connect();
         super.onStart();
     }
-
     protected void onStop() {
         mGoogleApiClient.disconnect();
         super.onStop();
@@ -166,11 +204,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             String lat = String.valueOf(mCurrentLocation.getLatitude());
             String lng = String.valueOf(mCurrentLocation.getLongitude());
 
-            Toast.makeText(getApplicationContext(), "Longitude: " + lng + "\nLatitude: "
-                    + lat, Toast.LENGTH_LONG).show();
-            mMap.clear();
+//            Toast.makeText(getApplicationContext(), "Longitude: " + lng + "\nLatitude: "
+//                    + lat, Toast.LENGTH_LONG).show();
+            try {
+                JSONObject dataInsert = new JSONObject();
+                //create JSONdata to send to server
+                dataInsert.put("uname",UName);
+                dataInsert.put("lng",lng);
+                dataInsert.put("lat",lat);
+                mSocket.emit("newmessage", dataInsert);
+            } catch (JSONException e){
+                Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_LONG).show();
+            }
+
             LatLng myLocation = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
-            mMap.addMarker(new MarkerOptions().position(myLocation).title("Marker in My location"));
+            Marker newmarker = ListMarkerByUser.get(UName);
+            if(newmarker == null) {
+                Toast.makeText(getApplicationContext(),"NOCHANGE",Toast.LENGTH_LONG).show();
+                newmarker = mMap.addMarker(new MarkerOptions().position(myLocation).title(UName));
+            } else {
+                newmarker.remove();
+                Toast.makeText(getApplicationContext(),lat +',' + lng,Toast.LENGTH_LONG).show();
+                newmarker = mMap.addMarker(new MarkerOptions().position(myLocation).title(UName));
+            }
+            ListMarkerByUser.put(UName,newmarker);
             mMap.moveCamera(CameraUpdateFactory.newLatLng(myLocation));
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLocation,16));
         } else {
@@ -186,5 +243,59 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Manifest.permission.WRITE_CALENDAR);
         return (permissionCheck == PackageManager.PERMISSION_GRANTED);
     }
-
+    private Emitter.Listener onNewmessage = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+//                    ListUser = (ListView) findViewById(R.id.listUser);
+                    JSONObject data = (JSONObject) args[0];
+                    String name;
+                    Double lng;
+                    Double lat;
+                    try {
+                        name = data.getString("name");
+                        lng = data.getDouble("lng");
+                        lat = data.getDouble("lat");
+                        LatLng myLocation = new LatLng(lat,lng);
+                        Marker newmarker = ListMarkerByUser.get(name);
+                        if(newmarker == null) {
+                            newmarker = mMap.addMarker(new MarkerOptions().position(myLocation).title(name));
+                        } else {
+                            newmarker.remove();
+                            newmarker = mMap.addMarker(new MarkerOptions().position(myLocation).title(name));
+                        }
+                        ListMarkerByUser.put(name,newmarker);
+//                        Toast.makeText(getApplicationContext(),name,Toast.LENGTH_LONG).show();
+                    } catch (JSONException e) {
+                        return;
+                    }
+                }
+            });
+        }
+    };
+    private Emitter.Listener onUserdisconnect = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    JSONObject data = (JSONObject) args[0];
+                    String name;
+                    try {
+                        name = data.getString("name");
+                        Marker newmarker = ListMarkerByUser.get(name);
+                        if(newmarker != null) {
+                            newmarker.remove();
+                        }
+                        ListMarkerByUser.remove(name);
+                        Toast.makeText(getApplicationContext(),name + " disconect",Toast.LENGTH_LONG).show();
+                    } catch (JSONException e) {
+                        return;
+                    }
+                }
+            });
+        }
+    };
 }
