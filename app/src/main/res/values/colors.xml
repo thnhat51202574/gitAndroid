@@ -2,5 +2,9 @@
 <resources>
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorAccent">#FF00FAFA</color>
+    <color name="btnbackground">#00b863</color>
+    <color name="btntextbackground">#ffffff</color>
+    <color name="WhiteColor">#ffffff</color>
+    <color name="hindfocus">#FF00FAFA</color>
 </resources>

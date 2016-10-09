@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">Testbug</string>
+    <string name="username">Tên đăng nhập</string>
+    <string name="password">Mật khẩu</string>
+    <string name="login">Đăng nhập</string>
+    <string name="register">Đăng ký</string>
     <string name="title_activity_maps">Map</string>
 </resources>

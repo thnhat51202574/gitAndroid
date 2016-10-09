@@ -9,15 +9,19 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
-    Button start;
+    Button loginbtn,registerbtn;
     EditText name;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getSupportActionBar().hide();
         setContentView(R.layout.activity_main);
-        start = (Button) findViewById(R.id.startbtn);
+        loginbtn = (Button) findViewById(R.id.startbtn);
+        registerbtn = (Button) findViewById(R.id.registerbtn);
         name = (EditText) findViewById(R.id.nameeditText);
-        start.setOnClickListener(new View.OnClickListener() {
+        loginbtn.getBackground().setAlpha(100);
+        registerbtn.getBackground().setAlpha(95);
+        loginbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String uname = name.getText().toString();
