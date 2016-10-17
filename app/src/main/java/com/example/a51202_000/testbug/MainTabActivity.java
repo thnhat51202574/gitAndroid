@@ -24,6 +24,8 @@ import android.view.animation.DecelerateInterpolator;
 import android.view.animation.ScaleAnimation;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 public class MainTabActivity extends AppCompatActivity {
 
     /**
@@ -186,6 +188,7 @@ public class MainTabActivity extends AppCompatActivity {
      * one of the sections/tabs/pages.
      */
     public class SectionsPagerAdapter extends FragmentPagerAdapter{
+        ArrayList<Fragment> fragments = new ArrayList<>();
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -196,12 +199,13 @@ public class MainTabActivity extends AppCompatActivity {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
             return PlaceholderFragment.newInstance(position + 1);
+//            return fragments.get(position)
         }
 
         @Override
         public int getCount() {
             // Show 3 total pages.
-            return 5;
+            return fragments.size();
         }
 
         @Override
@@ -217,6 +221,9 @@ public class MainTabActivity extends AppCompatActivity {
                     return "";
             }
             return null;
+        }
+        public void addPage(Fragment f) {
+            fragments.add(f);
         }
     }
 }
