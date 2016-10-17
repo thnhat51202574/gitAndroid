@@ -26,6 +26,9 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import layout.EventFragmeent;
+import layout.HomeFragment;
+
 public class MainTabActivity extends AppCompatActivity {
 
     /**
@@ -53,7 +56,10 @@ public class MainTabActivity extends AppCompatActivity {
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-
+//        mSectionsPagerAdapter.addPage(new HomeFragment());
+        mSectionsPagerAdapter.addPage(new PlaceholderFragment());
+        mSectionsPagerAdapter.addPage(new HomeFragment());
+        mSectionsPagerAdapter.addPage(new EventFragmeent());
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
@@ -63,8 +69,8 @@ public class MainTabActivity extends AppCompatActivity {
         tabLayout.getTabAt(0).setIcon(R.drawable.ic_home_black_24dp);
         tabLayout.getTabAt(1).setIcon(R.drawable.ic_event_note_black_24dp);
         tabLayout.getTabAt(2).setIcon(R.drawable.ic_message_black_24dp);
-        tabLayout.getTabAt(3).setIcon(R.drawable.ic_people_black_24dp);
-        tabLayout.getTabAt(4).setIcon(R.drawable.ic_person_black_24dp);
+//        tabLayout.getTabAt(3).setIcon(R.drawable.ic_people_black_24dp);
+//        tabLayout.getTabAt(4).setIcon(R.drawable.ic_person_black_24dp);
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -178,7 +184,7 @@ public class MainTabActivity extends AppCompatActivity {
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main_tab, container, false);
             TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
+            textView.setText("Đây là fragment 1");
             return rootView;
         }
     }
@@ -198,8 +204,8 @@ public class MainTabActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
-            return PlaceholderFragment.newInstance(position + 1);
-//            return fragments.get(position)
+//            return PlaceholderFragment.newInstance(position + 1);
+            return fragments.get(position);
         }
 
         @Override
