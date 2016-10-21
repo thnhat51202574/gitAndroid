@@ -23,8 +23,14 @@ import android.view.animation.Animation;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.ScaleAnimation;
 import android.widget.TextView;
+import android.widget.Toast;
 
-public class MainTabActivity extends AppCompatActivity {
+import java.util.ArrayList;
+
+import layout.EventFragment;
+import layout.HomeFragment;
+
+public class MainTabActivity extends AppCompatActivity implements HomeFragment.comuticateParent {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -40,7 +46,9 @@ public class MainTabActivity extends AppCompatActivity {
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
-    FloatingActionButton fab;
+//    FloatingActionButton fab;
+    HomeFragment homeFragment;
+    EventFragment eventFragment;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,23 +59,30 @@ public class MainTabActivity extends AppCompatActivity {
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+//        mSectionsPagerAdapter.addPage(new HomeFragment());
+        homeFragment = new HomeFragment();
+        eventFragment = new EventFragment();
+        //set frament to each tab
+        mSectionsPagerAdapter.addPage(homeFragment);
+        mSectionsPagerAdapter.addPage(eventFragment);
+//        mSectionsPagerAdapter.addPage(eventFragment);
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
-        fab = (FloatingActionButton) findViewById(R.id.fab);
+//        fab = (FloatingActionButton) findViewById(R.id.fab);
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
         tabLayout.getTabAt(0).setIcon(R.drawable.ic_home_black_24dp);
         tabLayout.getTabAt(1).setIcon(R.drawable.ic_event_note_black_24dp);
-        tabLayout.getTabAt(2).setIcon(R.drawable.ic_message_black_24dp);
-        tabLayout.getTabAt(3).setIcon(R.drawable.ic_people_black_24dp);
-        tabLayout.getTabAt(4).setIcon(R.drawable.ic_person_black_24dp);
+//        tabLayout.getTabAt(2).setIcon(R.drawable.ic_message_black_24dp);
+//        tabLayout.getTabAt(3).setIcon(R.drawable.ic_people_black_24dp);
+//        tabLayout.getTabAt(4).setIcon(R.drawable.ic_person_black_24dp);
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 mViewPager.setCurrentItem(tab.getPosition());
-                animateFab(tab.getPosition());
+//                animateFab(tab.getPosition());
             }
 
             @Override
@@ -82,47 +97,59 @@ public class MainTabActivity extends AppCompatActivity {
         });
 
 
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view,Integer.toString(mViewPager.getCurrentItem()), Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+//        fab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//               Snackbar.make(view,Integer.toString(mViewPager.getCurrentItem()), Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
+//                switch (mViewPager.getCurrentItem()) {
+//                    case 0:
+//                        homeFragment.receiveMess("ĐÂY LA TIN NHẮN TỪ HOME ACTIVITY");
+//                        break;
+//                    case 1:
+//                        eventFragment.receiveMess("ĐÂY LA TIN NHẮN TỪ EVENT ACTIVITY");
+//                        break;
+//
+//                }
+//            }
+//        });
 
     }
-    protected void animateFab(final int position) {
-        fab.clearAnimation();
-        // Scale down animation
-        ScaleAnimation shrink =  new ScaleAnimation(1f, 0.2f, 1f, 0.2f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-        shrink.setDuration(150);     // animation duration in milliseconds
-        shrink.setInterpolator(new DecelerateInterpolator());
-        shrink.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
 
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                // Change FAB color and icon
-                fab.setBackgroundTintList(ContextCompat.getColorStateList(getApplicationContext(),R.color.hindfocus));
-                fab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(),R.drawable.ic_home_black_24dp));
-
-                // Scale up animation
-                ScaleAnimation expand =  new ScaleAnimation(0.2f, 1f, 0.2f, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-                expand.setDuration(100);     // animation duration in milliseconds
-                expand.setInterpolator(new AccelerateInterpolator());
-                fab.startAnimation(expand);
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        });
-        fab.startAnimation(shrink);
-    }
+//    protected void animateFab(final int position) {
+//        if(position != 0) {
+//            fab.clearAnimation();
+//            // Scale down animation
+//            ScaleAnimation shrink = new ScaleAnimation(1f, 0.2f, 1f, 0.2f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+//            shrink.setDuration(150);     // animation duration in milliseconds
+//            shrink.setInterpolator(new DecelerateInterpolator());
+//            shrink.setAnimationListener(new Animation.AnimationListener() {
+//                @Override
+//                public void onAnimationStart(Animation animation) {
+//
+//                }
+//
+//                @Override
+//                public void onAnimationEnd(Animation animation) {
+//                    // Change FAB color and icon
+//                    fab.setBackgroundTintList(ContextCompat.getColorStateList(getApplicationContext(), R.color.hindfocus));
+//                    fab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_home_black_24dp));
+//
+//                    // Scale up animation
+//                    ScaleAnimation expand = new ScaleAnimation(0.2f, 1f, 0.2f, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+//                    expand.setDuration(100);     // animation duration in milliseconds
+//                    expand.setInterpolator(new AccelerateInterpolator());
+//                    fab.startAnimation(expand);
+//                }
+//
+//                @Override
+//                public void onAnimationRepeat(Animation animation) {
+//
+//                }
+//            });
+//            fab.startAnimation(shrink);
+//        }
+//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -144,6 +171,11 @@ public class MainTabActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void sendMess(String text) {
+        Toast.makeText(getApplicationContext(),text,Toast.LENGTH_LONG).show();
     }
 
     /**
@@ -176,7 +208,7 @@ public class MainTabActivity extends AppCompatActivity {
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main_tab, container, false);
             TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
+            textView.setText("Đây là fragment 1");
             return rootView;
         }
     }
@@ -186,6 +218,7 @@ public class MainTabActivity extends AppCompatActivity {
      * one of the sections/tabs/pages.
      */
     public class SectionsPagerAdapter extends FragmentPagerAdapter{
+        ArrayList<Fragment> fragments = new ArrayList<>();
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -195,13 +228,14 @@ public class MainTabActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
-            return PlaceholderFragment.newInstance(position + 1);
+//            return PlaceholderFragment.newInstance(position + 1);
+            return fragments.get(position);
         }
 
         @Override
         public int getCount() {
             // Show 3 total pages.
-            return 5;
+            return fragments.size();
         }
 
         @Override
@@ -217,6 +251,9 @@ public class MainTabActivity extends AppCompatActivity {
                     return "";
             }
             return null;
+        }
+        public void addPage(Fragment f) {
+            fragments.add(f);
         }
     }
 }
