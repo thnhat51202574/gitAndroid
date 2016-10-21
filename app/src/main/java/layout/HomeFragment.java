@@ -32,35 +32,14 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.w3c.dom.Text;
 
-public class HomeFragment extends Fragment implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class HomeFragment extends Fragment implements LocationListener ,GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
-
+    private static final String TAG = HomeFragment.class.getSimpleName();
 
     public interface comuticateParent {
         public void sendMess(String text);
     }
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-
-    public HomeFragment() {
-        // Required empty public constructor
-    }
-
-    public static HomeFragment newInstance(String param1, String param2) {
-        HomeFragment fragment = new HomeFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
     comuticateParent callback;
     Button btn1;
     TextView textView;
@@ -73,10 +52,7 @@ public class HomeFragment extends Fragment implements GoogleApiClient.Connection
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+
         if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
                     .addConnectionCallbacks(this)
@@ -84,6 +60,12 @@ public class HomeFragment extends Fragment implements GoogleApiClient.Connection
                     .addApi(LocationServices.API)
                     .build();
         }
+        mLocationRequest = LocationRequest.create()
+                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                .setInterval(10 * 1000)
+                .setFastestInterval(1 * 1000);
+
+        Log.d(TAG, "onCreate");
     }
 
     @Override
@@ -111,7 +93,6 @@ public class HomeFragment extends Fragment implements GoogleApiClient.Connection
         //init map to fragment
         mMapView = (MapView) rootView.findViewById(R.id.mapView);
         mMapView.onCreate(savedInstanceState);
-
         mMapView.onResume(); // needed to get the map to display immediately
 
         try {
@@ -119,6 +100,12 @@ public class HomeFragment extends Fragment implements GoogleApiClient.Connection
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return rootView;
+    }
+    @Override
+    public void onConnected(Bundle bundle) {
+        Log.d("Connect", "Connected ");
+        Log.d("onConected", Boolean.toString(mGoogleApiClient.isConnected()));
         mMapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(GoogleMap mMap) {
@@ -127,16 +114,17 @@ public class HomeFragment extends Fragment implements GoogleApiClient.Connection
 
                 mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                         mGoogleApiClient);
-                Log.d("12123", "onMapReady: ");
-//                String lat = String.valueOf(mLastLocation.getLatitude());
-//                String lng = String.valueOf(mLastLocation.getLongitude());
-//                Log.d("lat", lat);
-//                Log.d("lng", lng);
-//                LatLng mylocation =new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-//                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mylocation , 13));
+                String lat = String.valueOf(mLastLocation.getLatitude());
+                String lng = String.valueOf(mLastLocation.getLongitude());
+                LatLng mylocation =new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mylocation , 13));
             }
         });
-        return rootView;
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+
     }
 
     @Override
@@ -175,10 +163,6 @@ public class HomeFragment extends Fragment implements GoogleApiClient.Connection
         super.onLowMemory();
         mMapView.onLowMemory();
     }
-    @Override
-    public void onConnected(Bundle bundle) {
-        Log.d("Connect", "Connected ");
-    }
 
     @Override
     public void onConnectionSuspended(int i) {
@@ -195,7 +179,6 @@ public class HomeFragment extends Fragment implements GoogleApiClient.Connection
         super.onAttach(context);
         Activity activity;
         if (context instanceof Activity){
-            activity=(Activity) context;
             callback = (comuticateParent) getActivity();
         }
     }
