@@ -77,6 +77,12 @@ public class HomeFragment extends Fragment implements GoogleApiClient.Connection
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
         if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
                     .addConnectionCallbacks(this)
@@ -84,11 +90,6 @@ public class HomeFragment extends Fragment implements GoogleApiClient.Connection
                     .addApi(LocationServices.API)
                     .build();
         }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
 //        // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_home, container, false);
         FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
@@ -127,8 +128,7 @@ public class HomeFragment extends Fragment implements GoogleApiClient.Connection
 
                 mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                         mGoogleApiClient);
-                Log.d("12123", "onMapReady: ");
-//                String lat = String.valueOf(mLastLocation.getLatitude());
+                Log.d("12123", Boolean.toString(mGoogleApiClient.isConnected()));
 //                String lng = String.valueOf(mLastLocation.getLongitude());
 //                Log.d("lat", lat);
 //                Log.d("lng", lng);
@@ -142,6 +142,8 @@ public class HomeFragment extends Fragment implements GoogleApiClient.Connection
     @Override
     public void onStart() {
         mGoogleApiClient.connect();
+        Log.d("ConnectonStart", "Connected ");
+        Log.d("ONstart", Boolean.toString(mGoogleApiClient.isConnected()));
         super.onStart();
     }
 
@@ -178,6 +180,7 @@ public class HomeFragment extends Fragment implements GoogleApiClient.Connection
     @Override
     public void onConnected(Bundle bundle) {
         Log.d("Connect", "Connected ");
+        Log.d("onConnected", Boolean.toString(mGoogleApiClient.isConnected()));
     }
 
     @Override
