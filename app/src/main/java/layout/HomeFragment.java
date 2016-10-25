@@ -1,9 +1,11 @@
 package layout;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.location.Location;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -31,6 +33,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.w3c.dom.Text;
+import AsyncTask.getNearestLocationTask;
 
 public class HomeFragment extends Fragment implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
@@ -68,7 +71,7 @@ public class HomeFragment extends Fragment implements GoogleApiClient.Connection
     GoogleApiClient mGoogleApiClient;
     Location mLastLocation;
     LocationRequest mLocationRequest;
-    private GoogleMap googleMap;
+    public GoogleMap googleMap;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -120,22 +123,6 @@ public class HomeFragment extends Fragment implements GoogleApiClient.Connection
         } catch (Exception e) {
             e.printStackTrace();
         }
-        mMapView.getMapAsync(new OnMapReadyCallback() {
-            @Override
-            public void onMapReady(GoogleMap mMap) {
-                googleMap = mMap;
-                googleMap.setMyLocationEnabled(true);
-
-                mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                        mGoogleApiClient);
-                Log.d("12123", Boolean.toString(mGoogleApiClient.isConnected()));
-//                String lng = String.valueOf(mLastLocation.getLongitude());
-//                Log.d("lat", lat);
-//                Log.d("lng", lng);
-//                LatLng mylocation =new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-//                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mylocation , 13));
-            }
-        });
         return rootView;
     }
 
@@ -181,11 +168,25 @@ public class HomeFragment extends Fragment implements GoogleApiClient.Connection
     public void onConnected(Bundle bundle) {
         Log.d("Connect", "Connected ");
         Log.d("onConnected", Boolean.toString(mGoogleApiClient.isConnected()));
+        mMapView.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(GoogleMap mMap) {
+                googleMap = mMap;
+                googleMap.setMyLocationEnabled(true);
+
+                mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                        mGoogleApiClient);
+                LatLng mylocation =new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mylocation , 13));
+
+                getNearestLocationTask nearestLocationTask = new getNearestLocationTask(getActivity(),googleMap);
+                nearestLocationTask.execute("PRAMA");
+            }
+        });
     }
 
     @Override
     public void onConnectionSuspended(int i) {
-
     }
 
     @Override
