@@ -3,6 +3,8 @@ package layout;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -13,7 +15,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,14 +35,22 @@ import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.w3c.dom.Text;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.HashMap;
+
 import AsyncTask.getNearestLocationTask;
+import AsyncTask.DownloadImageTask;
+import Model.Address;
 
-public class HomeFragment extends Fragment implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
-
-
+public class HomeFragment extends Fragment implements GoogleMap.OnMarkerClickListener, getNearestLocationTask.OnTaskCompleted, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     public interface comuticateParent {
         public void sendMess(String text);
@@ -72,7 +85,14 @@ public class HomeFragment extends Fragment implements GoogleApiClient.Connection
     Location mLastLocation;
     LocationRequest mLocationRequest;
     public GoogleMap googleMap;
+    private View hiddenPanel;
+    private Button upbtn, downbtn;
+    private HashMap<Marker,Address> listAddressbyMaker = new HashMap<Marker,Address>();;
 
+//    detail address
+    ImageView address_picture;
+    TextView address_name, address_rate, address_position, address_phone, address_type, address_detail;
+//    end detail
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,7 +100,6 @@ public class HomeFragment extends Fragment implements GoogleApiClient.Connection
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-
     }
 
     @Override
@@ -123,9 +142,43 @@ public class HomeFragment extends Fragment implements GoogleApiClient.Connection
         } catch (Exception e) {
             e.printStackTrace();
         }
+        upbtn = (Button) rootView.findViewById(R.id.upbtn);
+        downbtn = (Button) rootView.findViewById(R.id.downbtn);
+        hiddenPanel = rootView.findViewById(R.id.hidden_panel);
+        address_picture =(ImageView) rootView.findViewById(R.id.picture);
+        address_name = (TextView) rootView.findViewById(R.id.detailname);
+        address_rate = (TextView) rootView.findViewById(R.id.detailRate);
+        address_position = (TextView) rootView.findViewById(R.id.nameAddress);
+        address_phone = (TextView) rootView.findViewById(R.id.detailphone);
+        address_type = (TextView) rootView.findViewById(R.id.detailtype);
+        address_detail = (TextView) rootView.findViewById(R.id.detailContent);
+        downbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                slideUpDown(hiddenPanel);
+            }
+        });
         return rootView;
     }
-
+    private boolean isPanelShown() {
+        return hiddenPanel.getVisibility() == View.VISIBLE;
+    }
+    public void slideUpDown(final View view) {
+        if (!isPanelShown()) {
+            // Show the panel
+            Animation bottomUp = AnimationUtils.loadAnimation(getActivity(),
+                    R.anim.bottom_up);
+            hiddenPanel.startAnimation(bottomUp);
+            hiddenPanel.setVisibility(View.VISIBLE);
+        }
+        else {
+            // Hide the Panel
+            Animation bottomDown = AnimationUtils.loadAnimation(getActivity(),
+                    R.anim.bottom_down);
+            hiddenPanel.startAnimation(bottomDown);
+            hiddenPanel.setVisibility(View.GONE);
+        }
+    }
     @Override
     public void onStart() {
         mGoogleApiClient.connect();
@@ -177,14 +230,38 @@ public class HomeFragment extends Fragment implements GoogleApiClient.Connection
                 mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                         mGoogleApiClient);
                 LatLng mylocation =new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mylocation , 13));
-
-                getNearestLocationTask nearestLocationTask = new getNearestLocationTask(getActivity(),googleMap);
-                nearestLocationTask.execute("PRAMA");
+                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mylocation , 14));
+                getNearestLocationTask nearestLocationTask = new getNearestLocationTask(getActivity(),googleMap,mLastLocation,HomeFragment.this);
+                nearestLocationTask.execute("http://totnghiep.herokuapp.com/api/nearestAddress");
+                googleMap.setOnMarkerClickListener(HomeFragment.this);
+                address_name.setText("12312312");
             }
         });
     }
 
+    @Override
+    public boolean onMarkerClick(Marker marker){
+        Address choose_address = this.listAddressbyMaker.get(marker);
+        address_name.setText(choose_address.getName());
+        address_rate.setText(String.valueOf(choose_address.getRate()));
+        address_position.setText(choose_address.getAddress());
+        address_phone.setText(choose_address.getPhone());
+        address_detail.setText(choose_address.getdetail());
+        address_type.setText("Nhà hàng");
+
+        String url ="http://totnghiep.herokuapp.com"+ choose_address.getArImage();
+        new DownloadImageTask(address_picture)
+                .execute("http://java.sogeti.nl/JavaBlog/wp-content/uploads/2009/04/android_icon_256.png");
+
+
+        slideUpDown(hiddenPanel);
+        return false;
+    }
+
+    @Override
+    public void getListAddress(HashMap<Marker, Address> result) {
+        this.listAddressbyMaker = result;
+    }
     @Override
     public void onConnectionSuspended(int i) {
     }
@@ -207,4 +284,5 @@ public class HomeFragment extends Fragment implements GoogleApiClient.Connection
         Toast.makeText(getActivity(),Text,Toast.LENGTH_LONG).show();
 //        textView.setText(Text);
     }
+
 }
