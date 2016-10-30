@@ -2,13 +2,17 @@ package layout;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.a51202_000.testbug.R;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -27,7 +31,11 @@ public class EventFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-    TextView textView;
+    private SlidingUpPanelLayout slidingLayout;
+    private Button btnShow;
+    private Button btnHide;
+    private TextView textView;
+
 
     public EventFragment() {
         // Required empty public constructor
@@ -64,13 +72,11 @@ public class EventFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View rootView =inflater.inflate(R.layout.fragment_event_fragmeent, container, false);
-        textView = (TextView) rootView.findViewById(R.id.textviewtest);
+        View rootView =inflater.inflate(R.layout.fragment_event, container, false);
         return rootView;
     }
     public void receiveMess(String Text) {
         Log.d("ABDCD", Text);
         textView.setText(Text);
     }
-
 }

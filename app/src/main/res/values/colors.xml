@@ -11,5 +11,6 @@
     <color name="colorGreenBackground">#045b0e</color>
     <color name="colorYellow">#f9e801</color>
     <color name="detaillabelcolor">#8ad5ec</color>
+    <color name="black">#000000</color>
 
 </resources>

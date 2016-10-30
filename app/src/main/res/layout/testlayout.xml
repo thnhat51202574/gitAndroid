@@ -6,6 +6,52 @@ android:orientation="vertical"
     >
     <LinearLayout
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/detailRate"
+            android:background="@drawable/ratetextview_template"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_margin="5dp"
+            android:gravity="center_vertical"
+            android:textColor="@color/WhiteColor"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:paddingLeft="10dp"
+            android:text="7.9"
+        />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="5dp">
+            <TextView
+                android:id="@+id/name"
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:layout_weight="1"
+                android:textColor="@android:color/black"
+                android:textStyle="bold"
+                android:gravity="top"
+                android:paddingLeft="10dp"
+                android:text="Đây là tên nhà hàng"
+                android:textSize="14sp" />
+            <TextView
+                android:id="@+id/detailaddress"
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:layout_weight="1"
+                android:textColor="@android:color/holo_green_dark"
+                android:gravity="top"
+                android:paddingLeft="10dp"
+                android:text="40/1 Thủ Khoa Huân,P8, Tân Bình"
+                android:textSize="14sp" />
+        </LinearLayout>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <ImageView
             android:layout_gravity="top"
@@ -21,14 +67,6 @@ android:orientation="vertical"
         android:layout_height="wrap_content"
         android:layout_marginRight="4dp"
         android:layout_marginLeft="4dp">
-        <ImageView
-            android:id="@+id/namelabel"
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:src="@drawable/ic_name_blue"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
-
         <TextView
             android:text="ĐÂY LÀ TÊN NHÀ HÀNG"
             android:layout_below="@+id/detailname"
@@ -41,22 +79,6 @@ android:orientation="vertical"
             android:textSize="15dp"
             android:textColor="@android:color/background_dark"
             android:textStyle="bold"
-            android:layout_centerVertical="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true" />
-        <TextView
-            android:layout_below="@+id/backgroundaddress"
-            android:text="7.9"
-            android:layout_width="35dp"
-            android:layout_height="wrap_content"
-            android:layout_alignRight="@+id/nameAddress"
-            android:layout_marginRight="10dp"
-            android:id="@+id/detailRate"
-            android:textSize="15dp"
-            android:paddingLeft="6dp"
-            android:textColor="@color/WhiteColor"
-            android:textStyle="bold"
-            android:background="@drawable/ratetextview_template"
             android:layout_centerVertical="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true" />

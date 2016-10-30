@@ -37,6 +37,8 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
+import com.squareup.picasso.Picasso;
 
 import org.w3c.dom.Text;
 
@@ -87,7 +89,8 @@ public class HomeFragment extends Fragment implements GoogleMap.OnMarkerClickLis
     public GoogleMap googleMap;
     private View hiddenPanel;
     private Button upbtn, downbtn;
-    private HashMap<Marker,Address> listAddressbyMaker = new HashMap<Marker,Address>();;
+    private HashMap<Marker,Address> listAddressbyMaker = new HashMap<Marker,Address>();
+    private SlidingUpPanelLayout slidingLayout;
 
 //    detail address
     ImageView address_picture;
@@ -142,9 +145,7 @@ public class HomeFragment extends Fragment implements GoogleMap.OnMarkerClickLis
         } catch (Exception e) {
             e.printStackTrace();
         }
-        upbtn = (Button) rootView.findViewById(R.id.upbtn);
-        downbtn = (Button) rootView.findViewById(R.id.downbtn);
-        hiddenPanel = rootView.findViewById(R.id.hidden_panel);
+
         address_picture =(ImageView) rootView.findViewById(R.id.picture);
         address_name = (TextView) rootView.findViewById(R.id.detailname);
         address_rate = (TextView) rootView.findViewById(R.id.detailRate);
@@ -152,33 +153,50 @@ public class HomeFragment extends Fragment implements GoogleMap.OnMarkerClickLis
         address_phone = (TextView) rootView.findViewById(R.id.detailphone);
         address_type = (TextView) rootView.findViewById(R.id.detailtype);
         address_detail = (TextView) rootView.findViewById(R.id.detailContent);
-        downbtn.setOnClickListener(new View.OnClickListener() {
+        slidingLayout = (SlidingUpPanelLayout)rootView.findViewById(R.id.sliding_layout);
+
+        //some "demo" event
+//        slidingLayout.setPanelSlideListener(onSlideListener());
+        slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
+        slidingLayout.addPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
             @Override
-            public void onClick(View v) {
-                slideUpDown(hiddenPanel);
+            public void onPanelSlide(View panel, float slideOffset) {
+                Log.i("TAG", "onPanelSlide, offset " + slideOffset);
+            }
+
+            @Override
+            public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState, SlidingUpPanelLayout.PanelState newState) {
+                Log.i("TAG", "onPanelStateChanged " + newState);
             }
         });
+        slidingLayout.setFadeOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+            }
+        });
+
         return rootView;
     }
-    private boolean isPanelShown() {
-        return hiddenPanel.getVisibility() == View.VISIBLE;
-    }
-    public void slideUpDown(final View view) {
-        if (!isPanelShown()) {
-            // Show the panel
-            Animation bottomUp = AnimationUtils.loadAnimation(getActivity(),
-                    R.anim.bottom_up);
-            hiddenPanel.startAnimation(bottomUp);
-            hiddenPanel.setVisibility(View.VISIBLE);
-        }
-        else {
-            // Hide the Panel
-            Animation bottomDown = AnimationUtils.loadAnimation(getActivity(),
-                    R.anim.bottom_down);
-            hiddenPanel.startAnimation(bottomDown);
-            hiddenPanel.setVisibility(View.GONE);
-        }
-    }
+//    private boolean isPanelShown() {
+//        return hiddenPanel.getVisibility() == View.VISIBLE;
+//    }
+//    public void slideUpDown(final View view) {
+//        if (!isPanelShown()) {
+//            // Show the panel
+//            Animation bottomUp = AnimationUtils.loadAnimation(getActivity(),
+//                    R.anim.bottom_up);
+//            hiddenPanel.startAnimation(bottomUp);
+//            hiddenPanel.setVisibility(View.VISIBLE);
+//        }
+//        else {
+//            // Hide the Panel
+//            Animation bottomDown = AnimationUtils.loadAnimation(getActivity(),
+//                    R.anim.bottom_down);
+//            hiddenPanel.startAnimation(bottomDown);
+//            hiddenPanel.setVisibility(View.GONE);
+//        }
+//    }
     @Override
     public void onStart() {
         mGoogleApiClient.connect();
@@ -234,7 +252,6 @@ public class HomeFragment extends Fragment implements GoogleMap.OnMarkerClickLis
                 getNearestLocationTask nearestLocationTask = new getNearestLocationTask(getActivity(),googleMap,mLastLocation,HomeFragment.this);
                 nearestLocationTask.execute("http://totnghiep.herokuapp.com/api/nearestAddress");
                 googleMap.setOnMarkerClickListener(HomeFragment.this);
-                address_name.setText("12312312");
             }
         });
     }
@@ -250,11 +267,8 @@ public class HomeFragment extends Fragment implements GoogleMap.OnMarkerClickLis
         address_type.setText("Nhà hàng");
 
         String url ="http://totnghiep.herokuapp.com"+ choose_address.getArImage();
-        new DownloadImageTask(address_picture)
-                .execute("http://java.sogeti.nl/JavaBlog/wp-content/uploads/2009/04/android_icon_256.png");
-
-
-        slideUpDown(hiddenPanel);
+        Picasso.with(getActivity()).load(url).placeholder(R.drawable.loading2).error(R.drawable.no_images).into(address_picture);
+        slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
         return false;
     }
 

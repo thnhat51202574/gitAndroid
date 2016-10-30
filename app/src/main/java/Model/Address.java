@@ -54,6 +54,10 @@ public class Address {
             this.detail = object.getString("description");
         }  else this.detail = "";
 
+        if((object.has("phonenumber")) && (!object.isNull("phonenumber"))) {
+            this.detail = object.getString("phonenumber");
+        }  else this.phonenumber = "";
+
         if((object.has("picture")) && (!object.isNull("picture"))) {
             this.arImage = new ArrayList<String>();
             JSONArray arPicture = object.getJSONArray("picture");
