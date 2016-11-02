@@ -10,11 +10,13 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 
 import Model.Event;
 
@@ -33,36 +35,62 @@ public class EventcustomListview extends ArrayAdapter<Event> {
         this.context = context;
         this.resource = resource;
     }
-
+    static class ViewHolder {
+        TextView name,date1,date2,time_start,date_start,count_member;
+        ImageButton btn1,btn2;
+    }
     @NonNull
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-
-        if(convertView == null) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
+        final ViewHolder h;
+        final Event event = events.get(position);
+        if (convertView == null){
             LayoutInflater layoutInflater = (LayoutInflater) getContext()
                     .getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
-            convertView = layoutInflater.inflate(R.layout.event_layout,null,true);
+            convertView = layoutInflater.inflate(R.layout.event_layout, null, true);
+            h = new ViewHolder();
+            h.date1 = (TextView) convertView.findViewById(R.id.event_date1);
+            h.date2 = (TextView) convertView.findViewById(R.id.event_date2);
+            h.time_start = (TextView) convertView.findViewById(R.id.event_time_start);
+            h.date_start = (TextView) convertView.findViewById(R.id.event_date_start);
+            h.count_member = (TextView) convertView.findViewById(R.id.event_num_member);
+            h.name = (TextView) convertView.findViewById(R.id.event_name);
+            h.btn1 = (ImageButton) convertView.findViewById(R.id.event_edit_btn);
+            h.btn2 = (ImageButton) convertView.findViewById(R.id.event_delete_btn);
+            convertView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(context,"Chi tiết" + event.get_id(),Toast.LENGTH_LONG).show();
+                }
+            });
+            h.btn1.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(context, "Không đồng ý kết bạn với" + event.get_id(), Toast.LENGTH_SHORT).show();
+                }
+            });
+            h.btn2.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(context, "Xóa" + event.get_id(), Toast.LENGTH_SHORT).show();
+                }
+            });
+            convertView.setTag(h);
+        } else {
+            h =(ViewHolder) convertView.getTag();
         }
-        Event event = events.get(position);
-        Calendar c = Calendar.getInstance();
-        c.setTime(event.getEvent_startTime());
+        Date  dateStarttime = event.getEvent_startTime();
+        String Date_inWeek = new SimpleDateFormat("EE").format(dateStarttime);
+        String Date_inMonth = (String) android.text.format.DateFormat.format("dd", dateStarttime);
+        h.date1.setText(Date_inWeek.toUpperCase());
+        h.date2.setText(Date_inMonth);
+        h.time_start.setText(android.text.format.DateFormat.format("HH:mm", dateStarttime));
+        h.date_start.setText(android.text.format.DateFormat.format("dd/MM", dateStarttime));
+        h.count_member.setText(String.valueOf(event.getCountUser()));
+        h.name.setText(event.getEvent_name());
 
-        TextView date1 = (TextView) convertView.findViewById(R.id.event_date1);
-//        date1.setText(c.get(Calendar.DAY_OF_WEEK));
-        TextView date2 = (TextView) convertView.findViewById(R.id.event_date2);
-//        date2.setText(c.get(Calendar.DAY_OF_MONTH));
-        TextView name = (TextView) convertView.findViewById(R.id.event_name);
-        name.setText(event.getEvent_name());
-//        TextView date_start = (TextView) convertView.findViewById(R.id.event_date_start);
-//        date_start.setText(event.getEvent_startTime().toString());
-//        TextView date_end = (TextView) convertView.findViewById(R.id.event_date_end);
-//        date_end.setText(event.getEvent_endTime().toString());
-//        TextView num_member = (TextView) convertView.findViewById(R.id.event_num_member);
-//        num_member.setText(event.getCountUser());
-//        ImageButton edit = (ImageButton) convertView.findViewById(R.id.event_edit_btn);
-//
-//        ImageButton detete = (ImageButton) convertView.findViewById(R.id.event_delete_btn);
 
-        return super.getView(position, convertView, parent);
+        return convertView;
     }
 }

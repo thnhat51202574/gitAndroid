@@ -1,7 +1,11 @@
 package Model;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.TimeZone;
 
 /**
  * Created by 51202_000 on 01/11/2016.
@@ -12,12 +16,15 @@ public class User {
     private Date birthday;
     private ArrayList<User> friend;
 
-    public User(String _id, String name, String firstName, String lastName, Date birthday) {
+
+    public User(String _id, String name, String firstName, String lastName, String birthday) throws ParseException{
         this._id = _id;
         this.name = name;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.birthday = birthday;
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        format.setTimeZone(TimeZone.getTimeZone("Asia/Saigon"));
+        this.birthday = format.parse(birthday);
         this.friend = new ArrayList<>();
     }
 

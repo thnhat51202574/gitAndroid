@@ -8,5 +8,5 @@
     <ListView
         android:id="@+id/list_event"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="321dp" />
 </FrameLayout>

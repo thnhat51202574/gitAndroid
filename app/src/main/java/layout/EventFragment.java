@@ -10,9 +10,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.a51202_000.testbug.EventcustomListview;
 import com.example.a51202_000.testbug.R;
@@ -29,18 +31,13 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import Model.Event;
+import Model.User;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link EventFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link EventFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class EventFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -130,9 +127,47 @@ public class EventFragment extends Fragment {
                 JSONArray arEventJson = object.getJSONArray("events");
                 for (int i = 0; i < arEventJson.length(); i++) {
                     JSONObject eventObject = (JSONObject) arEventJson.getJSONObject(i);
+                    JSONObject userObject = (JSONObject) eventObject.get("created");
+
+                    String User_firstName = "";
+                    String User_lastName = "";
+                    Calendar c = Calendar.getInstance();
+                    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+                    String User_birthday = df.format(c.getTime());
+                    String User_name = "";
+                    String User_id = "";
+                    if((userObject.has("firstName")) && (!userObject.isNull("firstName"))) {
+                        User_firstName = userObject.getString("firstName");
+                    }
+                    if((userObject.has("firstName")) && (!userObject.isNull("firstName"))) {
+                        User_lastName = userObject.getString("firstName");
+                    }
+                    if((userObject.has("birthday")) && (!userObject.isNull("birthday"))) {
+                        User_birthday = userObject.getString("birthday");
+                    }
+                    if((userObject.has("username")) && (!userObject.isNull("username"))) {
+                        User_name= userObject.getString("username");
+                    }
+                    if((userObject.has("_id")) && (!userObject.isNull("_id"))) {
+                        User_id= userObject.getString("_id");
+                    }
+                    User user = new User(
+                            User_id,
+                            User_name,
+                            User_firstName,
+                            User_lastName,
+                            User_birthday);
+                    JSONArray arMemIDJson = eventObject.getJSONArray("arUser");
+                    ArrayList<String> listID = new ArrayList<>();
+                    for (int idx = 0; idx < arMemIDJson.length(); idx++) {
+                        JSONObject UserIDObject = (JSONObject) arMemIDJson.getJSONObject(idx);
+                        listID.add(UserIDObject.getString("_id"));
+                    }
                     events.add(new Event(
                             eventObject.getString("_id"),
                             eventObject.getString("eventname"),
+                            user,
+                            listID,
                             eventObject.getString("starttime"),
                             eventObject.getString("endtime"),
                             eventObject.getString("description")
