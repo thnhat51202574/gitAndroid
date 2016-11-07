@@ -1,9 +1,6 @@
 package com.example.a51202_000.testbug;
 
 import android.support.design.widget.TabLayout;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -19,10 +16,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import android.view.WindowManager;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.Animation;
-import android.view.animation.DecelerateInterpolator;
-import android.view.animation.ScaleAnimation;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,6 +23,7 @@ import java.util.ArrayList;
 
 import layout.EventFragment;
 import layout.HomeFragment;
+import layout.ProfileFragment;
 
 public class MainTabActivity extends AppCompatActivity implements HomeFragment.comuticateParent {
 
@@ -50,6 +44,7 @@ public class MainTabActivity extends AppCompatActivity implements HomeFragment.c
 //    FloatingActionButton fab;
     HomeFragment homeFragment;
     EventFragment eventFragment;
+    ProfileFragment profileFragment;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,10 +60,12 @@ public class MainTabActivity extends AppCompatActivity implements HomeFragment.c
 //        mSectionsPagerAdapter.addPage(new HomeFragment());
         homeFragment = new HomeFragment();
         eventFragment = new EventFragment();
+        profileFragment = new ProfileFragment();
+      //  profileFragment = new ProfileFragment();
         //set frament to each tab
         mSectionsPagerAdapter.addPage(homeFragment);
         mSectionsPagerAdapter.addPage(eventFragment);
-//        mSectionsPagerAdapter.addPage(eventFragment);
+        mSectionsPagerAdapter.addPage(profileFragment);
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
@@ -80,7 +77,7 @@ public class MainTabActivity extends AppCompatActivity implements HomeFragment.c
         tabLayout.getTabAt(1).setIcon(R.drawable.ic_event_note_black_24dp);
 //        tabLayout.getTabAt(2).setIcon(R.drawable.ic_message_black_24dp);
 //        tabLayout.getTabAt(3).setIcon(R.drawable.ic_people_black_24dp);
-//        tabLayout.getTabAt(4).setIcon(R.drawable.ic_person_black_24dp);
+        tabLayout.getTabAt(2).setIcon(R.drawable.ic_person_black_24dp);
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
