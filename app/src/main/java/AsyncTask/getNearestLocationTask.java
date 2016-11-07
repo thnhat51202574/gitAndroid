@@ -2,6 +2,9 @@ package AsyncTask;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
@@ -15,10 +18,24 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONTokener;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.net.URL;
+import Model.Address;
+
+import static android.content.ContentValues.TAG;
+import static android.provider.ContactsContract.CommonDataKinds.Website.URL;
 
 
 /**
@@ -27,14 +44,21 @@ import java.io.IOException;
 
 public class getNearestLocationTask extends AsyncTask<String, Void, String> {
 
-    private double lon,lat;
     Activity ActivityContext;
     GoogleMap googleMap;
+    Location  currentLocation;
     ProgressDialog progressDialog;
+    private OnTaskCompleted listener;
 
-    public getNearestLocationTask(FragmentActivity activity, GoogleMap mMap) {
+    public interface OnTaskCompleted {
+        void getListAddress(HashMap<Marker,Address> result);
+    }
+    public getNearestLocationTask(FragmentActivity activity, GoogleMap mMap, Location location,OnTaskCompleted fragmentContext) {
         this.ActivityContext = activity;
         this.googleMap = mMap;
+        this.currentLocation = location;
+        this.listener = fragmentContext;
+
     }
 
     @Override
@@ -46,33 +70,106 @@ public class getNearestLocationTask extends AsyncTask<String, Void, String> {
     }
 
     @Override
-    protected String doInBackground(String... params) {
-
-        return getNearestLocation(params[0], this.lon, this.lat);
-
+    protected String doInBackground(String... params){
+        try {
+            return getNearestLocation(params[0],this.currentLocation);
+        } catch (IOException ex) {
+            return "Network error!";
+        }
     }
 
     @Override
     protected void onPostExecute(String s) {
+        List<Address> address = new ArrayList<Address>();
+        HashMap<Marker,Address> result = new HashMap<Marker, Address>();
         super.onPostExecute(s);
         try {
+            //json array
             JSONObject object = new JSONObject(s);
-            String test = object.getString("lat");
-            Log.d("TAG", test);
+            JSONArray arAddressJson = object.getJSONArray("addresses");
+            for (int i = 0; i < arAddressJson.length(); i++) {
+                Address address_tmp = new Address((JSONObject) arAddressJson.get(i));
+                address.add(address_tmp);
+//                  draw to map
+                LatLng mylocation = address_tmp.getLocs();
+                MarkerOptions marker = new MarkerOptions().position(mylocation).title(address_tmp.getName());
+                marker.icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons("restaurant",50,50)));
+
+                Marker _marker = googleMap.addMarker(marker);
+                result.put(_marker,address_tmp);
+            }
+            listener.getListAddress(result);
         }
         catch (JSONException e) {
             e.printStackTrace();
         }
-        LatLng mylocation =new LatLng(10.761797,106.666894);
-        MarkerOptions marker = new MarkerOptions().position(mylocation).title("abd");
-        marker.icon(BitmapDescriptorFactory.fromResource(R.drawable.restaurant));
-        googleMap.addMarker(marker);
         if (progressDialog != null) {
             progressDialog.dismiss();
         }
+
     }
 
-    private String getNearestLocation(String param,double latitude, double longitude) {
-        return "{\"lat\":\"106.666894\",\"10.761797\":\"WP\"}";
+    private String getNearestLocation(String urlpath,Location currentLocation) throws IOException{
+        StringBuilder result = new StringBuilder();
+        BufferedReader bufferedReader = null;
+        try {
+            String latitude = String.valueOf(currentLocation.getLatitude());
+            String longtitude = String.valueOf(currentLocation.getLongitude());
+            String distance = "1";
+            urlpath +="?lon="+longtitude+"&lat="+latitude+"&distance=" + distance;
+            URL url = new URL(urlpath);
+            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setReadTimeout(10000);
+            urlConnection.setConnectTimeout(10000);
+            urlConnection.setRequestMethod("GET");
+            urlConnection.setRequestProperty("Content-Type","application/json"); //set header
+            urlConnection.connect();
+            InputStream inputStream = urlConnection.getInputStream();
+            bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                result.append(line).append("\n");
+            }
+        } finally {
+            if(bufferedReader != null)
+                bufferedReader.close();
+        }
+        return result.toString();
+//        return "[\n" +
+//                "    {\n" +
+//                "      \"_id\": \"580e4ec4ed2a54120c924650\",\n" +
+//                "      \"name\": \"Btown - Healthy Drinks & Cakes\",\n" +
+//                "      \"address\": \"68 Út Tịch, P. 4 , Quận Tân Bình , TP. HCM \",\n" +
+//                "      \"locs\": [\n" +
+//                "        106.6586208,\n" +
+//                "        10.7958213\n" +
+//                "      ],\n" +
+//                "      \"rate\": 7.1,\n" +
+//                "      \"type\": 2,\n" +
+//                "      \"__v\": 0,\n" +
+//                "      \"picture\": [\n" +
+//                "        \"/images/foody-mobile-t0sb71vf-jpg-708-635993321789397171.jpg\"\n" +
+//                "      ]\n" +
+//                "    },\n" +
+//                "    {\n" +
+//                "      \"_id\": \"580e4ec4ed2a54120c92464e\",\n" +
+//                "      \"name\": \"Đạt Thành - Hủ Tiếu Nam Vang - Cách Mạng Tháng 8\",\n" +
+//                "      \"address\": \"607 Cách Mạng Tháng 8 , Quận 10 , TP. HCM \",\n" +
+//                "      \"locs\": [\n" +
+//                "        106.667815,\n" +
+//                "        10.784823\n" +
+//                "      ],\n" +
+//                "      \"rate\": 7,\n" +
+//                "      \"type\": 2,\n" +
+//                "      \"__v\": 0,\n" +
+//                "      \"picture\": [\n" +
+//                "        \"/images/foody-mobile-mobile-jpg-411-635767031415006760.jpg\"\n" +
+//                "      ]\n" +
+//                "    }]";
+    }
+    public Bitmap resizeMapIcons(String iconName,int width, int height){
+        Bitmap imageBitmap = BitmapFactory.decodeResource(this.ActivityContext.getResources(),this.ActivityContext.getResources().getIdentifier(iconName, "drawable", this.ActivityContext.getPackageName()));
+        Bitmap resizedBitmap = Bitmap.createScaledBitmap(imageBitmap, width, height, false);
+        return resizedBitmap;
     }
 }
