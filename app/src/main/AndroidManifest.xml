@@ -19,7 +19,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <!--android:name="android.support.multidex.MultiDexApplication"
+        <!--
+            android:name="android.support.multidex.MultiDexApplication"
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
              Note that the API key is linked to the encryption key used to sign the APK.
@@ -53,6 +54,18 @@
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".EditprofileAcitivity"
+            android:label="Sửa thông tin"
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainTabActivity" />
             </intent-filter>
         </activity>
     </application>
