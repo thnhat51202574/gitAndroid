@@ -27,11 +27,12 @@ public class RegisterActivity extends AppCompatActivity {
     private Button btnRegister, btnLogin;
     private ProgressDialog progressDialog;
 
-    private static String RegisterURL = "http://192.168.1.112:3000/api/user";
+    private static String RegisterURL = "http://totnghiep.herokuapp.com/api/user";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getSupportActionBar().hide();
         setContentView(R.layout.activity_register);
 
         edtEmail = (EditText) findViewById(R.id.edtEmailRe);
