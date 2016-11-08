@@ -1,269 +1,192 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/map"
-    tools:context="layout.HomeFragment">
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end|bottom"
-        android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@android:drawable/ic_dialog_email" />
-    <com.sothree.slidinguppanel.SlidingUpPanelLayout xmlns:sothree="http://schemas.android.com/apk/lib/com.example.a51202_00.testbug"
+    <com.sothree.slidinguppanel.SlidingUpPanelLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        xmlns:sothree="http://schemas.android.com/apk/res-auto"
         android:id="@+id/sliding_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="bottom"
+        sothree:umanoPanelHeight="52dp"
+        sothree:umanoShadowHeight="4dp"
+        sothree:umanoParallaxOffset="100dp"
         sothree:umanoDragView="@+id/dragView"
         sothree:umanoOverlay="true"
-        sothree:umanoPanelHeight="68dp"
-        sothree:umanoParalaxOffset="100dp"
-        sothree:umanoShadowHeight="4dp">
+        sothree:umanoScrollableView="@+id/list">
         <!-- TODO: Update blank fragment layout -->
-    <com.google.android.gms.maps.MapView
-        android:id="@+id/mapView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-    <LinearLayout
-        android:id="@+id/dragView"
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:clickable="true"
-        android:focusable="false"
-        android:background="@color/WhiteColor"
-        >
-        <LinearLayout
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/map"
+        tools:context="layout.HomeFragment">
+        <com.google.android.gms.maps.MapView
+            android:id="@+id/mapView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/detailRate"
-                android:background="@drawable/ratetextview_template"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_margin="5dp"
-                android:gravity="center_vertical"
-                android:textColor="@color/WhiteColor"
-                android:textStyle="bold"
-                android:textSize="14sp"
-                android:paddingLeft="10dp"
-                android:text="7.9"
-                />
+            android:layout_height="match_parent" />
+    </FrameLayout>
+        <LinearLayout
+            android:id="@+id/dragView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:clickable="true"
+            android:focusable="false"
+            android:background="@color/WhiteColor"
+            >
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingTop="5dp">
+                android:layout_height="52dp"
+                android:orientation="horizontal">
+
                 <TextView
-                    android:id="@+id/detailname"
-                    android:layout_width="match_parent"
-                    android:layout_height="20dp"
-                    android:layout_weight="1"
-                    android:textColor="@android:color/black"
+                    android:id="@+id/detailRate"
+                    android:background="@drawable/ratetextview_template"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_margin="5dp"
+                    android:gravity="center_vertical"
+                    android:textColor="@color/WhiteColor"
                     android:textStyle="bold"
-                    android:gravity="top"
+                    android:textSize="14sp"
                     android:paddingLeft="10dp"
-                    android:text="Đây là tên nhà hàng"
-                    android:textSize="14sp" />
-                <TextView
-                    android:id="@+id/nameAddress"
+                    android:text="7.9"
+                    />
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="20dp"
-                    android:layout_weight="1"
-                    android:textColor="@android:color/holo_green_dark"
-                    android:gravity="top"
-                    android:paddingLeft="10dp"
-                    android:text="40/1 Thủ Khoa Huân,P8, Tân Bình"
-                    android:textSize="14sp" />
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingTop="5dp">
+                    <TextView
+                        android:id="@+id/detailname"
+                        android:layout_width="match_parent"
+                        android:layout_height="20dp"
+                        android:layout_weight="1"
+                        android:textColor="@android:color/black"
+                        android:textStyle="bold"
+                        android:gravity="top"
+                        android:paddingLeft="10dp"
+                        android:text="Đây là tên nhà hàng"
+                        android:textSize="14sp" />
+                    <TextView
+                        android:id="@+id/nameAddress"
+                        android:layout_width="match_parent"
+                        android:layout_height="20dp"
+                        android:layout_weight="1"
+                        android:textColor="@android:color/holo_green_dark"
+                        android:gravity="top"
+                        android:paddingLeft="10dp"
+                        android:text="40/1 Thủ Khoa Huân,P8, Tân Bình"
+                        android:textSize="14sp" />
+                </LinearLayout>
             </LinearLayout>
-        </LinearLayout>
-        <LinearLayout
-            android:layout_gravity="top"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <ImageView
+            <LinearLayout
                 android:layout_gravity="top"
-                android:id="@+id/picture"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:src="@drawable/testbg"
-                android:layout_marginBottom="5dp"
-                />
+                android:layout_height="wrap_content">
+                <ImageView
+                    android:layout_gravity="top"
+                    android:id="@+id/picture"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:src="@drawable/testbg"
+                    android:layout_marginBottom="5dp"
+                    />
+            </LinearLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="4dp"
+                android:layout_marginLeft="4dp">
+                <ImageView
+                    android:id="@+id/phonelabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:src="@drawable/ic_phone_detail"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true" />
+
+                <TextView
+                    android:text="01667191726"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="30dp"
+                    android:layout_marginRight="50dp"
+                    android:layout_marginTop="7dp"
+                    android:id="@+id/detailphone"
+                    android:textSize="14dp"
+                    android:textColor="@android:color/background_dark"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="4dp"
+                android:layout_marginLeft="4dp">
+                <ImageView
+                    android:id="@+id/typelabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:src="@drawable/ic_type"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true" />
+
+                <TextView
+                    android:text="Nhà hàng"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="30dp"
+                    android:layout_marginRight="50dp"
+                    android:layout_marginTop="7dp"
+                    android:id="@+id/detailtype"
+                    android:textSize="14dp"
+                    android:textColor="@android:color/background_dark"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="4dp"
+                android:layout_marginLeft="4dp">
+                <ImageView
+                    android:id="@+id/contentlabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:src="@drawable/ic_description"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true" />
+
+                <TextView
+                    android:text="Nhà hàng số 1 tại Việt Nam Nhà hàng số 1 tại Việt Nam Nhà hàng số 1 tại Việt Nam"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="30dp"
+                    android:layout_marginRight="50dp"
+                    android:layout_marginTop="7dp"
+                    android:id="@+id/detailContent"
+                    android:textSize="14dp"
+                    android:textColor="@android:color/background_dark"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="4dp"
+                android:layout_marginLeft="4dp">
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Ẩn"
+                    android:id="@+id/downbtn" />
+            </RelativeLayout>
         </LinearLayout>
-        <!--<RelativeLayout-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_marginRight="4dp"-->
-            <!--android:layout_marginLeft="4dp">-->
-            <!--<ImageView-->
-                <!--android:id="@+id/namelabel"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="30dp"-->
-                <!--android:src="@drawable/ic_name_blue"-->
-                <!--android:layout_alignParentLeft="true"-->
-                <!--android:layout_alignParentStart="true" />-->
-
-            <!--<TextView-->
-                <!--android:text="ĐÂY LÀ TÊN NHÀ HÀNG"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_marginLeft="30dp"-->
-                <!--android:layout_marginRight="50dp"-->
-                <!--android:layout_marginTop="7dp"-->
-                <!--android:layout_alignRight="@+id/namelabel"-->
-                <!--android:id="@+id/detailname"-->
-                <!--android:textSize="15dp"-->
-                <!--android:textColor="@android:color/background_dark"-->
-                <!--android:textStyle="bold"-->
-                <!--android:layout_centerVertical="true"-->
-                <!--android:layout_alignParentRight="true"-->
-                <!--android:layout_alignParentEnd="true" />-->
-            <!--<TextView-->
-                <!--android:layout_below="@+id/backgroundaddress"-->
-                <!--android:text="7.9"-->
-                <!--android:layout_width="35dp"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_alignRight="@+id/nameAddress"-->
-                <!--android:layout_marginRight="10dp"-->
-                <!--android:id="@+id/detailRate"-->
-                <!--android:textSize="15dp"-->
-                <!--android:paddingLeft="6dp"-->
-                <!--android:textColor="@color/WhiteColor"-->
-                <!--android:textStyle="bold"-->
-                <!--android:background="@drawable/ratetextview_template"-->
-                <!--android:layout_centerVertical="true"-->
-                <!--android:layout_alignParentRight="true"-->
-                <!--android:layout_alignParentEnd="true" />-->
-        <!--</RelativeLayout>-->
-        <!--<RelativeLayout-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_marginRight="4dp"-->
-            <!--android:layout_marginLeft="4dp">-->
-            <!--<ImageView-->
-                <!--android:id="@+id/addresslabel"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="30dp"-->
-                <!--android:src="@drawable/ic_address"-->
-                <!--android:layout_alignParentLeft="true"-->
-                <!--android:layout_alignParentStart="true" />-->
-
-            <!--<TextView-->
-                <!--android:text="40/1 Thủ Khoa Huân,P8, Tân Bình"-->
-                <!--android:layout_below="@+id/detailaddress"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_marginLeft="30dp"-->
-                <!--android:layout_marginRight="50dp"-->
-                <!--android:layout_marginTop="7dp"-->
-                <!--android:layout_alignRight="@+id/namelabel"-->
-                <!--android:id="@+id/nameAddress"-->
-                <!--android:textSize="14dp"-->
-                <!--android:textColor="@android:color/background_dark"-->
-                <!--android:layout_centerVertical="true"-->
-                <!--android:layout_alignParentRight="true"-->
-                <!--android:layout_alignParentEnd="true" />-->
-        <!--</RelativeLayout>-->
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="4dp"
-            android:layout_marginLeft="4dp">
-            <ImageView
-                android:id="@+id/phonelabel"
-                android:layout_width="wrap_content"
-                android:layout_height="30dp"
-                android:src="@drawable/ic_phone_detail"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true" />
-
-            <TextView
-                android:text="01667191726"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="30dp"
-                android:layout_marginRight="50dp"
-                android:layout_marginTop="7dp"
-                android:id="@+id/detailphone"
-                android:textSize="14dp"
-                android:textColor="@android:color/background_dark"
-                android:layout_centerVertical="true"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true" />
-        </RelativeLayout>
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="4dp"
-            android:layout_marginLeft="4dp">
-            <ImageView
-                android:id="@+id/typelabel"
-                android:layout_width="wrap_content"
-                android:layout_height="30dp"
-                android:src="@drawable/ic_type"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true" />
-
-            <TextView
-                android:text="Nhà hàng"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="30dp"
-                android:layout_marginRight="50dp"
-                android:layout_marginTop="7dp"
-                android:id="@+id/detailtype"
-                android:textSize="14dp"
-                android:textColor="@android:color/background_dark"
-                android:layout_centerVertical="true"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true" />
-        </RelativeLayout>
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="4dp"
-            android:layout_marginLeft="4dp">
-            <ImageView
-                android:id="@+id/contentlabel"
-                android:layout_width="wrap_content"
-                android:layout_height="30dp"
-                android:src="@drawable/ic_description"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true" />
-
-            <TextView
-                android:text="Nhà hàng số 1 tại Việt Nam Nhà hàng số 1 tại Việt Nam Nhà hàng số 1 tại Việt Nam"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="30dp"
-                android:layout_marginRight="50dp"
-                android:layout_marginTop="7dp"
-                android:id="@+id/detailContent"
-                android:textSize="14dp"
-                android:textColor="@android:color/background_dark"
-                android:layout_centerVertical="true"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true" />
-        </RelativeLayout>
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="4dp"
-            android:layout_marginLeft="4dp">
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Ẩn"
-                android:id="@+id/downbtn" />
-        </RelativeLayout>
-
-    </LinearLayout>
     </com.sothree.slidinguppanel.SlidingUpPanelLayout>
 
-</FrameLayout>
+

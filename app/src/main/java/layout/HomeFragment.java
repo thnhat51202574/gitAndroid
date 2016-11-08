@@ -76,10 +76,10 @@ public class HomeFragment extends Fragment implements GoogleMap.OnMarkerClickLis
     private HashMap<Marker,Address> listAddressbyMaker = new HashMap<Marker,Address>();
     private SlidingUpPanelLayout slidingLayout;
 
-//    detail address
+    //    detail address
     ImageView address_picture;
     TextView address_name, address_rate, address_position, address_phone, address_type, address_detail;
-//    end detail
+    //    end detail
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -101,13 +101,7 @@ public class HomeFragment extends Fragment implements GoogleMap.OnMarkerClickLis
         }
 //        // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_home, container, false);
-        FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(getActivity(),"ON MAP",Toast.LENGTH_LONG).show();
-            }
-        });
+
 //        btn1 = (Button) rootView.findViewById(R.id.button);
 //        btn1.setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -162,25 +156,7 @@ public class HomeFragment extends Fragment implements GoogleMap.OnMarkerClickLis
 
         return rootView;
     }
-//    private boolean isPanelShown() {
-//        return hiddenPanel.getVisibility() == View.VISIBLE;
-//    }
-//    public void slideUpDown(final View view) {
-//        if (!isPanelShown()) {
-//            // Show the panel
-//            Animation bottomUp = AnimationUtils.loadAnimation(getActivity(),
-//                    R.anim.bottom_up);
-//            hiddenPanel.startAnimation(bottomUp);
-//            hiddenPanel.setVisibility(View.VISIBLE);
-//        }
-//        else {
-//            // Hide the Panel
-//            Animation bottomDown = AnimationUtils.loadAnimation(getActivity(),
-//                    R.anim.bottom_down);
-//            hiddenPanel.startAnimation(bottomDown);
-//            hiddenPanel.setVisibility(View.GONE);
-//        }
-//    }
+
     @Override
     public void onStart() {
         mGoogleApiClient.connect();
@@ -198,12 +174,14 @@ public class HomeFragment extends Fragment implements GoogleMap.OnMarkerClickLis
     @Override
     public void onResume() {
         mGoogleApiClient.connect();
+        slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
         super.onResume();
         mMapView.onResume();
     }
 
     @Override
     public void onPause() {
+        slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
         super.onPause();
         mMapView.onPause();
     }
@@ -221,6 +199,7 @@ public class HomeFragment extends Fragment implements GoogleMap.OnMarkerClickLis
     }
     @Override
     public void onConnected(Bundle bundle) {
+        slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
         Log.d("Connect", "Connected ");
         Log.d("onConnected", Boolean.toString(mGoogleApiClient.isConnected()));
         mMapView.getMapAsync(new OnMapReadyCallback() {
