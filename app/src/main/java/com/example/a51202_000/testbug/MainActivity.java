@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -23,6 +24,8 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import globalClass.GlobalUserClass;
+
 public class MainActivity extends AppCompatActivity {
     private Button btnLogin, btnRegister;
     private EditText edtEmail, edtPass;
@@ -34,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     EditText name;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
 
         btnLogin.getBackground().setAlpha(100);
         btnRegister.getBackground().setAlpha(95);
-
+		final GlobalUserClass globalUser = (GlobalUserClass) getApplicationContext();
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -101,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
             try{
                 if(checkLogin(result) == true) {
                     Toast.makeText(getApplicationContext(), "login sucess", Toast.LENGTH_LONG).show();
-                    Intent intent = new Intent(MainActivity.this, MainTabActivity.class);
+                    Intent intent = new Intent(MainActivity.this, MainTabActivity.class);					
                     startActivity(intent);
                 }
                 else
