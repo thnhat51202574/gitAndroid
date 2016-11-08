@@ -30,9 +30,9 @@ public class MainActivity extends AppCompatActivity {
     private Button btnLogin, btnRegister;
     private EditText edtEmail, edtPass;
     private ProgressDialog progressDialog;
+    GlobalUserClass globalUser;
 
-
-    private static String loginURL = "http://192.168.1.112:3000/api/user";
+    private static String loginURL = "http://totnghiep.herokuapp.com/api/login/user";
 
 
 
@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
 
         btnLogin.getBackground().setAlpha(100);
         btnRegister.getBackground().setAlpha(95);
-		final GlobalUserClass globalUser = (GlobalUserClass) getApplicationContext();
+		globalUser = (GlobalUserClass) getApplicationContext();
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -105,6 +105,10 @@ public class MainActivity extends AppCompatActivity {
             try{
                 if(checkLogin(result) == true) {
                     Toast.makeText(getApplicationContext(), "login sucess", Toast.LENGTH_LONG).show();
+                    JSONObject resultJSON= new JSONObject(result.toString());
+                    JSONObject user = resultJSON.getJSONObject("user");
+                    String _id = user.getString("_id");
+                    globalUser.set_id(_id);
                     Intent intent = new Intent(MainActivity.this, MainTabActivity.class);					
                     startActivity(intent);
                 }
