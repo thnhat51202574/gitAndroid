@@ -90,7 +90,7 @@ public class EventFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView =inflater.inflate(R.layout.fragment_event, container, false);
         lv_event = (ListView) rootView.findViewById(R.id.list_event);
-        new ReadEventJSON().execute("http://192.168.1.114:3000/api/event");
+        new ReadEventJSON().execute("http://totnghiep.herokuapp.com/api/event");
         return rootView;
     }
     public void receiveMess(String Text) {

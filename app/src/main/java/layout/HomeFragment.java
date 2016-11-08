@@ -76,10 +76,10 @@ public class HomeFragment extends Fragment implements GoogleMap.OnMarkerClickLis
     private HashMap<Marker,Address> listAddressbyMaker = new HashMap<Marker,Address>();
     private SlidingUpPanelLayout slidingLayout;
 
-//    detail address
+    //    detail address
     ImageView address_picture;
     TextView address_name, address_rate, address_position, address_phone, address_type, address_detail;
-//    end detail
+    //    end detail
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -162,7 +162,7 @@ public class HomeFragment extends Fragment implements GoogleMap.OnMarkerClickLis
 
         return rootView;
     }
-//    private boolean isPanelShown() {
+    //    private boolean isPanelShown() {
 //        return hiddenPanel.getVisibility() == View.VISIBLE;
 //    }
 //    public void slideUpDown(final View view) {
