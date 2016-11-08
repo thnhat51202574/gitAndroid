@@ -1,8 +1,9 @@
 package com.example.a51202_000.testbug;
 
-import android.support.design.widget.TabLayout;
+import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -18,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.view.WindowManager;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.DecelerateInterpolator;
@@ -28,7 +30,9 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 import layout.EventFragment;
+import layout.FriendFrament;
 import layout.HomeFragment;
+import layout.ProfileFragment;
 
 public class MainTabActivity extends AppCompatActivity implements HomeFragment.comuticateParent {
 
@@ -46,14 +50,18 @@ public class MainTabActivity extends AppCompatActivity implements HomeFragment.c
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
-//    FloatingActionButton fab;
+    FloatingActionButton fab;
     HomeFragment homeFragment;
     EventFragment eventFragment;
+    ProfileFragment profileFragment;
+    FriendFrament frendFragment;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_tab);
-
+//        screen holdon
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+//        end holdon
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         // Create the adapter that will return a fragment for each of the three
@@ -62,27 +70,31 @@ public class MainTabActivity extends AppCompatActivity implements HomeFragment.c
 //        mSectionsPagerAdapter.addPage(new HomeFragment());
         homeFragment = new HomeFragment();
         eventFragment = new EventFragment();
+        profileFragment = new ProfileFragment();
+        frendFragment = new FriendFrament();
         //set frament to each tab
         mSectionsPagerAdapter.addPage(homeFragment);
         mSectionsPagerAdapter.addPage(eventFragment);
-//        mSectionsPagerAdapter.addPage(eventFragment);
+        mSectionsPagerAdapter.addPage(frendFragment);
+        mSectionsPagerAdapter.addPage(profileFragment);
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
-//        fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
+
         tabLayout.getTabAt(0).setIcon(R.drawable.ic_home_black_24dp);
         tabLayout.getTabAt(1).setIcon(R.drawable.ic_event_note_black_24dp);
 //        tabLayout.getTabAt(2).setIcon(R.drawable.ic_message_black_24dp);
-//        tabLayout.getTabAt(3).setIcon(R.drawable.ic_people_black_24dp);
-//        tabLayout.getTabAt(4).setIcon(R.drawable.ic_person_black_24dp);
+        tabLayout.getTabAt(2).setIcon(R.drawable.ic_people_black_24dp);
+        tabLayout.getTabAt(3).setIcon(R.drawable.ic_person_black_24dp);
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 mViewPager.setCurrentItem(tab.getPosition());
-//                animateFab(tab.getPosition());
+                animateFab(tab.getPosition());
             }
 
             @Override
@@ -97,59 +109,66 @@ public class MainTabActivity extends AppCompatActivity implements HomeFragment.c
         });
 
 
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//               Snackbar.make(view,Integer.toString(mViewPager.getCurrentItem()), Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//                switch (mViewPager.getCurrentItem()) {
-//                    case 0:
-//                        homeFragment.receiveMess("ĐÂY LA TIN NHẮN TỪ HOME ACTIVITY");
-//                        break;
-//                    case 1:
-//                        eventFragment.receiveMess("ĐÂY LA TIN NHẮN TỪ EVENT ACTIVITY");
-//                        break;
-//
-//                }
-//            }
-//        });
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+               Snackbar.make(view,Integer.toString(mViewPager.getCurrentItem()), Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+                switch (mViewPager.getCurrentItem()) {
+                    case 0:
+                        homeFragment.receiveMess("ĐÂY LA TIN NHẮN TỪ HOME ACTIVITY");
+                        break;
+                    case 1:
+                        eventFragment.receiveMess("ĐÂY LA TIN NHẮN TỪ EVENT ACTIVITY");
+                        break;
+                    case 2:
+                        break;
+                    case 3:
+                        Intent intent = new Intent(MainTabActivity.this, EditprofileAcitivity.class);
+                        startActivity(intent);
+                        break;
+
+                }
+            }
+        });
 
     }
 
-//    protected void animateFab(final int position) {
-//        if(position != 0) {
-//            fab.clearAnimation();
-//            // Scale down animation
-//            ScaleAnimation shrink = new ScaleAnimation(1f, 0.2f, 1f, 0.2f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-//            shrink.setDuration(150);     // animation duration in milliseconds
-//            shrink.setInterpolator(new DecelerateInterpolator());
-//            shrink.setAnimationListener(new Animation.AnimationListener() {
-//                @Override
-//                public void onAnimationStart(Animation animation) {
-//
-//                }
-//
-//                @Override
-//                public void onAnimationEnd(Animation animation) {
-//                    // Change FAB color and icon
-//                    fab.setBackgroundTintList(ContextCompat.getColorStateList(getApplicationContext(), R.color.hindfocus));
-//                    fab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_home_black_24dp));
-//
-//                    // Scale up animation
-//                    ScaleAnimation expand = new ScaleAnimation(0.2f, 1f, 0.2f, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-//                    expand.setDuration(100);     // animation duration in milliseconds
-//                    expand.setInterpolator(new AccelerateInterpolator());
-//                    fab.startAnimation(expand);
-//                }
-//
-//                @Override
-//                public void onAnimationRepeat(Animation animation) {
-//
-//                }
-//            });
-//            fab.startAnimation(shrink);
-//        }
-//    }
+    protected void animateFab(final int position) {
+        final int[] colorIntArray = {R.color.hindfocus,R.color.btnbackground,R.color.orange,R.color.orange};
+        final int[] iconIntArray = {R.drawable.ic_home_black_24dp, R.drawable.fab_ic_add, R.drawable.fab_ic_add,R.drawable.fab_ic_edit};
+
+            fab.clearAnimation();
+            // Scale down animation
+            ScaleAnimation shrink = new ScaleAnimation(1f, 0.2f, 1f, 0.2f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+            shrink.setDuration(150);     // animation duration in milliseconds
+            shrink.setInterpolator(new DecelerateInterpolator());
+            shrink.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    // Change FAB color and icon
+                    fab.setBackgroundTintList(ContextCompat.getColorStateList(getApplicationContext(), colorIntArray[position]));
+                    fab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), iconIntArray[position]));
+
+                    // Scale up animation
+                    ScaleAnimation expand = new ScaleAnimation(0.2f, 1f, 0.2f, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+                    expand.setDuration(100);     // animation duration in milliseconds
+                    expand.setInterpolator(new AccelerateInterpolator());
+                    fab.startAnimation(expand);
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+            fab.startAnimation(shrink);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

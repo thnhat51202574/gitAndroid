@@ -7,4 +7,13 @@
     <color name="btntextbackground">#ffffff</color>
     <color name="WhiteColor">#ffffff</color>
     <color name="hindfocus">#FF00FAFA</color>
+    <color name="colorGreen">#01f91e</color>
+    <color name="colorGreenBackground">#045b0e</color>
+    <color name="colorYellow">#f9e801</color>
+    <color name="detaillabelcolor">#8ad5ec</color>
+    <color name="black">#000000</color>
+    <color name="itemtitle">#0b66c3</color>
+    <color name="datecolor">#757575</color>
+    <color name="orange">#ff5e00</color>
+
 </resources>
