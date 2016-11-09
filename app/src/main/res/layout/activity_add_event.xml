@@ -10,4 +10,94 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.a51202_000.testbug.AddEventActivity">
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:weightSum="1">
+
+                <TextView
+                    android:textAlignment="center"
+                    android:text="Tên chuyến đi"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/textView2"
+                    android:layout_toLeftOf="@+id/editText2"
+                    android:layout_marginRight="35dp"
+                    android:layout_marginEnd="35dp" />
+
+                <EditText
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPersonName"
+                    android:text="Name"
+                    android:ems="10"
+                    android:id="@+id/editText2"/>
+
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:weightSum="1">
+
+                <TextView
+                    android:textAlignment="center"
+                    android:text="Ngày bắt đầu"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/textView2"
+                    android:layout_toLeftOf="@+id/editText2"
+                    android:layout_marginRight="35dp"
+                    android:layout_marginEnd="35dp" />
+                <EditText
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPersonName"
+                    android:hint="Chọn ngày"
+                    android:ems="10"
+                    android:focusable="false"
+                    android:id="@+id/DateTimePickerEditText"/>
+
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:weightSum="1">
+
+                <TextView
+                    android:textAlignment="center"
+                    android:text="Giờ khởi hành"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/timelabel"
+                    android:layout_marginRight="35dp"
+                    android:layout_marginEnd="35dp" />
+                <EditText
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPersonName"
+                    android:hint="Chọn giờ"
+                    android:ems="10"
+                    android:focusable="false"
+                    android:id="@+id/TimePickerEditText"/>
+
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
 </RelativeLayout>

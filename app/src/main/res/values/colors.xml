@@ -15,5 +15,6 @@
     <color name="itemtitle">#0b66c3</color>
     <color name="datecolor">#757575</color>
     <color name="orange">#ff5e00</color>
+    <color name="DateTimeBackground">#02702e</color>
 
 </resources>
