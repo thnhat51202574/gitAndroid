@@ -75,7 +75,7 @@ public class HomeFragment extends Fragment implements GoogleMap.OnMarkerClickLis
     private Button upbtn, downbtn;
     private HashMap<Marker,Address> listAddressbyMaker = new HashMap<Marker,Address>();
     private SlidingUpPanelLayout slidingLayout;
-
+    private View image_progressbar;
     //    detail address
     ImageView address_picture;
     TextView address_name, address_rate, address_position, address_phone, address_type, address_detail;
@@ -123,7 +123,7 @@ public class HomeFragment extends Fragment implements GoogleMap.OnMarkerClickLis
         } catch (Exception e) {
             e.printStackTrace();
         }
-
+        image_progressbar = (View) rootView.findViewById(R.id.image_progressbar);
         address_picture =(ImageView) rootView.findViewById(R.id.picture);
         address_name = (TextView) rootView.findViewById(R.id.detailname);
         address_rate = (TextView) rootView.findViewById(R.id.detailRate);
@@ -221,6 +221,7 @@ public class HomeFragment extends Fragment implements GoogleMap.OnMarkerClickLis
 
     @Override
     public boolean onMarkerClick(Marker marker){
+        image_progressbar.setVisibility(View.VISIBLE);
         final GlobalUserClass globalUser = (GlobalUserClass) getActivity().getApplicationContext();
         Toast.makeText(getActivity(),globalUser.get_id(),Toast.LENGTH_LONG).show();
         Address choose_address = this.listAddressbyMaker.get(marker);
@@ -232,7 +233,16 @@ public class HomeFragment extends Fragment implements GoogleMap.OnMarkerClickLis
         address_type.setText("Nhà hàng");
 
         String url ="http://totnghiep.herokuapp.com"+ choose_address.getArImage();
-        Picasso.with(getActivity()).load(url).placeholder(R.drawable.loading2).error(R.drawable.no_images).into(address_picture);
+        Picasso.with(getActivity()).load(url).error(R.drawable.no_images).into(address_picture, new com.squareup.picasso.Callback() {
+            @Override
+            public void onSuccess() {
+                image_progressbar.setVisibility(View.GONE);
+            }
+            @Override
+            public void onError() {
+                image_progressbar.setVisibility(View.GONE);
+            }
+        });
         slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
         return false;
     }
