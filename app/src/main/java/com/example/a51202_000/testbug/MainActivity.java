@@ -1,13 +1,18 @@
 package com.example.a51202_000.testbug;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.annotation.TargetApi;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -29,9 +34,9 @@ import globalClass.GlobalUserClass;
 public class MainActivity extends AppCompatActivity {
     private Button btnLogin, btnRegister;
     private EditText edtEmail, edtPass;
-    private ProgressDialog progressDialog;
     GlobalUserClass globalUser;
-
+    private View mLoginFormView;
+    private View mProgressView;
     private static String loginURL = "http://totnghiep.herokuapp.com/api/login/user";
 
 
@@ -44,11 +49,13 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().hide();
         setContentView(R.layout.activity_main);
 
+        mProgressView = (View) findViewById(R.id.login_progress);
+        mLoginFormView = (View) findViewById(R.id.mLogin_FormView);
+
         btnLogin = (Button) findViewById(R.id.btnLoginLg);
         btnRegister = (Button) findViewById(R.id.btnRegisterLg);
         edtEmail = (EditText) findViewById(R.id.edtNameLg);
         edtPass = (EditText) findViewById(R.id.edtPasswordLg);
-
         btnLogin.getBackground().setAlpha(100);
         btnRegister.getBackground().setAlpha(95);
 		globalUser = (GlobalUserClass) getApplicationContext();
@@ -74,15 +81,49 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Shows the progress UI and hides the login form.
+     */
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+    private void showProgress(final boolean show) {
+        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
+        // for very easy animations. If available, use these APIs to fade-in
+        // the progress spinner.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+
+            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+            mLoginFormView.animate().setDuration(shortAnimTime).alpha(
+                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+                }
+            });
+
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            mProgressView.animate().setDuration(shortAnimTime).alpha(
+                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+                }
+            });
+        } else {
+            // The ViewPropertyAnimator APIs are not available, so simply show
+            // and hide the relevant UI components.
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+        }
+    }
+
     private class connectServerLg extends AsyncTask<String, Void, String> {
 
 
         @Override
         protected void onPreExecute() {
+            showProgress(true);
             super.onPreExecute();
-            progressDialog = new ProgressDialog(MainActivity.this);
-            progressDialog.setMessage(" Kiểm tra đăng nhập... ");
-            progressDialog.show();
         }
 
         @Override
@@ -99,9 +140,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-            if (progressDialog != null) {
-                progressDialog.dismiss();
-            }
+            showProgress(false);
             try{
                 if(checkLogin(result) == true) {
                     Toast.makeText(getApplicationContext(), "login sucess", Toast.LENGTH_LONG).show();
