@@ -131,6 +131,7 @@ public class MainTabActivity extends AppCompatActivity implements HomeFragment.c
                     case 3:
                         Intent intent = new Intent(MainTabActivity.this, EditprofileAcitivity.class);
                         startActivity(intent);
+                        overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
                         break;
 
                 }
@@ -174,7 +175,11 @@ public class MainTabActivity extends AppCompatActivity implements HomeFragment.c
             });
             fab.startAnimation(shrink);
     }
-
+    @Override
+    public void onBackPressed() {
+        // Disable going back to the MainActivity
+        moveTaskToBack(true);
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
