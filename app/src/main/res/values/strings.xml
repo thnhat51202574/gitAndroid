@@ -25,4 +25,6 @@
 
     <!-- Strings related to login -->
     <string name="LoginStatus">Đang đăng nhập vui lòng đợi</string>
+
+    <string name="hello_world">Hello world!</string>
 </resources>
