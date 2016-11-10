@@ -33,6 +33,8 @@ public class RegisterActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().hide();
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
         setContentView(R.layout.activity_register);
 
         edtEmail = (EditText) findViewById(R.id.edtEmailRe);

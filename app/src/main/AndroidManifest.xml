@@ -54,6 +54,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name="com.example.a51202_000.testbug.LoginActivity" android:theme="@style/AppTheme.Dark" />
         <activity
             android:name=".MainTabActivity"
             android:label="@string/title_activity_main_tab"
@@ -70,6 +71,7 @@
             android:theme="@style/EditUserActionbarTheme">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
+
                 <category android:name="android.intent.category.DEFAULT" />
 
                 <meta-data
@@ -82,7 +84,9 @@
             android:label="Thêm chuyến đi"
             android:theme="@style/AddEventActionbar">
             <action android:name="android.intent.action.SEND" />
+
             <category android:name="android.intent.category.DEFAULT" />
+
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainTabActivity" />
