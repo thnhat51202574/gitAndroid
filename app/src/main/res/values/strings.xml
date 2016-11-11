@@ -21,4 +21,10 @@
     <string name="action_anchor_disable">Disable Anchor Point</string>
     <string name="hello"><![CDATA[<b>The Awesome Sliding Up Panel</b><br/> Brought to you by<br/><a href="http://umanoapp.com">http://umanoapp.com</a>]]></string>
     <string name="follow"><![CDATA[Follow us<br/>on <a href="http://twitter.com/umanoapp">Twitter</a>]]></string>
+    <string name="title_activity_add_event">Thêm chuyến đi</string>
+
+    <!-- Strings related to login -->
+    <string name="LoginStatus">Đang đăng nhập vui lòng đợi</string>
+
+    <string name="hello_world">Hello world!</string>
 </resources>

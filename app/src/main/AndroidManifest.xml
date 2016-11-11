@@ -11,6 +11,11 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- To auto-complete the email text field in the login form with the user's emails -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.READ_PROFILE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+
     <application
         android:name="globalClass.GlobalUserClass"
         android:allowBackup="true"
@@ -35,19 +40,20 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/title_activity_maps">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <activity android:name=".MapsActivity">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
         <activity android:name=".RegisterActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".MainTabActivity"
@@ -55,20 +61,35 @@
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
         <activity
             android:name=".EditprofileAcitivity"
             android:label="Sửa thông tin"
-            >
+            android:theme="@style/EditUserActionbarTheme">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+
+                <meta-data
+                    android:name="android.support.PARENT_ACTIVITY"
+                    android:value=".MainTabActivity" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".AddEventActivity"
+            android:label="Thêm chuyến đi"
+            android:theme="@style/AddEventActionbar">
+            <action android:name="android.intent.action.SEND" />
+
+            <category android:name="android.intent.category.DEFAULT" />
+
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainTabActivity" />
-            </intent-filter>
         </activity>
     </application>
 

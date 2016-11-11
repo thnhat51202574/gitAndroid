@@ -29,6 +29,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import globalClass.GlobalUserClass;
 import layout.EventFragment;
 import layout.FriendFrament;
 import layout.HomeFragment;
@@ -54,11 +55,13 @@ public class MainTabActivity extends AppCompatActivity implements HomeFragment.c
     HomeFragment homeFragment;
     EventFragment eventFragment;
     ProfileFragment profileFragment;
-    FriendFrament frendFragment;
+    FriendFrament friendFragment;
+    GlobalUserClass globalUser;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_tab);
+        globalUser = (GlobalUserClass) getApplicationContext();
 //        screen holdon
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 //        end holdon
@@ -71,11 +74,11 @@ public class MainTabActivity extends AppCompatActivity implements HomeFragment.c
         homeFragment = new HomeFragment();
         eventFragment = new EventFragment();
         profileFragment = new ProfileFragment();
-        frendFragment = new FriendFrament();
+        friendFragment = new FriendFrament();
         //set frament to each tab
         mSectionsPagerAdapter.addPage(homeFragment);
         mSectionsPagerAdapter.addPage(eventFragment);
-        mSectionsPagerAdapter.addPage(frendFragment);
+        mSectionsPagerAdapter.addPage(friendFragment);
         mSectionsPagerAdapter.addPage(profileFragment);
 
         // Set up the ViewPager with the sections adapter.
@@ -119,13 +122,16 @@ public class MainTabActivity extends AppCompatActivity implements HomeFragment.c
                         homeFragment.receiveMess("ĐÂY LA TIN NHẮN TỪ HOME ACTIVITY");
                         break;
                     case 1:
-                        eventFragment.receiveMess("ĐÂY LA TIN NHẮN TỪ EVENT ACTIVITY");
+                        Intent intent_add_event = new Intent(MainTabActivity.this, AddEventActivity.class);
+                        intent_add_event.putExtra("userid",globalUser.get_id());
+                        startActivity(intent_add_event);
                         break;
                     case 2:
                         break;
                     case 3:
                         Intent intent = new Intent(MainTabActivity.this, EditprofileAcitivity.class);
                         startActivity(intent);
+                        overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
                         break;
 
                 }
@@ -169,7 +175,11 @@ public class MainTabActivity extends AppCompatActivity implements HomeFragment.c
             });
             fab.startAnimation(shrink);
     }
-
+    @Override
+    public void onBackPressed() {
+        // Disable going back to the MainActivity
+        moveTaskToBack(true);
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.

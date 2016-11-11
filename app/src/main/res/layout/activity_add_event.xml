@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_add_event"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.example.a51202_000.testbug.AddEventActivity">
+
+    <ScrollView
+
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:weightSum="1">
+
+                <TextView
+                    android:textAlignment="center"
+                    android:text="Tên chuyến đi"
+                    android:gravity="left"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/textView12"
+                    android:layout_marginRight="35dp"
+                    android:layout_marginEnd="35dp" />
+
+                <EditText
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPersonName"
+                    android:hint="Name"
+                    android:gravity="left"
+                    android:ems="10"
+                    android:id="@+id/editText2"/>
+
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity="left"
+                android:weightSum="1">
+
+                <TextView
+                    android:textAlignment="center"
+                    android:text="Ngày bắt đầu"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/textView2"
+                    android:layout_toLeftOf="@+id/editText2"
+                    android:layout_marginRight="35dp"
+                    android:layout_marginEnd="35dp" />
+                <EditText
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPersonName"
+                    android:hint="Chọn ngày"
+                    android:ems="10"
+                    android:focusable="false"
+                    android:id="@+id/DateTimePickerEditText"/>
+
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:weightSum="1">
+
+                <TextView
+                    android:textAlignment="center"
+                    android:text="Giờ khởi hành"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/timelabel"
+                    android:layout_marginRight="35dp"
+                    android:layout_marginEnd="35dp" />
+                <EditText
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPersonName"
+                    android:hint="Chọn giờ"
+                    android:ems="10"
+                    android:focusable="false"
+                    android:id="@+id/TimePickerEditText"/>
+
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity=""
+                android:weightSum="1">
+
+                <TextView
+                    android:textAlignment="center"
+                    android:text="Điểm đi"
+                    android:layout_gravity="left|center"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="35dp"
+                    android:layout_marginEnd="35dp" />
+                <EditText
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPersonName"
+                    android:hint="Điểm đi"
+                    android:ems="10"
+                    android:focusable="false"
+                    android:id="@+id/StartAddress"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity=""
+                android:weightSum="1">
+
+                <TextView
+                    android:textAlignment="center"
+                    android:text="Điểm đến"
+                    android:layout_gravity="left|center"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="35dp"
+                    android:layout_marginEnd="35dp" />
+                <EditText
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPersonName"
+                    android:hint="Điểm đến"
+                    android:focusable="false"
+                    android:ems="10"
+                    android:id="@+id/EndtAddress"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="top"
+                android:weightSum="1">
+
+                <TextView
+                    android:textAlignment="center"
+                    android:text="Mô tả"
+                    android:layout_gravity="left|center"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                />
+                <EditText
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="top"
+                    android:inputType="textMultiLine"
+                    android:ems="10"
+                    android:lines="5"
+                    android:hint="Nhập mô tả"
+                    android:id="@+id/EvetnDescription"/>
+
+            </LinearLayout>
+            <LinearLayout
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:weightSum="1">
+
+                <at.markushi.ui.CircleButton
+                    android:id="@+id/OkBtnAdd"
+                    android:layout_width="64dip"
+                    android:layout_height="64dip"
+                    app:cb_color="#99CC00"
+                    android:src="@drawable/add_event_ic_tick"
+                    app:cb_pressedRingWidth="8dip" />
+                <at.markushi.ui.CircleButton
+                    android:id="@+id/CancelBtnAdd"
+                    android:layout_width="64dip"
+                    android:layout_height="64dip"
+                    app:cb_color="@color/primary_darker"
+                    android:src="@drawable/add_event_ic_cancel"
+                    app:cb_pressedRingWidth="8dip" />
+                </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</RelativeLayout>
