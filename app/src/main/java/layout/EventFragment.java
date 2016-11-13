@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -34,6 +35,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.logging.Handler;
 
 import Model.Event;
 import Model.User;
@@ -41,9 +43,7 @@ import Model.User;
 public class EventFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
+    private SwipeRefreshLayout swipeContainer;
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
@@ -52,7 +52,7 @@ public class EventFragment extends Fragment {
     private Button btnHide;
     private TextView textView;
     private ListView lv_event;
-
+    ProgressDialog progressDialog;
     public EventFragment() {
         // Required empty public constructor
     }
@@ -69,8 +69,6 @@ public class EventFragment extends Fragment {
     public static EventFragment newInstance(String param1, String param2) {
         EventFragment fragment = new EventFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -78,10 +76,6 @@ public class EventFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
@@ -89,23 +83,46 @@ public class EventFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView =inflater.inflate(R.layout.fragment_event, container, false);
+
+        swipeContainer = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeContainer);
+
         lv_event = (ListView) rootView.findViewById(R.id.list_event);
-        new ReadEventJSON().execute("http://totnghiep.herokuapp.com/api/event");
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refreshListEvent();
+            }
+        });
+        swipeContainer.setColorSchemeResources(
+                android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
+
+        //load event
+        progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setMessage("Đang tải dữ liệu....");
+        progressDialog.show();
+
+        new ReadEventJSON().execute("http://totnghiep.herokuapp.com/api/event/");
         return rootView;
     }
+
+    private void refreshListEvent() {
+        new ReadEventJSON().execute("http://totnghiep.herokuapp.com/api/event/");
+        swipeContainer.setRefreshing(false);
+    }
+
+
     public void receiveMess(String Text) {
         textView.setText(Text);
     }
 
     class ReadEventJSON extends AsyncTask<String, Integer,String> {
-        ProgressDialog progressDialog;
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            progressDialog = new ProgressDialog(getActivity());
-            progressDialog.setMessage("Đang tải dữ liệu....");
-            progressDialog.show();
         }
 
         @Override
