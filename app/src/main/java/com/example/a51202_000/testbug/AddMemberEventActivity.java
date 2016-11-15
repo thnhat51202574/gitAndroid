@@ -1,18 +1,10 @@
-package layout;
+package com.example.a51202_000.testbug;
 
-import android.content.Context;
-import android.net.Uri;
 import android.os.AsyncTask;
+import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ListView;
-
-import com.example.a51202_000.testbug.EventcustomListview;
-import com.example.a51202_000.testbug.FriendcustomListView;
-import com.example.a51202_000.testbug.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -29,58 +21,18 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-import Model.Event;
 import Model.User;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link FriendFrament.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link FriendFrament#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class FriendFrament extends Fragment {
-
-    private OnFragmentInteractionListener mListener;
-    private ListView friends_lv;
-
-    public FriendFrament() {
-    }
-    public static FriendFrament newInstance(String param1, String param2) {
-        FriendFrament fragment = new FriendFrament();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
-        return fragment;
-    }
-
+public class AddMemberEventActivity extends AppCompatActivity {
+    private ListView list_frient_search;
+    private EditText searchEdittext;
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-        }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-
-        View rootView = inflater.inflate(R.layout.fragment_friend_frament, container, false);
-        friends_lv = (ListView) rootView.findViewById(R.id.list_frient);
+        setContentView(R.layout.activity_add_member_event);
+        list_frient_search = (ListView) findViewById(R.id.list_frient_search);
+        searchEdittext = (EditText) findViewById(R.id.searchNameInput);
         new ReadFriendJSON().execute("http://totnghiep.herokuapp.com/api/user/57f374a398cf132bd49b6483");
-        return rootView;
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
-
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
     }
     class ReadFriendJSON extends AsyncTask<String, Integer,String> {
 
@@ -149,9 +101,9 @@ public class FriendFrament extends Fragment {
                 e.printStackTrace();
             }
 
-            FriendcustomListView adapter = new FriendcustomListView(
-                    getActivity().getApplicationContext(), R.layout.friend_layout,friends);
-            friends_lv.setAdapter(adapter);
+            MemberEventCustomListview adapter
+                    = new MemberEventCustomListview(getApplicationContext(), R.layout.friend_in_event_add,friends);
+            list_frient_search.setAdapter(adapter);
 
         }
 

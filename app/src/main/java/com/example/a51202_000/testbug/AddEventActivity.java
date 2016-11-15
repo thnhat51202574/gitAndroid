@@ -258,6 +258,13 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
                 }
             }
         });
+        findViewById(R.id.Addmemberbtn).setOnClickListener(new View.OnClickListener() {
+            public  void onClick(View v) {
+                Intent intent = new Intent(AddEventActivity.this, AddMemberEventActivity.class);
+                startActivity(intent);
+                overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+            }
+        });
     }
 
     private void ShowFragment(RouteMapEventFragment routeMapEventFragment) {

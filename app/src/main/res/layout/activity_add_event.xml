@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/activity_add_event"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -144,6 +144,7 @@
                             android:layout_height="wrap_content"
                             android:padding="5dp"
                             android:src="@drawable/event_startaddress" />
+
                         <EditText
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -171,7 +172,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:inputType="textPersonName"
-                            android:hint="Chọn điểm đén"
+                            android:hint="Chọn điểm đến"
                             android:focusable="false"
                             android:ems="10"
                             android:textSize="15sp"
@@ -211,6 +212,20 @@
                     android:textSize="15sp"
                     android:id="@+id/EvetnDescription"/>
 
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity="top"
+                android:weightSum="1">
+                <at.markushi.ui.CircleButton
+                    android:id="@+id/Addmemberbtn"
+                    android:layout_width="54dip"
+                    android:layout_height="54dip"
+                    app:cb_color="#18ba4f"
+                    android:src="@drawable/event_add_member"
+                    app:cb_pressedRingWidth="8dip" />
             </LinearLayout>
             <LinearLayout
                 xmlns:android="http://schemas.android.com/apk/res/android"

@@ -39,8 +39,7 @@
 
         <activity
             android:name=".MainActivity"
-            android:label="@string/title_activity_maps">
-        </activity>
+            android:label="@string/title_activity_maps"></activity>
         <activity android:name=".MapsActivity">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
@@ -48,8 +47,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".RegisterActivity">
-        </activity>
+        <activity android:name=".RegisterActivity"></activity>
         <activity
             android:name=".MainTabActivity"
             android:label="@string/title_activity_main_tab"
@@ -90,6 +88,16 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainTabActivity" />
+        </activity>
+        <activity android:name=".AddMemberEventActivity"
+            android:label="Thêm thành viên"
+            android:theme="@style/AddEventActionbar">
+            <action android:name="android.intent.action.SEND" />
+
+            <category android:name="android.intent.category.DEFAULT" />
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".AddEventActivity" />
         </activity>
     </application>
 
