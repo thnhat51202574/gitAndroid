@@ -118,4 +118,8 @@
     </style>
 
     <!--endlogin register-->
+    <style name="WeGoCheckbox" parent="Theme.AppCompat.Light">
+        <item name="colorControlNormal">@color/indigo</item>
+        <item name="colorControlActivated">@color/GreenColor</item>
+    </style>
 </resources>
