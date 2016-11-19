@@ -1,14 +1,40 @@
 package layout;
 
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.content.ActivityNotFoundException;
+import android.content.CursorLoader;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.database.Cursor;
+import android.widget.Toast;
 
+import com.dd.CircularProgressButton;
 import com.example.a51202_000.testbug.R;
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.Ion;
+import com.koushikdutta.ion.ProgressCallback;
+import com.koushikdutta.ion.Response;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.util.concurrent.Future;
+
+import static android.app.Activity.RESULT_OK;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -27,9 +53,11 @@ public class ProfileFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-
+    private ImageView avatar;
     private OnFragmentInteractionListener mListener;
-
+    private CircularProgressButton chooseImgBtn;
+    private int CHOOSE_FILE_IMAGE = 1;
+    String path;
     public ProfileFragment() {
         // Required empty public constructor
     }
@@ -65,7 +93,98 @@ public class ProfileFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_user_profile, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_user_profile, container, false);
+        avatar = (ImageView) rootView.findViewById(R.id.avatar);
+        chooseImgBtn  = (CircularProgressButton) rootView.findViewById(R.id.circularButton1);
+        chooseImgBtn.setIndeterminateProgressMode(true);
+        avatar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                chooseImgBtn.setVisibility(View.VISIBLE);
+            }
+        });
+        chooseImgBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                chooseImgBtn .setProgress(0);
+                pickImage(CHOOSE_FILE_IMAGE);
+            }
+        });
+        return rootView;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode != RESULT_OK) {
+            return;
+        }
+        if (requestCode == CHOOSE_FILE_IMAGE) {
+                final Bundle extras = data.getExtras();
+            if (extras != null) {
+                //Get image
+
+                final Bitmap newProfilePic = extras.getParcelable("data");
+                Uri imageURI = getImageUri(getActivity().getApplicationContext(),newProfilePic);
+                path = getPathFromURI(imageURI);
+                File f = new File(path);
+                Future uploading = Ion.with(getActivity().getApplicationContext())
+                        .load("http://192.168.1.113:3000/upload")
+                        .progress(new ProgressCallback() {@Override
+                            public void onProgress(long downloaded, long total) {
+                                int percent =(int)(downloaded*100/total);
+                                Log.d("TAG","" + percent);
+                                chooseImgBtn .setProgress(percent-1);
+                            }
+                        })
+                        .setMultipartParameter("_id", "123123132")
+                        .setMultipartFile("image", f)
+                        .asString()
+                        .withResponse()
+                        .setCallback(new FutureCallback<Response<String>>() {
+                            @Override
+                            public void onCompleted(Exception e, Response<String> result) {
+                                    avatar.setImageBitmap(newProfilePic);
+                                    chooseImgBtn .setProgress(100);
+                                    Handler handler = new Handler();
+                                    handler.postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            chooseImgBtn.setVisibility(View.GONE);
+                                            chooseImgBtn .setProgress(0);
+                                        }
+                                    }, 1000);
+                            }
+                        });
+
+            }
+        }
+    }
+
+    public Uri getImageUri(Context inContext, Bitmap inImage) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
+        return Uri.parse(path);
+    }
+
+    public String getPathFromURI(Uri uri) {
+        Cursor cursor = getActivity().getContentResolver().query(uri, null, null, null, null);
+        cursor.moveToFirst();
+        int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+        return cursor.getString(idx);
+    }
+    public void pickImage(int req_code) {
+        Intent intent = new Intent(Intent.ACTION_PICK,
+                MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+        intent.setType("image/*");
+        intent.putExtra("crop", "true");
+        intent.putExtra("scale", true);
+        intent.putExtra("outputX", 256);
+        intent.putExtra("outputY", 256);
+        intent.putExtra("aspectX", 1);
+        intent.putExtra("aspectY", 1);
+        intent.putExtra("return-data", true);
+        startActivityForResult(intent, req_code);
     }
 
     // TODO: Rename method, update argument and hook method into UI event
