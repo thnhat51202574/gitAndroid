@@ -223,7 +223,7 @@ public class HomeFragment extends Fragment implements GoogleMap.OnMarkerClickLis
     public boolean onMarkerClick(Marker marker){
         image_progressbar.setVisibility(View.VISIBLE);
         final GlobalUserClass globalUser = (GlobalUserClass) getActivity().getApplicationContext();
-        Toast.makeText(getActivity(),globalUser.get_id(),Toast.LENGTH_LONG).show();
+        Toast.makeText(getActivity(),globalUser.getCur_user().get_id(),Toast.LENGTH_LONG).show();
         Address choose_address = this.listAddressbyMaker.get(marker);
         address_name.setText(choose_address.getName());
         address_rate.setText(String.valueOf(choose_address.getRate()));
