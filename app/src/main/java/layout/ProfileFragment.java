@@ -6,8 +6,11 @@ import android.graphics.Bitmap;
 import android.content.ActivityNotFoundException;
 import android.content.CursorLoader;
 import android.content.Intent;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
@@ -18,6 +21,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.database.Cursor;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dd.CircularProgressButton;
@@ -34,6 +38,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.concurrent.Future;
 
+import globalClass.GlobalUserClass;
+
 import static android.app.Activity.RESULT_OK;
 
 /**
@@ -49,14 +55,16 @@ public class ProfileFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-
+    GlobalUserClass globalUser;
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
     private ImageView avatar;
+    private TextView userName;
     private OnFragmentInteractionListener mListener;
     private CircularProgressButton chooseImgBtn;
     private int CHOOSE_FILE_IMAGE = 1;
+    private String SERVER_PATH ="http://totnghiep.herokuapp.com";
     String path;
     public ProfileFragment() {
         // Required empty public constructor
@@ -95,7 +103,11 @@ public class ProfileFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_user_profile, container, false);
         avatar = (ImageView) rootView.findViewById(R.id.avatar);
+        userName = (TextView) rootView.findViewById(R.id.userName);
+
+        globalUser = (GlobalUserClass) getActivity().getApplicationContext();
         chooseImgBtn  = (CircularProgressButton) rootView.findViewById(R.id.circularButton1);
+        setContentToView();
         chooseImgBtn.setIndeterminateProgressMode(true);
         avatar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -110,7 +122,19 @@ public class ProfileFragment extends Fragment {
                 pickImage(CHOOSE_FILE_IMAGE);
             }
         });
+
         return rootView;
+    }
+
+    private void setContentToView() {
+        Ion.with(avatar)
+//                .placeholder(R.drawable.placeholder_image)
+//                .error(R.drawable.error_image)
+//                .animateLoad(spinAnimation)
+//                .animateIn(fadeInAnimation)
+                .centerCrop()
+                .load(SERVER_PATH + globalUser.getCur_user().getAvatarLink());
+        userName.setText(globalUser.getCur_user().getName());
     }
 
     @Override
@@ -126,9 +150,9 @@ public class ProfileFragment extends Fragment {
                 final Bitmap newProfilePic = extras.getParcelable("data");
                 Uri imageURI = getImageUri(getActivity().getApplicationContext(),newProfilePic);
                 path = getPathFromURI(imageURI);
-                File f = new File(path);
+                final File f = new File(path);
                 Future uploading = Ion.with(getActivity().getApplicationContext())
-                        .load("http://192.168.1.113:3000/upload")
+                        .load("http://totnghiep.herokuapp.com/upload")
                         .progress(new ProgressCallback() {@Override
                             public void onProgress(long downloaded, long total) {
                                 int percent =(int)(downloaded*100/total);
@@ -136,7 +160,7 @@ public class ProfileFragment extends Fragment {
                                 chooseImgBtn .setProgress(percent-1);
                             }
                         })
-                        .setMultipartParameter("_id", "123123132")
+                        .setMultipartParameter("_id", globalUser.getCur_user().get_id())
                         .setMultipartFile("image", f)
                         .asString()
                         .withResponse()
@@ -145,6 +169,7 @@ public class ProfileFragment extends Fragment {
                             public void onCompleted(Exception e, Response<String> result) {
                                     avatar.setImageBitmap(newProfilePic);
                                     chooseImgBtn .setProgress(100);
+                                    deleteImage(f);
                                     Handler handler = new Handler();
                                     handler.postDelayed(new Runnable() {
                                         @Override
@@ -156,6 +181,15 @@ public class ProfileFragment extends Fragment {
                             }
                         });
 
+            }
+        }
+    }
+    public void deleteImage(File fdelete) {
+        if (fdelete.exists()) {
+            if (fdelete.delete()) {
+                Log.e("-->", "file Deleted :");
+            } else {
+                Log.e("-->", "file not Deleted :");
             }
         }
     }
