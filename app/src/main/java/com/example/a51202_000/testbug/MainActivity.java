@@ -26,7 +26,9 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.ParseException;
 
+import Model.User;
 import globalClass.GlobalUserClass;
 
 public class MainActivity extends AppCompatActivity {
@@ -186,9 +188,8 @@ public class MainActivity extends AppCompatActivity {
                     JSONObject resultJSON= new JSONObject(result.toString());
                     JSONObject user = resultJSON.getJSONObject("user");
                     String _id = user.getString("_id");
-                    globalUser.set_id(_id);
-                    globalUser.setUsername(edtEmail.getText().toString());
-                    globalUser.setPassword(edtPass.getText().toString());
+                    String userName = user.getString("username");
+                    globalUser.setCur_user(new User(user));
                     Intent intent = new Intent(MainActivity.this, MainTabActivity.class);					
                     startActivity(intent);
                     new android.os.Handler().postDelayed(
@@ -206,9 +207,9 @@ public class MainActivity extends AppCompatActivity {
             }catch(JSONException ex)
             {
                 ex.printStackTrace();
-//                Toast.makeText(getApplicationContext(),"login fail ex", Toast.LENGTH_LONG).show();
+            } catch (ParseException e) {
+                e.printStackTrace();
             }
-
         }
 
         private String SetData(String urlPath) throws IOException, JSONException {

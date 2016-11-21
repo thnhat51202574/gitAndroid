@@ -30,4 +30,8 @@
     <color name="base">#AAAAAA</color>
     <color name="iron">#CCCCCC</color>
     <color name="white">#FFFFFF</color>
+    <color name="GreenColor">#01f91e</color>
+
+    <color name="indigo">#3f51b5</color>
+
 </resources>
