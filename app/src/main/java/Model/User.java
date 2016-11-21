@@ -8,7 +8,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -17,44 +16,55 @@ import java.util.TimeZone;
  */
 
 public class User {
-    private String _id, name,firstName,lastName,phone,avatarLink;
+    private String _id, name,fullName,phone,avatarLink,address;
     private Date birthday;
     private ArrayList<String> friends_id;
-
-    public User(String _id, String name) throws ParseException{
-        this._id = _id;
-        this.name = name;
-        this.firstName = "";
-        this.lastName = "";
-        String birthday_ = "1970-01-01T00:00:00Z";
-        DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-        format.setTimeZone(TimeZone.getTimeZone("Asia/Saigon"));
-        this.birthday = format.parse(birthday_);
-        this.friends_id = new ArrayList<>();
-    }
-
-    public User(String _id, String name, String firstName, String lastName, String birthday) throws ParseException{
-        this._id = _id;
-        this.name = name;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-        format.setTimeZone(TimeZone.getTimeZone("Asia/Saigon"));
-        this.birthday = format.parse(birthday);
-        this.friends_id = new ArrayList<>();
-    }
-
-    public User(String _id, String name, String firstName, String lastName, Date birthday, ArrayList<String> friend) {
-        this._id = _id;
-        this.name = name;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.birthday = birthday;
-        this.friends_id = friend;
-    }
+    private ArrayList<User> friends_list;
 
     public String getAvatarLink() {
         return avatarLink;
+    }
+
+    public ArrayList<User> getFriends_list() {
+        return friends_list;
+    }
+
+    public void setFriends_list(ArrayList<User> friends_list) {
+
+        this.friends_list = friends_list;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public void setAvatarLink(String avatarLink) {
+        this.avatarLink = avatarLink;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public void setFriends_id(ArrayList<String> friends_id) {
+        this.friends_id = friends_id;
+    }
+
+    public String getPhone() {
+
+        return phone;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public ArrayList<String> getFriends_id() {
+        return friends_id;
     }
 
     public User(JSONObject object) throws JSONException, ParseException {
@@ -66,13 +76,13 @@ public class User {
             this.name = object.getString("username");
         } else {this.name ="";}
 
-        if((object.has("lastName")) && (!object.isNull("lastName"))){
-            this.lastName = object.getString("lastName");
-        } else {this.lastName ="";}
+        if((object.has("fullName")) && (!object.isNull("fullName"))){
+            this.fullName = object.getString("fullName");
+        } else {this.fullName ="";}
 
-        if((object.has("firstName")) && (!object.isNull("firstName"))){
-            this.firstName = object.getString("firstName");
-        } else {this.firstName ="";}
+        if((object.has("address")) && (!object.isNull("address"))){
+            this.address = object.getString("address");
+        } else {this.address ="";}
 
         if((object.has("phone")) && (!object.isNull("phone"))){
             this.phone = object.getString("phone");
@@ -97,13 +107,15 @@ public class User {
 
         if((object.has("friends")) && (!object.isNull("friends"))){
             JSONArray arrayFriend = object.getJSONArray("friends");
+            ArrayList<String> listFriendId = new ArrayList<>();
             for (int i = 0; i < arrayFriend.length(); i++) {
-                String friend_id = arrayFriend.getString(i);
-
-                friends_id.add(friend_id);
+                String friend_id_ = arrayFriend.getString(i);
+                listFriendId.add(friend_id_);
             }
+            this.friends_id = listFriendId;
         } else {this.friends_id = new ArrayList<>();}
 
+        this.friends_list = new ArrayList<>();
     }
 
     public void set_id(String _id) {
@@ -114,13 +126,6 @@ public class User {
         this.name = name;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
 
     public void setBirthday(Date birthday) {
         this.birthday = birthday;
@@ -139,13 +144,10 @@ public class User {
         return name;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public String getFullName() {
+        return fullName;
     }
 
-    public String getLastName() {
-        return lastName;
-    }
 
     public Date getBirthday() {
         return birthday;
