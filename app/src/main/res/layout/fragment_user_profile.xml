@@ -16,7 +16,7 @@
                 android:layout_width="150dp"
                 android:layout_height="150dp"
                 android:layout_gravity="center"
-                android:id="@+id/avatar"
+                android:id="@+id/imgAvatar"
                 android:src="@drawable/avatar"
                 android:scaleType="centerCrop"/>
 
@@ -29,7 +29,7 @@
                 android:layout_marginBottom="5dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/textView" />
+                android:id="@+id/txtUserNameFg" />
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -57,7 +57,7 @@
                         android:layout_marginLeft="30dp"
                         android:layout_marginRight="50dp"
                         android:layout_marginTop="7dp"
-                        android:id="@+id/nameAddress"
+                        android:id="@+id/txtUserNameLoginFg"
                         android:textSize="14dp"
                         android:textColor="@android:color/background_dark"
                         android:layout_centerVertical="true"
@@ -87,7 +87,7 @@
                         android:layout_marginLeft="30dp"
                         android:layout_marginRight="50dp"
                         android:layout_marginTop="7dp"
-                        android:id="@+id/nameAddress"
+                        android:id="@+id/txtPhoneFg"
                         android:textSize="14dp"
                         android:textColor="@android:color/background_dark"
                         android:layout_centerVertical="true"
@@ -116,7 +116,7 @@
                         android:layout_marginLeft="30dp"
                         android:layout_marginRight="50dp"
                         android:layout_marginTop="7dp"
-                        android:id="@+id/birthday"
+                        android:id="@+id/txtBirthdayFg"
                         android:textSize="14dp"
                         android:textColor="@android:color/background_dark"
                         android:layout_centerVertical="true"
@@ -145,7 +145,7 @@
                         android:layout_marginLeft="30dp"
                         android:layout_marginRight="50dp"
                         android:layout_marginTop="7dp"
-                        android:id="@+id/address"
+                        android:id="@+id/txtAddressFg"
                         android:textSize="14dp"
                         android:textColor="@android:color/background_dark"
                         android:layout_centerVertical="true"
