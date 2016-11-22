@@ -88,14 +88,7 @@ public class AddMemberEventActivity extends AppCompatActivity {
                     if((userObject.has("_id")) && (!userObject.isNull("_id"))) {
                         User_id= userObject.getString("_id");
                     }
-                    User user = new User(
-                            User_id,
-                            User_name,
-                            User_fullName,
-                            User_address,
-                            User_phone,
-                            User_birthday);
-
+                    User user = new User(userObject);
                     friends.add(user);
                 }
 

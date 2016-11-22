@@ -122,6 +122,7 @@ public class ProfileFragment extends Fragment {
     }
 
     private void setContentToView() {
+        String Link = SERVER_PATH + globalUser.getCur_user().getAvatarLink();
         Ion.with(avatar)
 //                .placeholder(R.drawable.placeholder_image)
 //                .error(R.drawable.error_image)
@@ -166,6 +167,8 @@ public class ProfileFragment extends Fragment {
                         .setCallback(new FutureCallback<Response<String>>() {
                             @Override
                             public void onCompleted(Exception e, Response<String> result) {
+                                    Ion.getDefault(getActivity().getApplicationContext()).getCache().clear();
+                                    Ion.getDefault(getActivity().getApplicationContext()).getBitmapCache().clear();
                                     avatar.setImageBitmap(newProfilePic);
                                     chooseImgBtn .setProgress(100);
                                     deleteImage(f);

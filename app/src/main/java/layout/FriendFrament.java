@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import Model.User;
+import globalClass.GlobalUserClass;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -41,7 +42,7 @@ public class FriendFrament extends Fragment {
 
     private OnFragmentInteractionListener mListener;
     private ListView friends_lv;
-
+    GlobalUserClass globalUser;
     public FriendFrament() {
     }
     public static FriendFrament newInstance(String param1, String param2) {
@@ -64,7 +65,8 @@ public class FriendFrament extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_friend_frament, container, false);
         friends_lv = (ListView) rootView.findViewById(R.id.list_frient);
-        new ReadFriendJSON().execute("http://totnghiep.herokuapp.com/api/user/57f374a398cf132bd49b6483");
+        globalUser = (GlobalUserClass) getActivity().getApplicationContext();
+        new ReadFriendJSON().execute("http://totnghiep.herokuapp.com/api/user/"+globalUser.getCur_user().get_id());
         return rootView;
     }
 
@@ -106,44 +108,10 @@ public class FriendFrament extends Fragment {
                 JSONArray arFriend = userObject_.getJSONArray("friends");
                 for (int i = 0; i < arFriend.length(); i++) {
                     JSONObject userObject = arFriend.getJSONObject(i);
-
-                    String User_fullName = "";
-                    Calendar c = Calendar.getInstance();
-                    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-                    String User_birthday = df.format(c.getTime());
-                    String User_name = "";
-                    String User_id = "";
-                    String User_phone = "";
-                    String User_address = "";
-                    if((userObject.has("fullName")) && (!userObject.isNull("fullName"))) {
-                        User_fullName = userObject.getString("fullName");
-                    }
-                    if((userObject.has("address")) && (!userObject.isNull("address"))) {
-                        User_address = userObject.getString("address");
-                    }
-                    if((userObject.has("phone")) && (!userObject.isNull("phone"))) {
-                        User_phone = userObject.getString("phone");
-                    }
-                    if((userObject.has("birthday")) && (!userObject.isNull("birthday"))) {
-                        User_birthday = userObject.getString("birthday");
-                    }
-                    if((userObject.has("username")) && (!userObject.isNull("username"))) {
-                        User_name= userObject.getString("username");
-                    }
-                    if((userObject.has("_id")) && (!userObject.isNull("_id"))) {
-                        User_id= userObject.getString("_id");
-                    }
-                    User user = new User(
-                            User_id,
-                            User_name,
-                            User_fullName,
-                            User_address,
-                            User_phone,
-                            User_birthday);
-
+                    User user = new User(userObject);
                     friends.add(user);
                 }
-
+                globalUser.getCur_user().setFriends_list(friends);
             }
             catch (JSONException e) {
                 e.printStackTrace();

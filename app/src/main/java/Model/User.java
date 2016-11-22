@@ -16,47 +16,55 @@ import java.util.TimeZone;
  */
 
 public class User {
-    private String _id, name,fullName,address,phone,avatarLink;
+    private String _id, name,fullName,phone,avatarLink,address;
     private Date birthday;
     private ArrayList<String> friends_id;
-
-    public User(String _id, String name) throws ParseException{
-        this._id = _id;
-        this.name = name;
-        this.fullName = "";
-        this.address= "";
-        this.phone ="";
-        String birthday_ = "1970-01-01T00:00:00Z";
-        DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-        format.setTimeZone(TimeZone.getTimeZone("Asia/Saigon"));
-        this.birthday = format.parse(birthday_);
-        this.friends_id = new ArrayList<>();
-    }
-
-    public User(String _id, String name, String fullName,String address,String phone, String birthday) throws ParseException{
-        this._id = _id;
-        this.name = name;
-        this.fullName = fullName;
-        this.address = address;
-        this.phone = phone;
-        DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-        format.setTimeZone(TimeZone.getTimeZone("Asia/Saigon"));
-        this.birthday = format.parse(birthday);
-        this.friends_id = new ArrayList<>();
-    }
-
-    public User(String _id, String name, String fullName,String address, String phone, Date birthday, ArrayList<String> friend) {
-        this._id = _id;
-        this.name = name;
-        this.fullName = fullName;
-        this.phone = phone;
-        this.birthday = birthday;
-        this.address = address;
-        this.friends_id = friend;
-    }
+    private ArrayList<User> friends_list;
 
     public String getAvatarLink() {
         return avatarLink;
+    }
+
+    public ArrayList<User> getFriends_list() {
+        return friends_list;
+    }
+
+    public void setFriends_list(ArrayList<User> friends_list) {
+
+        this.friends_list = friends_list;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public void setAvatarLink(String avatarLink) {
+        this.avatarLink = avatarLink;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public void setFriends_id(ArrayList<String> friends_id) {
+        this.friends_id = friends_id;
+    }
+
+    public String getPhone() {
+
+        return phone;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public ArrayList<String> getFriends_id() {
+        return friends_id;
     }
 
     public User(JSONObject object) throws JSONException, ParseException {
@@ -99,13 +107,15 @@ public class User {
 
         if((object.has("friends")) && (!object.isNull("friends"))){
             JSONArray arrayFriend = object.getJSONArray("friends");
-            String newFriend_id = "";
+            ArrayList<String> listFriendId = new ArrayList<>();
             for (int i = 0; i < arrayFriend.length(); i++) {
-                newFriend_id = arrayFriend.getString(i);
-                friends_id.add(newFriend_id);
+                String friend_id_ = arrayFriend.getString(i);
+                listFriendId.add(friend_id_);
             }
+            this.friends_id = listFriendId;
         } else {this.friends_id = new ArrayList<>();}
 
+        this.friends_list = new ArrayList<>();
     }
 
     public void set_id(String _id) {
@@ -115,19 +125,6 @@ public class User {
     public void setName(String name) {
         this.name = name;
     }
-
-    public void setAddress(String address){
-        this.address = address;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
     public void setBirthday(Date birthday) {
         this.birthday = birthday;
     }
@@ -147,14 +144,6 @@ public class User {
 
     public String getFullName() {
         return fullName;
-    }
-
-    public String getPhone(){
-        return phone;
-    }
-
-    public String getAddress(){
-        return address;
     }
 
     public Date getBirthday() {

@@ -45,6 +45,7 @@ import java.sql.Time;
 import java.util.Calendar;
 import java.util.TimeZone;
 
+import globalClass.GlobalUserClass;
 import layout.FriendFrament;
 import layout.HomeFragment;
 import layout.RouteMapEventFragment;
@@ -56,6 +57,7 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
     private DatePicker datePicker;
     private Calendar calendar;
     private ImageView mapViewDemo;
+    GlobalUserClass globalUser;
     private EditText DateStart, TimeStart, DateReturn, TimeReturn;
     private EditText StartAddress, EndAddress, nameEvent;
     private String from_Date, to_Date, from_Time, to_Time;
@@ -71,10 +73,9 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_event);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        Intent intent = getIntent();
-        String id = intent.getStringExtra("userid");
+        globalUser = (GlobalUserClass) getApplicationContext();
         AddEventURL = "http://totnghiep.herokuapp.com/api/event";
-        Toast.makeText(getApplicationContext(),id,Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(),globalUser.getCur_user().get_id(),Toast.LENGTH_LONG).show();
 
         mapViewDemo = (ImageView) findViewById(R.id.mapViewDemo);
         nameEvent = (EditText) findViewById(R.id.NameEvent);
@@ -473,7 +474,7 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
                 JSONObject dataInsert = new JSONObject();
                 //create JSONdata to send to server
                 dataInsert.put("eventname",nameEvent.getText());
-                dataInsert.put("createID","5813608be7287400117ff6a5");
+                dataInsert.put("createID",globalUser.getCur_user().get_id());
                 dataInsert.put("starttime",from_Date+from_Time);
                 dataInsert.put("endtime",to_Date+to_Time);
                 //txtLoginView.setText(urlPath);
