@@ -145,35 +145,7 @@ public class EventFragment extends Fragment {
                 for (int i = 0; i < arEventJson.length(); i++) {
                     JSONObject eventObject = (JSONObject) arEventJson.getJSONObject(i);
                     JSONObject userObject = (JSONObject) eventObject.get("created");
-
-                    String User_firstName = "";
-                    String User_lastName = "";
-                    Calendar c = Calendar.getInstance();
-                    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-                    String User_birthday = df.format(c.getTime());
-                    String User_name = "";
-                    String User_id = "";
-                    if((userObject.has("firstName")) && (!userObject.isNull("firstName"))) {
-                        User_firstName = userObject.getString("firstName");
-                    }
-                    if((userObject.has("firstName")) && (!userObject.isNull("firstName"))) {
-                        User_lastName = userObject.getString("firstName");
-                    }
-                    if((userObject.has("birthday")) && (!userObject.isNull("birthday"))) {
-                        User_birthday = userObject.getString("birthday");
-                    }
-                    if((userObject.has("username")) && (!userObject.isNull("username"))) {
-                        User_name= userObject.getString("username");
-                    }
-                    if((userObject.has("_id")) && (!userObject.isNull("_id"))) {
-                        User_id= userObject.getString("_id");
-                    }
-                    User user = new User(
-                            User_id,
-                            User_name,
-                            User_firstName,
-                            User_lastName,
-                            User_birthday);
+                    User user = new User(userObject);
                     JSONArray arMemIDJson = eventObject.getJSONArray("arUser");
                     ArrayList<String> listID = new ArrayList<>();
                     for (int idx = 0; idx < arMemIDJson.length(); idx++) {
