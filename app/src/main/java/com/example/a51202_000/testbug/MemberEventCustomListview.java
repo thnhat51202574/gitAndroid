@@ -59,7 +59,7 @@ public class MemberEventCustomListview extends ArrayAdapter<User> {
         } else {
             h =(ViewHolder) convertView.getTag();
         }
-        h.Frient_name.setText(user.getFirstName() +" " +user.getLastName());
+        h.Frient_name.setText(user.getFullName());
         return convertView;
     }
 }

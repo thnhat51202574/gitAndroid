@@ -5,17 +5,12 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.a51202_000.testbug.EventcustomListview;
 import com.example.a51202_000.testbug.R;
@@ -35,7 +30,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.logging.Handler;
 
 import Model.Event;
 import Model.User;
@@ -146,18 +140,22 @@ public class EventFragment extends Fragment {
                     JSONObject eventObject = (JSONObject) arEventJson.getJSONObject(i);
                     JSONObject userObject = (JSONObject) eventObject.get("created");
 
-                    String User_firstName = "";
-                    String User_lastName = "";
+                    String User_fullName = "";
                     Calendar c = Calendar.getInstance();
                     SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
                     String User_birthday = df.format(c.getTime());
                     String User_name = "";
                     String User_id = "";
-                    if((userObject.has("firstName")) && (!userObject.isNull("firstName"))) {
-                        User_firstName = userObject.getString("firstName");
+                    String User_phone = "";
+                    String User_address = "";
+                    if((userObject.has("fullName")) && (!userObject.isNull("fullName"))) {
+                        User_fullName = userObject.getString("fullName");
                     }
-                    if((userObject.has("firstName")) && (!userObject.isNull("firstName"))) {
-                        User_lastName = userObject.getString("firstName");
+                    if((userObject.has("address")) && (!userObject.isNull("address"))) {
+                        User_address = userObject.getString("address");
+                    }
+                    if((userObject.has("phone")) && (!userObject.isNull("phone"))) {
+                        User_phone = userObject.getString("phone");
                     }
                     if((userObject.has("birthday")) && (!userObject.isNull("birthday"))) {
                         User_birthday = userObject.getString("birthday");
@@ -171,8 +169,9 @@ public class EventFragment extends Fragment {
                     User user = new User(
                             User_id,
                             User_name,
-                            User_firstName,
-                            User_lastName,
+                            User_fullName,
+                            User_address,
+                            User_phone,
                             User_birthday);
                     JSONArray arMemIDJson = eventObject.getJSONArray("arUser");
                     ArrayList<String> listID = new ArrayList<>();

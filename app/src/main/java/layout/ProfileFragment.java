@@ -2,15 +2,10 @@ package layout;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.content.ActivityNotFoundException;
-import android.content.CursorLoader;
-import android.content.Intent;
-import android.media.MediaScannerConnection;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
@@ -18,11 +13,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.database.Cursor;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.dd.CircularProgressButton;
 import com.example.a51202_000.testbug.R;
@@ -30,9 +22,6 @@ import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 import com.koushikdutta.ion.ProgressCallback;
 import com.koushikdutta.ion.Response;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -60,7 +49,7 @@ public class ProfileFragment extends Fragment {
     private String mParam1;
     private String mParam2;
     private ImageView avatar;
-    private TextView userName;
+    private TextView txtUserFullName,txtUserNameLogin, txtAddress, txtBrithday,txtPhone;
     private OnFragmentInteractionListener mListener;
     private CircularProgressButton chooseImgBtn;
     private int CHOOSE_FILE_IMAGE = 1;
@@ -103,10 +92,16 @@ public class ProfileFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_user_profile, container, false);
         avatar = (ImageView) rootView.findViewById(R.id.avatar);
-        userName = (TextView) rootView.findViewById(R.id.userName);
+        txtUserNameLogin = (TextView) rootView.findViewById(R.id.txtUserNameLoginFg);
+        txtUserFullName = (TextView) rootView.findViewById(R.id.txtUserNameFg);
+        txtAddress = (TextView) rootView.findViewById(R.id.txtAddressFg);
+        txtBrithday = (TextView) rootView.findViewById(R.id.txtBirthdayFg);
+        txtPhone = (TextView) rootView.findViewById(R.id.txtPhoneFg);
+
 
         globalUser = (GlobalUserClass) getActivity().getApplicationContext();
         chooseImgBtn  = (CircularProgressButton) rootView.findViewById(R.id.circularButton1);
+
         setContentToView();
         chooseImgBtn.setIndeterminateProgressMode(true);
         avatar.setOnClickListener(new View.OnClickListener() {
@@ -134,7 +129,11 @@ public class ProfileFragment extends Fragment {
 //                .animateIn(fadeInAnimation)
                 .centerCrop()
                 .load(SERVER_PATH + globalUser.getCur_user().getAvatarLink());
-        userName.setText(globalUser.getCur_user().getName());
+        txtUserNameLogin.setText(globalUser.getCur_user().getName());
+        txtUserFullName.setText(globalUser.getCur_user().getFullName());
+        txtBrithday.setText(globalUser.getCur_user().getBirthday().toString());
+        txtAddress.setText(globalUser.getCur_user().getAddress());
+        txtPhone.setText(globalUser.getCur_user().getPhone());
     }
 
     @Override
@@ -213,8 +212,8 @@ public class ProfileFragment extends Fragment {
         intent.setType("image/*");
         intent.putExtra("crop", "true");
         intent.putExtra("scale", true);
-        intent.putExtra("outputX", 256);
-        intent.putExtra("outputY", 256);
+        intent.putExtra("outputX", 512);
+        intent.putExtra("outputY", 512);
         intent.putExtra("aspectX", 1);
         intent.putExtra("aspectY", 1);
         intent.putExtra("return-data", true);
