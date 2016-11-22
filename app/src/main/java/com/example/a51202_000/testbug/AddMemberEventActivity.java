@@ -17,22 +17,30 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 
 import Model.User;
+import globalClass.GlobalUserClass;
 
 public class AddMemberEventActivity extends AppCompatActivity {
     private ListView list_frient_search;
     private EditText searchEdittext;
+    GlobalUserClass globalUser;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_member_event);
         list_frient_search = (ListView) findViewById(R.id.list_frient_search);
         searchEdittext = (EditText) findViewById(R.id.searchNameInput);
-        new ReadFriendJSON().execute("http://totnghiep.herokuapp.com/api/user/57f374a398cf132bd49b6483");
+        globalUser = (GlobalUserClass) getApplicationContext();
+        ArrayList<User> listfriend = globalUser.getCur_user().getFriends_list();
+        if((listfriend.size())>0) {
+            MemberEventCustomListview adapter
+                    = new MemberEventCustomListview(getApplicationContext(), R.layout.friend_in_event_add,listfriend);
+            list_frient_search.setAdapter(adapter);
+        } else {
+            new ReadFriendJSON().execute("http://totnghiep.herokuapp.com/api/user/"+globalUser.getCur_user().get_id());
+        }
     }
     class ReadFriendJSON extends AsyncTask<String, Integer,String> {
 
@@ -61,31 +69,7 @@ public class AddMemberEventActivity extends AppCompatActivity {
                 JSONArray arFriend = userObject_.getJSONArray("friends");
                 for (int i = 0; i < arFriend.length(); i++) {
                     JSONObject userObject = arFriend.getJSONObject(i);
-
-                    String User_firstName = "";
-                    String User_lastName = "";
-                    Calendar c = Calendar.getInstance();
-                    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-                    String User_birthday = df.format(c.getTime());
-                    String User_name = "";
-                    String User_id = "";
-                    if((userObject.has("firstName")) && (!userObject.isNull("firstName"))) {
-                        User_firstName = userObject.getString("firstName");
-                    }
-                    if((userObject.has("lastName")) && (!userObject.isNull("lastName"))) {
-                        User_lastName = userObject.getString("lastName");
-                    }
-                    if((userObject.has("birthday")) && (!userObject.isNull("birthday"))) {
-                        User_birthday = userObject.getString("birthday");
-                    }
-                    if((userObject.has("username")) && (!userObject.isNull("username"))) {
-                        User_name= userObject.getString("username");
-                    }
-                    if((userObject.has("_id")) && (!userObject.isNull("_id"))) {
-                        User_id= userObject.getString("_id");
-                    }
                     User user = new User(userObject);
-
                     friends.add(user);
                 }
 
@@ -99,7 +83,6 @@ public class AddMemberEventActivity extends AppCompatActivity {
             MemberEventCustomListview adapter
                     = new MemberEventCustomListview(getApplicationContext(), R.layout.friend_in_event_add,friends);
             list_frient_search.setAdapter(adapter);
-
         }
 
 

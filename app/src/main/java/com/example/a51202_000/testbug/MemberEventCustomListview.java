@@ -45,7 +45,7 @@ public class MemberEventCustomListview extends ArrayAdapter<User> {
         if (convertView == null){
             LayoutInflater layoutInflater = (LayoutInflater) getContext()
                     .getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
-            convertView = layoutInflater.inflate(R.layout.friend_in_event_add, null, true);
+            convertView = layoutInflater.inflate(resource, parent, false);
             h = new ViewHolder();
             h.Frient_name = (TextView)  convertView.findViewById(R.id.friend_name);
             h.Avatar =(CircularImageView) convertView.findViewById(R.id.frient_avatar);
@@ -53,13 +53,20 @@ public class MemberEventCustomListview extends ArrayAdapter<User> {
             convertView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    if(h.friendcheckbox.isChecked()) {
+                        h.friendcheckbox.setChecked(false);
+                    } else {
+                        h.friendcheckbox.setChecked(true);
+                    }
                     Toast.makeText(context,"Chi tiết" + user.get_id(),Toast.LENGTH_LONG).show();
                 }
             });
         } else {
             h =(ViewHolder) convertView.getTag();
         }
-        h.Frient_name.setText(user.getFullName());
+        if(h!=null) {
+            h.Frient_name.setText(user.getFullName());
+        }
         return convertView;
     }
 }

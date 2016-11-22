@@ -69,7 +69,14 @@ public class FriendFrament extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_friend_frament, container, false);
         friends_lv = (ListView) rootView.findViewById(R.id.list_frient);
         globalUser = (GlobalUserClass) getActivity().getApplicationContext();
-        new ReadFriendJSON().execute("http://totnghiep.herokuapp.com/api/user/"+globalUser.getCur_user().get_id());
+        ArrayList<User> listfriend = globalUser.getCur_user().getFriends_list();
+        if((listfriend.size())>0) {
+            FriendcustomListView adapter = new FriendcustomListView(
+                    getActivity().getApplicationContext(), R.layout.friend_layout,listfriend);
+            friends_lv.setAdapter(adapter);
+        } else {
+            new ReadFriendJSON().execute("http://totnghiep.herokuapp.com/api/user/"+globalUser.getCur_user().get_id());
+        }
         return rootView;
     }
 

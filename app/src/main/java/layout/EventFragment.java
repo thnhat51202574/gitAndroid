@@ -144,7 +144,7 @@ public class EventFragment extends Fragment {
                 JSONArray arEventJson = object.getJSONArray("events");
                 for (int i = 0; i < arEventJson.length(); i++) {
                     JSONObject eventObject = (JSONObject) arEventJson.getJSONObject(i);
-                    JSONObject userObject = (JSONObject) eventObject.get("created");
+                    JSONObject userObject = (JSONObject) eventObject.getJSONObject("created");
                     User user = new User(userObject);
                     JSONArray arMemIDJson = eventObject.getJSONArray("arUser");
                     ArrayList<String> listID = new ArrayList<>();
