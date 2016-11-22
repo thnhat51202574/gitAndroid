@@ -1,6 +1,5 @@
 package layout;
 
-import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -10,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-import com.example.a51202_000.testbug.EventcustomListview;
 import com.example.a51202_000.testbug.FriendcustomListView;
 import com.example.a51202_000.testbug.R;
 
@@ -29,7 +27,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-import Model.Event;
 import Model.User;
 import globalClass.GlobalUserClass;
 

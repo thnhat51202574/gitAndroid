@@ -125,8 +125,6 @@ public class User {
     public void setName(String name) {
         this.name = name;
     }
-
-
     public void setBirthday(Date birthday) {
         this.birthday = birthday;
     }
@@ -147,7 +145,6 @@ public class User {
     public String getFullName() {
         return fullName;
     }
-
 
     public Date getBirthday() {
         return birthday;
