@@ -62,18 +62,22 @@ public class AddMemberEventActivity extends AppCompatActivity {
                 for (int i = 0; i < arFriend.length(); i++) {
                     JSONObject userObject = arFriend.getJSONObject(i);
 
-                    String User_firstName = "";
-                    String User_lastName = "";
+                    String User_fullName = "";
                     Calendar c = Calendar.getInstance();
                     SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
                     String User_birthday = df.format(c.getTime());
                     String User_name = "";
                     String User_id = "";
-                    if((userObject.has("firstName")) && (!userObject.isNull("firstName"))) {
-                        User_firstName = userObject.getString("firstName");
+                    String User_phone = "";
+                    String User_address = "";
+                    if((userObject.has("fullName")) && (!userObject.isNull("fullName"))) {
+                        User_fullName = userObject.getString("fullName");
                     }
-                    if((userObject.has("lastName")) && (!userObject.isNull("lastName"))) {
-                        User_lastName = userObject.getString("lastName");
+                    if((userObject.has("address")) && (!userObject.isNull("address"))) {
+                        User_address = userObject.getString("address");
+                    }
+                    if((userObject.has("phone")) && (!userObject.isNull("phone"))) {
+                        User_phone = userObject.getString("phone");
                     }
                     if((userObject.has("birthday")) && (!userObject.isNull("birthday"))) {
                         User_birthday = userObject.getString("birthday");
@@ -85,7 +89,6 @@ public class AddMemberEventActivity extends AppCompatActivity {
                         User_id= userObject.getString("_id");
                     }
                     User user = new User(userObject);
-
                     friends.add(user);
                 }
 
