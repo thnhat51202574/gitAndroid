@@ -11,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mikhaellopez.circularimageview.CircularImageView;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -57,6 +58,18 @@ public class FriendcustomListView extends ArrayAdapter<User> {
             h =(ViewHolder) convertView.getTag();
         }
         h.Frient_name.setText(user.getFullName());
+        h.Frient_name.setText(user.getFullName());
+        String url ="http://totnghiep.herokuapp.com"+ user.getAvatarLink();
+        Picasso.with(context).load(url).error(R.drawable.no_images).into(h.Avatar, new com.squareup.picasso.Callback() {
+            @Override
+            public void onSuccess() {
+
+            }
+            @Override
+            public void onError() {
+
+            }
+        });
         return convertView;
 
 

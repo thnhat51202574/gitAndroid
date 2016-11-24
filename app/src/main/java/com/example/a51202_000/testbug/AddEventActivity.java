@@ -29,6 +29,7 @@ import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -42,9 +43,11 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.sql.Time;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.TimeZone;
 
+import Model.User;
 import globalClass.GlobalUserClass;
 import layout.FriendFrament;
 import layout.HomeFragment;
@@ -54,15 +57,18 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
 
     private int PLACE_PICKER_REQUEST = 101;
     private int PLACE_DESTINATION_PICKER_REQUEST = 102;
+    private int ADD_MEMBER_REQUEST = 103;
     private DatePicker datePicker;
     private Calendar calendar;
     private ImageView mapViewDemo;
     GlobalUserClass globalUser;
     private EditText DateStart, TimeStart, DateReturn, TimeReturn;
-    private EditText StartAddress, EndAddress, nameEvent;
+    private EditText StartAddress, EndAddress, nameEvent,EventDescription;
     private String from_Date, to_Date, from_Time, to_Time;
     private int year, month, day;
-    private LatLng startaddress,destination;
+    private LatLng startaddress_LatLgn,destination_LatLgn;
+    private ArrayList<User> ArrayMember;
+    private JSONArray JSONListMember,JSONStartLocs,JSONEndLocs;
     ProgressDialog progressDialog;
     DatePickerDialog.OnDateSetListener from_dateListener,to_dateListener;
     TimePickerDialog.OnTimeSetListener from_timeListener, to_timeListener;
@@ -76,7 +82,11 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
         globalUser = (GlobalUserClass) getApplicationContext();
         AddEventURL = "http://totnghiep.herokuapp.com/api/event";
         Toast.makeText(getApplicationContext(),globalUser.getCur_user().get_id(),Toast.LENGTH_LONG).show();
-
+        ArrayMember = new ArrayList<>();
+        JSONListMember = new JSONArray();
+        JSONStartLocs = new JSONArray();
+        JSONEndLocs = new JSONArray();
+        EventDescription = (EditText) findViewById(R.id.EventDescription);
         mapViewDemo = (ImageView) findViewById(R.id.mapViewDemo);
         nameEvent = (EditText) findViewById(R.id.NameEvent);
         DateStart = (EditText) findViewById(R.id.DateStart);
@@ -250,9 +260,9 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
         });
         mapViewDemo.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
-                if(startaddress==null) {
+                if(startaddress_LatLgn==null) {
                     Toast.makeText(getApplicationContext(),"Chưa chọn điểm khởi hành", Toast.LENGTH_LONG).show();
-                } else if (destination==null) {
+                } else if (destination_LatLgn==null) {
                     Toast.makeText(getApplicationContext(),"Chưa chọn điểm đích", Toast.LENGTH_LONG).show();
                 } else {
                     ShowFragment(routeMapEventFragment);
@@ -262,7 +272,7 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
         findViewById(R.id.Addmemberbtn).setOnClickListener(new View.OnClickListener() {
             public  void onClick(View v) {
                 Intent intent = new Intent(AddEventActivity.this, AddMemberEventActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent,ADD_MEMBER_REQUEST);
                 overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
             }
         });
@@ -280,38 +290,56 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
 
 
     protected void onActivityResult(int requestCode,int resultCode,Intent data) {
+        if(resultCode != RESULT_OK) {
+            return;
+        }
         if(requestCode == PLACE_PICKER_REQUEST) {
-            if(resultCode == RESULT_OK) {
                 Place place = PlacePicker.getPlace(data, this);
                 String address = String.format("%s",place.getAddress());
+            try {
                 this.setStartAddress(place.getLatLng());
-                StartAddress.setText(address);
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
+            StartAddress.setText(address);
         } else if(requestCode == PLACE_DESTINATION_PICKER_REQUEST) {
-            if(resultCode == RESULT_OK) {
                 Place place = PlacePicker.getPlace(data, this);
                 String address = String.format("%s",place.getAddress());
+            try {
                 this.setDestination(place.getLatLng());
-                destination = place.getLatLng();
-                EndAddress.setText(address);
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
+            EndAddress.setText(address);
+        }
+        else if (requestCode == ADD_MEMBER_REQUEST) {
+            ArrayList<String> ListMember = data.getStringArrayListExtra("listMember");
+            Toast.makeText(this, String.valueOf(ListMember.size()), Toast.LENGTH_SHORT).show();
+            for (int i = 0;i < ListMember.size(); i++) {
+                JSONListMember.put(ListMember.get(i));
+            }
+
         }
     }
 
-    public void setStartAddress(LatLng start_) {
-        this.startaddress = start_;
+    public void setStartAddress(LatLng start_) throws JSONException {
+        JSONStartLocs.put(start_.longitude);
+        JSONStartLocs.put(start_.latitude);
+        this.startaddress_LatLgn = start_;
     }
 
-    public void setDestination(LatLng destination) {
-        this.destination = destination;
+    public void setDestination(LatLng destination) throws JSONException {
+        JSONEndLocs.put(destination.longitude);
+        JSONEndLocs.put(destination.latitude);
+        this.destination_LatLgn = destination;
     }
 
     public LatLng getStartaddress() {
-        return startaddress;
+        return startaddress_LatLgn;
     }
 
     public LatLng getDestination() {
-        return destination;
+        return destination_LatLgn;
     }
 
     @Override
@@ -477,8 +505,15 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
                 dataInsert.put("createID",globalUser.getCur_user().get_id());
                 dataInsert.put("starttime",from_Date+from_Time);
                 dataInsert.put("endtime",to_Date+to_Time);
-                //txtLoginView.setText(urlPath);
+                dataInsert.put("startAddress",StartAddress.getText());
+                dataInsert.put("endAddress",EndAddress.getText());
+                dataInsert.put("arUser",JSONListMember);
+                dataInsert.put("startLocs",JSONStartLocs);
+                dataInsert.put("endLocs",JSONEndLocs);
+                dataInsert.put("description",EventDescription.getText());
 
+                String a = dataInsert.toString();
+                String b = "2";
                 //initialize and config request , then connect the server.
                 URL url = new URL(urlPath);
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
@@ -503,8 +538,6 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
                 if((line = bufferedReader.readLine())!=null) {
                     reSult.append(line);
                 }
-                // JSONObject resultJSON= new JSONObject(reSult.toString());
-                //message = resultJSON.getString("message");
 
             } finally {
                 if(bufferedWriter !=null) {

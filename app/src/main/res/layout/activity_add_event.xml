@@ -210,7 +210,7 @@
                     android:lines="5"
                     android:hint="Nhập mô tả"
                     android:textSize="15sp"
-                    android:id="@+id/EvetnDescription"/>
+                    android:id="@+id/EventDescription"/>
 
             </LinearLayout>
             <LinearLayout
