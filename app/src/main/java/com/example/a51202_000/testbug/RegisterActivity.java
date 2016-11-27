@@ -112,7 +112,7 @@ public class RegisterActivity extends AppCompatActivity {
             }
 
             try{
-                if(checkLogin(result) == true) {
+                if(checkStateRegister(result) == true) {
                     Toast.makeText(getApplicationContext(),stringStatusRegister, Toast.LENGTH_LONG).show();
                     Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
                     startActivity(intent);
@@ -182,7 +182,7 @@ public class RegisterActivity extends AppCompatActivity {
         }
     }
 
-    Boolean checkLogin(String reSult ) throws JSONException{
+    Boolean checkStateRegister(String reSult ) throws JSONException{
         JSONObject resultJSON= new JSONObject(reSult.toString());
 
         stringStatusRegister = resultJSON.getString("message");

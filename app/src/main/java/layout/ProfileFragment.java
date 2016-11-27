@@ -15,8 +15,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.dd.CircularProgressButton;
+import com.example.a51202_000.testbug.EditprofileAcitivity;
 import com.example.a51202_000.testbug.R;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
@@ -52,7 +54,7 @@ public class ProfileFragment extends Fragment {
     private TextView txtUserFullName,txtUserNameLogin, txtAddress, txtBrithday,txtPhone;
     private OnFragmentInteractionListener mListener;
     private CircularProgressButton chooseImgBtn;
-    private int CHOOSE_FILE_IMAGE = 1;
+    private int CHOOSE_FILE_IMAGE = 2;
     private String SERVER_PATH ="http://totnghiep.herokuapp.com";
     String path;
     public ProfileFragment() {
@@ -89,6 +91,8 @@ public class ProfileFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_user_profile, container, false);
         avatar = (ImageView) rootView.findViewById(R.id.avatar);
@@ -121,8 +125,9 @@ public class ProfileFragment extends Fragment {
         return rootView;
     }
 
-    private void setContentToView() {
-        String Link = SERVER_PATH + globalUser.getCur_user().getAvatarLink();
+    public void setContentToView() {
+
+        String Link = globalUser.getCur_user().getAvatarLink();
         Ion.with(avatar)
 //                .placeholder(R.drawable.placeholder_image)
 //                .error(R.drawable.error_image)
@@ -132,16 +137,20 @@ public class ProfileFragment extends Fragment {
                 .load(SERVER_PATH + globalUser.getCur_user().getAvatarLink());
         txtUserNameLogin.setText(globalUser.getCur_user().getName());
         txtUserFullName.setText(globalUser.getCur_user().getFullName());
-        txtBrithday.setText(globalUser.getCur_user().getBirthday().toString());
+        txtBrithday.setText(android.text.format.DateFormat.format("dd/MM/yyyy", globalUser.getCur_user().getBirthday()));
         txtAddress.setText(globalUser.getCur_user().getAddress());
         txtPhone.setText(globalUser.getCur_user().getPhone());
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode != RESULT_OK) {
+        super.onActivityResult(requestCode,resultCode, data );
+
+        Toast.makeText(getActivity().getApplicationContext(),"onActivityResult",Toast.LENGTH_LONG).show();
+        if(resultCode != RESULT_OK) {
             return;
         }
+ //       Toast.makeText(getActivity().getApplicationContext(),data.getExtras().getString("results").toString(),Toast.LENGTH_LONG).show();
         if (requestCode == CHOOSE_FILE_IMAGE) {
                 final Bundle extras = data.getExtras();
             if (extras != null) {
@@ -185,7 +194,13 @@ public class ProfileFragment extends Fragment {
 
             }
         }
+
+        else if(requestCode == 101){
+            setContentToView();
+        }
+
     }
+
     public void deleteImage(File fdelete) {
         if (fdelete.exists()) {
             if (fdelete.delete()) {
@@ -229,6 +244,13 @@ public class ProfileFragment extends Fragment {
             mListener.onFragmentInteraction(uri);
         }
     }
+
+    public void startEditProfile() {
+        Intent intent = new Intent(getActivity(), EditprofileAcitivity.class);
+        startActivityForResult(intent, 101);
+//        overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+    }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
