@@ -2,29 +2,30 @@ package com.example.a51202_000.testbug;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.graphics.Color;
-import android.location.Location;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
-import android.view.View.OnClickListener;
 
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.model.LatLng;
-import com.wdullaer.materialdatetimepicker.Utils;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
@@ -41,13 +42,9 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.sql.Time;
 import java.util.Calendar;
-import java.util.TimeZone;
 
 import globalClass.GlobalUserClass;
-import layout.FriendFrament;
-import layout.HomeFragment;
 import layout.RouteMapEventFragment;
 
 public class AddEventActivity extends AppCompatActivity implements RouteMapEventFragment.RooteComunicate {
@@ -62,12 +59,18 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
     private EditText StartAddress, EndAddress, nameEvent;
     private String from_Date, to_Date, from_Time, to_Time;
     private int year, month, day;
-    private LatLng startaddress,destination;
+    private LatLng startaddress, destination;
     ProgressDialog progressDialog;
-    DatePickerDialog.OnDateSetListener from_dateListener,to_dateListener;
+    DatePickerDialog.OnDateSetListener from_dateListener, to_dateListener;
     TimePickerDialog.OnTimeSetListener from_timeListener, to_timeListener;
     String AddEventURL;
     Button OkButton;
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    private GoogleApiClient client;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,7 +78,7 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         globalUser = (GlobalUserClass) getApplicationContext();
         AddEventURL = "http://totnghiep.herokuapp.com/api/event";
-        Toast.makeText(getApplicationContext(),globalUser.getCur_user().get_id(),Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), globalUser.getCur_user().get_id(), Toast.LENGTH_LONG).show();
 
         mapViewDemo = (ImageView) findViewById(R.id.mapViewDemo);
         nameEvent = (EditText) findViewById(R.id.NameEvent);
@@ -96,7 +99,7 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
                 String hourString = hourOfDay < 10 ? "0" + hourOfDay : "" + hourOfDay;
                 String minuteString = minute < 10 ? "0" + minute : "" + minute;
                 String time = hourString + ":" + minuteString;
-                from_Time = time +":"+"00";
+                from_Time = time + ":" + "00";
                 TimeStart.setText(time);
             }
         };
@@ -115,7 +118,7 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
                 String hourString = hourOfDay < 10 ? "0" + hourOfDay : "" + hourOfDay;
                 String minuteString = minute < 10 ? "0" + minute : "" + minute;
                 String time = hourString + ":" + minuteString;
-                to_Time = time +":"+"00";
+                to_Time = time + ":" + "00";
                 TimeReturn.setText(time);
             }
         };
@@ -132,7 +135,7 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
 
         month = calendar.get(Calendar.MONTH);
         day = calendar.get(Calendar.DAY_OF_MONTH);
-        DateStart.setOnClickListener(new View.OnClickListener(){
+        DateStart.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 Calendar now = Calendar.getInstance();
@@ -142,14 +145,14 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
                         now.get(Calendar.MONTH),
                         now.get(Calendar.DAY_OF_MONTH)
                 );
-                dpd.setAccentColor(ContextCompat.getColor(getApplicationContext(),R.color.DateTimeBackground));
+                dpd.setAccentColor(ContextCompat.getColor(getApplicationContext(), R.color.DateTimeBackground));
                 dpd.setOkText("ĐỒNG Ý");
                 dpd.setCancelText("HỦY");
                 dpd.setTitle("Chọn ngày khởi hành");
                 dpd.show(getFragmentManager(), "Datepickerdialog");
             }
         });
-        TimeStart.setOnClickListener(new View.OnClickListener(){
+        TimeStart.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 Calendar now = Calendar.getInstance();
@@ -160,14 +163,14 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
                         true
                 );
                 tpd.setTitle("Chọn giờ khởi hành");
-                tpd.setAccentColor(ContextCompat.getColor(getApplicationContext(),R.color.DateTimeBackground));
+                tpd.setAccentColor(ContextCompat.getColor(getApplicationContext(), R.color.DateTimeBackground));
                 tpd.setOkText("ĐỒNG Ý");
                 tpd.setCancelText("HỦY");
                 tpd.show(getFragmentManager(), "Timepickerdialog");
             }
         });
 
-        DateReturn.setOnClickListener(new View.OnClickListener(){
+        DateReturn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 Calendar now = Calendar.getInstance();
@@ -177,14 +180,14 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
                         now.get(Calendar.MONTH),
                         now.get(Calendar.DAY_OF_MONTH)
                 );
-                dpd.setAccentColor(ContextCompat.getColor(getApplicationContext(),R.color.DateTimeBackground));
+                dpd.setAccentColor(ContextCompat.getColor(getApplicationContext(), R.color.DateTimeBackground));
                 dpd.setOkText("ĐỒNG Ý");
                 dpd.setCancelText("HỦY");
                 dpd.setTitle("Chọn ngày khởi hành");
                 dpd.show(getFragmentManager(), "DatepickerdialogReturn");
             }
         });
-        TimeReturn.setOnClickListener(new View.OnClickListener(){
+        TimeReturn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 Calendar now = Calendar.getInstance();
@@ -195,20 +198,20 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
                         true
                 );
                 tpd.setTitle("Chọn giờ khởi hành");
-                tpd.setAccentColor(ContextCompat.getColor(getApplicationContext(),R.color.DateTimeBackground));
+                tpd.setAccentColor(ContextCompat.getColor(getApplicationContext(), R.color.DateTimeBackground));
                 tpd.setOkText("ĐỒNG Ý");
                 tpd.setCancelText("HỦY");
                 tpd.show(getFragmentManager(), "TimepickerdialogReturn");
             }
         });
 
-        StartAddress.setOnClickListener(new View.OnClickListener(){
+        StartAddress.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 PlacePicker.IntentBuilder buider = new PlacePicker.IntentBuilder();
                 Intent intent;
                 try {
-                    intent = buider.build(getApplicationContext());
+                    intent = buider.build(AddEventActivity.this);
                     startActivityForResult(intent, PLACE_PICKER_REQUEST);
                 } catch (GooglePlayServicesNotAvailableException e) {
                     e.printStackTrace();
@@ -218,14 +221,14 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
 
             }
         });
-        EndAddress.setOnClickListener(new View.OnClickListener(){
+        EndAddress.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 PlacePicker.IntentBuilder buider = new PlacePicker.IntentBuilder();
 
                 Intent intent;
                 try {
-                    intent = buider.build(getApplicationContext());
+                    intent = buider.build(AddEventActivity.this);
                     startActivityForResult(intent, PLACE_DESTINATION_PICKER_REQUEST);
                 } catch (GooglePlayServicesNotAvailableException e) {
                     e.printStackTrace();
@@ -236,36 +239,39 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
             }
         });
         final RouteMapEventFragment routeMapEventFragment = new RouteMapEventFragment();
-        findViewById(R.id.OkBtnAdd).setOnClickListener(new View.OnClickListener(){
+        findViewById(R.id.OkBtnAdd).setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                if(validate()) {
+                if (validate()) {
                     new addEvent().execute(AddEventURL);
                 }
             }
         });
-        findViewById(R.id.CancelBtnAdd).setOnClickListener(new View.OnClickListener(){
+        findViewById(R.id.CancelBtnAdd).setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 finish();
             }
         });
-        mapViewDemo.setOnClickListener(new View.OnClickListener(){
+        mapViewDemo.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                if(startaddress==null) {
-                    Toast.makeText(getApplicationContext(),"Chưa chọn điểm khởi hành", Toast.LENGTH_LONG).show();
-                } else if (destination==null) {
-                    Toast.makeText(getApplicationContext(),"Chưa chọn điểm đích", Toast.LENGTH_LONG).show();
+                if (startaddress == null) {
+                    Toast.makeText(getApplicationContext(), "Chưa chọn điểm khởi hành", Toast.LENGTH_LONG).show();
+                } else if (destination == null) {
+                    Toast.makeText(getApplicationContext(), "Chưa chọn điểm đích", Toast.LENGTH_LONG).show();
                 } else {
                     ShowFragment(routeMapEventFragment);
                 }
             }
         });
-        findViewById(R.id.Addmemberbtn).setOnClickListener(new View.OnClickListener() {
-            public  void onClick(View v) {
+        findViewById(R.id.Addmemberbtn).setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
                 Intent intent = new Intent(AddEventActivity.this, AddMemberEventActivity.class);
                 startActivity(intent);
                 overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
             }
         });
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
     private void ShowFragment(RouteMapEventFragment routeMapEventFragment) {
@@ -279,18 +285,18 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
     }
 
 
-    protected void onActivityResult(int requestCode,int resultCode,Intent data) {
-        if(requestCode == PLACE_PICKER_REQUEST) {
-            if(resultCode == RESULT_OK) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == PLACE_PICKER_REQUEST) {
+            if (resultCode == RESULT_OK) {
                 Place place = PlacePicker.getPlace(data, this);
-                String address = String.format("%s",place.getAddress());
+                String address = String.format("%s", place.getAddress());
                 this.setStartAddress(place.getLatLng());
                 StartAddress.setText(address);
             }
-        } else if(requestCode == PLACE_DESTINATION_PICKER_REQUEST) {
-            if(resultCode == RESULT_OK) {
+        } else if (requestCode == PLACE_DESTINATION_PICKER_REQUEST) {
+            if (resultCode == RESULT_OK) {
                 Place place = PlacePicker.getPlace(data, this);
-                String address = String.format("%s",place.getAddress());
+                String address = String.format("%s", place.getAddress());
                 this.setDestination(place.getLatLng());
                 destination = place.getLatLng();
                 EndAddress.setText(address);
@@ -322,10 +328,10 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
         DatePickerDialog dpdReturn = (DatePickerDialog) getFragmentManager().findFragmentByTag("DatepickerdialogReturn");
         TimePickerDialog tpdReturn = (TimePickerDialog) getFragmentManager().findFragmentByTag("TimepickerDialogReturn");
 
-        if(tpd != null) tpd.setOnTimeSetListener(this.from_timeListener);
-        if(dpd != null) dpd.setOnDateSetListener(this.from_dateListener);
-        if(dpdReturn != null) tpd.setOnTimeSetListener(this.to_timeListener);
-        if(tpdReturn != null) dpd.setOnDateSetListener(this.to_dateListener);
+        if (tpd != null) tpd.setOnTimeSetListener(this.from_timeListener);
+        if (dpd != null) dpd.setOnDateSetListener(this.from_dateListener);
+        if (dpdReturn != null) tpd.setOnTimeSetListener(this.to_timeListener);
+        if (tpdReturn != null) dpd.setOnDateSetListener(this.to_dateListener);
     }
 
     @Override
@@ -344,6 +350,7 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
         from_Date = tmp_time.toString();
         DateStart.setText(new StringBuilder().append(day).append("/").append(month + 1).append("/").append(year).append(" "));
     }
+
     private void updateDisplay_return() {
         DateReturn.setText(new StringBuilder().append(day).append("/").append(month + 1).append("/").append(year).append(" "));
         StringBuilder tmp_time = new StringBuilder().append(month + 1).append("/").append(day).append("/").append(year).append(" ");
@@ -363,10 +370,11 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
     public void senlocation(LatLng start, LatLng destination) {
         return;
     }
+
     public boolean validate() {
         boolean valid = true;
 
-        String nameEvent_ =  nameEvent.getText().toString();
+        String nameEvent_ = nameEvent.getText().toString();
         String DateStart_ = DateStart.getText().toString();
         String TimeStart_ = TimeStart.getText().toString();
 
@@ -376,7 +384,7 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
         String StartAddress_ = StartAddress.getText().toString();
         String EndAddress_ = EndAddress.getText().toString();
 
-        if (nameEvent_.isEmpty()|| nameEvent_.length() < 10) {
+        if (nameEvent_.isEmpty() || nameEvent_.length() < 10) {
             nameEvent.setError("Nhập tên sự kiện lớn hơn 10 ký tự");
             valid = false;
         } else {
@@ -427,6 +435,43 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
 
         return valid;
     }
+
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    public Action getIndexApiAction() {
+        Thing object = new Thing.Builder()
+                .setName("AddEvent Page") // TODO: Define a title for the content shown.
+                // TODO: Make sure this auto-generated URL is correct.
+                .setUrl(Uri.parse("http://[ENTER-YOUR-URL-HERE]"))
+                .build();
+        return new Action.Builder(Action.TYPE_VIEW)
+                .setObject(object)
+                .setActionStatus(Action.STATUS_TYPE_COMPLETED)
+                .build();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client.connect();
+        AppIndex.AppIndexApi.start(client, getIndexApiAction());
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        AppIndex.AppIndexApi.end(client, getIndexApiAction());
+        client.disconnect();
+    }
+
     private class addEvent extends AsyncTask<String, Void, String> {
 
         @Override
@@ -441,7 +486,7 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
         protected String doInBackground(String... params) {
             try {
                 return SetData(params[0]);
-            } catch (IOException ex){
+            } catch (IOException ex) {
                 return "Network Error ";
             } catch (JSONException ex) {
                 return "Invalid data!";
@@ -457,8 +502,8 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
             try {
                 JSONObject resultObject = new JSONObject(result);
                 String message = resultObject.getString("message");
-                Toast.makeText(getApplicationContext(),message,Toast.LENGTH_LONG).show();
-            } catch (JSONException ex){
+                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+            } catch (JSONException ex) {
                 ex.printStackTrace();
             }
 
@@ -473,10 +518,10 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
             try {
                 JSONObject dataInsert = new JSONObject();
                 //create JSONdata to send to server
-                dataInsert.put("eventname",nameEvent.getText());
-                dataInsert.put("createID",globalUser.getCur_user().get_id());
-                dataInsert.put("starttime",from_Date+from_Time);
-                dataInsert.put("endtime",to_Date+to_Time);
+                dataInsert.put("eventname", nameEvent.getText());
+                dataInsert.put("createID", globalUser.getCur_user().get_id());
+                dataInsert.put("starttime", from_Date + from_Time);
+                dataInsert.put("endtime", to_Date + to_Time);
                 //txtLoginView.setText(urlPath);
 
                 //initialize and config request , then connect the server.
@@ -486,7 +531,7 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
                 urlConnection.setConnectTimeout(10000);
                 urlConnection.setRequestMethod("POST");
                 urlConnection.setDoOutput(true); //enable output data
-                urlConnection.setRequestProperty("Content-Type","application/json"); //set header
+                urlConnection.setRequestProperty("Content-Type", "application/json"); //set header
                 urlConnection.connect();
 
                 //write data to server
@@ -500,17 +545,17 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
                 InputStream inputStream = urlConnection.getInputStream();
                 bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
                 String line;
-                if((line = bufferedReader.readLine())!=null) {
+                if ((line = bufferedReader.readLine()) != null) {
                     reSult.append(line);
                 }
                 // JSONObject resultJSON= new JSONObject(reSult.toString());
                 //message = resultJSON.getString("message");
 
             } finally {
-                if(bufferedWriter !=null) {
+                if (bufferedWriter != null) {
                     bufferedWriter.close();
                 }
-                if(bufferedReader !=null) {
+                if (bufferedReader != null) {
                     bufferedReader.close();
                 }
             }

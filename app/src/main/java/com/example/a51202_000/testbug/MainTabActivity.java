@@ -112,6 +112,7 @@ public class MainTabActivity extends AppCompatActivity implements HomeFragment.c
         });
 
 
+
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -129,9 +130,7 @@ public class MainTabActivity extends AppCompatActivity implements HomeFragment.c
                     case 2:
                         break;
                     case 3:
-                        Intent intent = new Intent(MainTabActivity.this, EditprofileAcitivity.class);
-                        startActivity(intent);
-                        overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+                        profileFragment.startEditProfile();
                         break;
 
                 }
@@ -180,6 +179,7 @@ public class MainTabActivity extends AppCompatActivity implements HomeFragment.c
         // Disable going back to the MainActivity
         moveTaskToBack(true);
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.

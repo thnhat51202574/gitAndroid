@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-import com.example.a51202_000.testbug.FriendcustomListView;
 import com.example.a51202_000.testbug.R;
 
 import org.json.JSONArray;
@@ -23,9 +22,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 
 import Model.User;
 import globalClass.GlobalUserClass;
@@ -119,9 +116,9 @@ public class FriendFrament extends Fragment {
                 e.printStackTrace();
             }
 
-            FriendcustomListView adapter = new FriendcustomListView(
-                    getActivity().getApplicationContext(), R.layout.friend_layout,friends);
-            friends_lv.setAdapter(adapter);
+//            FriendcustomListView adapter = new FriendcustomListView(
+//                    getActivity().getApplicationContext(), R.layout.friend_layout,friends);
+//            friends_lv.setAdapter(adapter);
 
         }
 
