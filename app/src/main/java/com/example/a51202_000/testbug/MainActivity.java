@@ -7,14 +7,12 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
-
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -28,7 +26,9 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.ParseException;
 
+import Model.User;
 import globalClass.GlobalUserClass;
 
 public class MainActivity extends AppCompatActivity {
@@ -63,8 +63,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String uname = edtEmail.getText().toString();
-                if(uname.trim().equals("")) {
-                    Toast.makeText(getApplicationContext(),"Please Input your Name", Toast.LENGTH_LONG).show();
+                if(!validate()) {
+                    onLoginFailed();
                 } else {
                     new connectServerLg().execute(loginURL);
 
@@ -117,12 +117,54 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void onLoginSuccess() {
+        btnLogin.setEnabled(true);
+        finish();
+    }
+    public void onLoginFailed() {
+        Toast.makeText(getBaseContext(), "Đăng nhập thất bại", Toast.LENGTH_LONG).show();
+        btnLogin.setEnabled(true);
+    }
+
+    @Override
+    public void onBackPressed() {
+        // Disable going back to the MainActivity
+        moveTaskToBack(true);
+    }
+
+    public boolean validate() {
+        boolean valid = true;
+
+        String email = edtEmail.getText().toString();
+        String password = edtPass.getText().toString();
+
+        if (email.isEmpty()) {
+            edtEmail.setError("Vui lòng nhập tên đăng nhập");
+            valid = false;
+        } else {
+            edtEmail.setError(null);
+        }
+
+        if (password.isEmpty() || password.length() < 4 || password.length() > 10) {
+            edtPass.setError("Mật khẩu lớn hơn 4 ký tự");
+            valid = false;
+        } else {
+            edtPass.setError(null);
+        }
+
+        return valid;
+    }
+
     private class connectServerLg extends AsyncTask<String, Void, String> {
 
-
+        ProgressDialog progressDialog;
         @Override
         protected void onPreExecute() {
-            showProgress(true);
+//            showProgress(true);
+            progressDialog = new ProgressDialog(MainActivity.this,R.style.AppTheme_CustomDialog);
+            progressDialog.setIndeterminate(true);
+            progressDialog.setMessage("Đang đang nhập...");
+            progressDialog.show();
             super.onPreExecute();
         }
 
@@ -140,24 +182,34 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-            showProgress(false);
             try{
                 if(checkLogin(result) == true) {
                     Toast.makeText(getApplicationContext(), "login sucess", Toast.LENGTH_LONG).show();
                     JSONObject resultJSON= new JSONObject(result.toString());
                     JSONObject user = resultJSON.getJSONObject("user");
                     String _id = user.getString("_id");
-                    globalUser.set_id(_id);
+                    String userName = user.getString("username");
+                    globalUser.setCur_user(new User(user));
                     Intent intent = new Intent(MainActivity.this, MainTabActivity.class);					
                     startActivity(intent);
+                    new android.os.Handler().postDelayed(
+                            new Runnable() {
+                                public void run() {
+                                    // On complete call either onLoginSuccess or onLoginFailed
+                                    onLoginSuccess();
+                                    // onLoginFailed();
+                                    progressDialog.dismiss();
+                                }
+                            }, 3000);
                 }
                 else
-                    Toast.makeText(getApplicationContext(),"login fail", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(),"Có lỗi xảy ra", Toast.LENGTH_LONG).show();
             }catch(JSONException ex)
             {
-                Toast.makeText(getApplicationContext(),"login fail ex", Toast.LENGTH_LONG).show();
+                ex.printStackTrace();
+            } catch (ParseException e) {
+                e.printStackTrace();
             }
-
         }
 
         private String SetData(String urlPath) throws IOException, JSONException {

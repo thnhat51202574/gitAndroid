@@ -1,17 +1,21 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="layout.UserProfileFragment">
+    tools:context="layout.ProfileFragment">
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:fillViewport="true"
+        android:layout_height="match_parent" >
+
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="vertical"
-            android:paddingTop="20dp">
+            android:layout_marginTop="20dp"
+            >
             <ImageView
                 android:layout_width="150dp"
                 android:layout_height="150dp"
@@ -19,7 +23,19 @@
                 android:id="@+id/avatar"
                 android:src="@drawable/avatar"
                 android:scaleType="centerCrop"/>
-
+            <com.dd.CircularProgressButton
+                android:id="@+id/circularButton1"
+                android:layout_marginTop="4dp"
+                android:visibility="gone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/WhiteColor"
+                android:textSize="13sp"
+                android:layout_gravity="center"
+                app:cpb_cornerRadius="48dp"
+                app:cpb_iconComplete="@drawable/add_event_ic_tick"
+                app:cpb_iconError="@drawable/add_event_ic_cancel"
+                app:cpb_textIdle="Tải hình" />
             <TextView
                 android:text="Hoàng Nhật"
                 android:textColor="@color/colorPrimary"
@@ -29,7 +45,7 @@
                 android:layout_marginBottom="5dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/textView" />
+                android:id="@+id/txtUserNameFg" />
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -51,13 +67,13 @@
                         android:layout_alignParentStart="true" />
 
                     <TextView
-                        android:text="thnhat51202574"
+                        android:text="Hoàng Nhật"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="30dp"
                         android:layout_marginRight="50dp"
                         android:layout_marginTop="7dp"
-                        android:id="@+id/nameAddress"
+                        android:id="@+id/txtUserNameLoginFg"
                         android:textSize="14dp"
                         android:textColor="@android:color/background_dark"
                         android:layout_centerVertical="true"
@@ -87,7 +103,7 @@
                         android:layout_marginLeft="30dp"
                         android:layout_marginRight="50dp"
                         android:layout_marginTop="7dp"
-                        android:id="@+id/nameAddress"
+                        android:id="@+id/txtPhoneFg"
                         android:textSize="14dp"
                         android:textColor="@android:color/background_dark"
                         android:layout_centerVertical="true"
@@ -116,7 +132,7 @@
                         android:layout_marginLeft="30dp"
                         android:layout_marginRight="50dp"
                         android:layout_marginTop="7dp"
-                        android:id="@+id/birthday"
+                        android:id="@+id/txtBirthdayFg"
                         android:textSize="14dp"
                         android:textColor="@android:color/background_dark"
                         android:layout_centerVertical="true"
@@ -145,14 +161,14 @@
                         android:layout_marginLeft="30dp"
                         android:layout_marginRight="50dp"
                         android:layout_marginTop="7dp"
-                        android:id="@+id/address"
+                        android:id="@+id/txtAddressFg"
                         android:textSize="14dp"
                         android:textColor="@android:color/background_dark"
                         android:layout_centerVertical="true"
                         android:layout_alignParentRight="true"
                         android:layout_alignParentEnd="true" />
                 </RelativeLayout>
-
+                <include layout="@layout/item_divider" />
             </LinearLayout>
 
         </LinearLayout>

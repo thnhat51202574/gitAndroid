@@ -22,19 +22,20 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+
 public class RegisterActivity extends AppCompatActivity {
     private EditText edtEmail, edtPass, edtRepass;
     private Button btnRegister, btnLogin;
     private ProgressDialog progressDialog;
 
     private static String RegisterURL = "http://totnghiep.herokuapp.com/api/user";
+    private String stringStatusRegister = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().hide();
-        Intent intent = new Intent(this, LoginActivity.class);
-        startActivity(intent);
+
         setContentView(R.layout.activity_register);
 
         edtEmail = (EditText) findViewById(R.id.edtEmailRe);
@@ -52,12 +53,16 @@ public class RegisterActivity extends AppCompatActivity {
                 String uPass = edtPass.getText().toString();
                 String uRePass = edtRepass.getText().toString();
 
-                if(uName.trim().equals("") ||uPass.trim().equals("")||uRePass.trim().equals("")) {
+                if(uName.isEmpty() ||uPass.isEmpty()||uRePass.isEmpty() ) {
                     Toast.makeText(getApplicationContext()," Hãy điền đầy đủ thông tin", Toast.LENGTH_LONG).show();
+                }
+                else if(uPass.length() < 4 || uPass.length() >10)
+                {
+                    Toast.makeText(getApplicationContext()," Mật khẩu nhiều hơn 4 ký tự", Toast.LENGTH_LONG).show();
                 }
                 else if(!uRePass.equals(uPass))
                 {
-                    Toast.makeText(getApplicationContext(),"Password nhập lại không đúng", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(),"Mật khẩu nhập lại không đúng", Toast.LENGTH_LONG).show();
                 }
                 else {
                     new connectServerRe().execute(RegisterURL);
@@ -82,8 +87,8 @@ public class RegisterActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            ProgressDialog progressDialog = new ProgressDialog(RegisterActivity.this);
-            progressDialog.setMessage(" Kiểm tra đăng Ky... ");
+            progressDialog = new ProgressDialog(RegisterActivity.this);
+            progressDialog.setMessage(" Kiểm tra đăng Ký... ");
             progressDialog.show();
         }
 
@@ -101,20 +106,25 @@ public class RegisterActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-            if (progressDialog != null) {
+            if(progressDialog != null)
+            {
                 progressDialog.dismiss();
             }
+
             try{
-                if(checkLogin(result) == true) {
-                    Toast.makeText(getApplicationContext(), "Register sucess", Toast.LENGTH_LONG).show();
-                    Intent intent = new Intent(RegisterActivity.this, MainTabActivity.class);
+                if(checkStateRegister(result) == true) {
+                    Toast.makeText(getApplicationContext(),stringStatusRegister, Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
                     startActivity(intent);
                 }
                 else
-                    Toast.makeText(getApplicationContext(),"Register fail", Toast.LENGTH_LONG).show();
+                {
+                    Toast.makeText(getApplicationContext(),stringStatusRegister, Toast.LENGTH_LONG).show();
+                }
+
             }catch(JSONException ex)
             {
-                Toast.makeText(getApplicationContext(),"Register fail ex", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(),"Lỗi đăng ký, thử lại sau!", Toast.LENGTH_LONG).show();
             }
 
         }
@@ -130,7 +140,6 @@ public class RegisterActivity extends AppCompatActivity {
                 dataInsert.put("username",edtEmail.getText());
                 dataInsert.put("password",edtPass.getText());
                 //txtLoginView.setText(urlPath);
-
 
 
                 //initialize and config request , then connect the server.
@@ -173,8 +182,10 @@ public class RegisterActivity extends AppCompatActivity {
         }
     }
 
-    Boolean checkLogin(String reSult ) throws JSONException{
+    Boolean checkStateRegister(String reSult ) throws JSONException{
         JSONObject resultJSON= new JSONObject(reSult.toString());
+
+        stringStatusRegister = resultJSON.getString("message");
         String flag = resultJSON.getString("CODE");
         if (flag.equals("SUCCESS")) return true;
         else return false;

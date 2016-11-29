@@ -112,6 +112,7 @@ public class MainTabActivity extends AppCompatActivity implements HomeFragment.c
         });
 
 
+
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -129,8 +130,7 @@ public class MainTabActivity extends AppCompatActivity implements HomeFragment.c
                     case 2:
                         break;
                     case 3:
-                        Intent intent = new Intent(MainTabActivity.this, EditprofileAcitivity.class);
-                        startActivity(intent);
+                        profileFragment.startEditProfile();
                         break;
 
                 }
@@ -173,6 +173,11 @@ public class MainTabActivity extends AppCompatActivity implements HomeFragment.c
                 }
             });
             fab.startAnimation(shrink);
+    }
+    @Override
+    public void onBackPressed() {
+        // Disable going back to the MainActivity
+        moveTaskToBack(true);
     }
 
     @Override
