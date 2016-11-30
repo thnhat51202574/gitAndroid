@@ -1,10 +1,13 @@
 package layout;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -41,6 +44,7 @@ public class HomeFragment extends Fragment implements GoogleMap.OnMarkerClickLis
     public interface comuticateParent {
         public void sendMess(String text);
     }
+
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -52,7 +56,6 @@ public class HomeFragment extends Fragment implements GoogleMap.OnMarkerClickLis
 
 
     public HomeFragment() {
-        // Required empty public constructor
     }
 
     public static HomeFragment newInstance(String param1, String param2) {
@@ -63,6 +66,7 @@ public class HomeFragment extends Fragment implements GoogleMap.OnMarkerClickLis
         fragment.setArguments(args);
         return fragment;
     }
+
     comuticateParent callback;
     Button btn1;
     TextView textView;
@@ -73,12 +77,13 @@ public class HomeFragment extends Fragment implements GoogleMap.OnMarkerClickLis
     public GoogleMap googleMap;
     private View hiddenPanel;
     private Button upbtn, downbtn;
-    private HashMap<Marker,Address> listAddressbyMaker = new HashMap<Marker,Address>();
+    private HashMap<Marker, Address> listAddressbyMaker = new HashMap<Marker, Address>();
     private SlidingUpPanelLayout slidingLayout;
     private View image_progressbar;
     //    detail address
     ImageView address_picture;
     TextView address_name, address_rate, address_position, address_phone, address_type, address_detail;
+
     //    end detail
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -124,14 +129,14 @@ public class HomeFragment extends Fragment implements GoogleMap.OnMarkerClickLis
             e.printStackTrace();
         }
         image_progressbar = (View) rootView.findViewById(R.id.image_progressbar);
-        address_picture =(ImageView) rootView.findViewById(R.id.picture);
+        address_picture = (ImageView) rootView.findViewById(R.id.picture);
         address_name = (TextView) rootView.findViewById(R.id.detailname);
         address_rate = (TextView) rootView.findViewById(R.id.detailRate);
         address_position = (TextView) rootView.findViewById(R.id.nameAddress);
         address_phone = (TextView) rootView.findViewById(R.id.detailphone);
         address_type = (TextView) rootView.findViewById(R.id.detailtype);
         address_detail = (TextView) rootView.findViewById(R.id.detailContent);
-        slidingLayout = (SlidingUpPanelLayout)rootView.findViewById(R.id.sliding_layout);
+        slidingLayout = (SlidingUpPanelLayout) rootView.findViewById(R.id.sliding_layout);
 
         //some "demo" event
 //        slidingLayout.setPanelSlideListener(onSlideListener());
@@ -197,6 +202,7 @@ public class HomeFragment extends Fragment implements GoogleMap.OnMarkerClickLis
         super.onLowMemory();
         mMapView.onLowMemory();
     }
+
     @Override
     public void onConnected(Bundle bundle) {
         slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
@@ -208,6 +214,16 @@ public class HomeFragment extends Fragment implements GoogleMap.OnMarkerClickLis
                 googleMap = mMap;
                 googleMap.setMyLocationEnabled(true);
 
+                if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    // TODO: Consider calling
+                    //    ActivityCompat#requestPermissions
+                    // here to request the missing permissions, and then overriding
+                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                    //                                          int[] grantResults)
+                    // to handle the case where the user grants the permission. See the documentation
+                    // for ActivityCompat#requestPermissions for more details.
+                    return;
+                }
                 mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                         mGoogleApiClient);
                 LatLng mylocation =new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
