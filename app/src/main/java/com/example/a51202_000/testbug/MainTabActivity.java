@@ -7,6 +7,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -34,7 +35,7 @@ import layout.FriendFrament;
 import layout.HomeFragment;
 import layout.ProfileFragment;
 
-public class MainTabActivity extends AppCompatActivity{
+public class MainTabActivity extends AppCompatActivity implements HomeFragment.comuticateParent {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -115,7 +116,7 @@ public class MainTabActivity extends AppCompatActivity{
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view,Integer.toString(mViewPager.getCurrentItem()), Snackbar.LENGTH_LONG)
+               Snackbar.make(view,Integer.toString(mViewPager.getCurrentItem()), Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
                 switch (mViewPager.getCurrentItem()) {
                     case 0:
@@ -142,36 +143,36 @@ public class MainTabActivity extends AppCompatActivity{
         final int[] colorIntArray = {R.color.hindfocus,R.color.btnbackground,R.color.orange,R.color.orange};
         final int[] iconIntArray = {R.drawable.ic_home_black_24dp, R.drawable.fab_ic_add, R.drawable.fab_ic_add,R.drawable.fab_ic_edit};
 
-        fab.clearAnimation();
-        // Scale down animation
-        ScaleAnimation shrink = new ScaleAnimation(1f, 0.2f, 1f, 0.2f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-        shrink.setDuration(150);     // animation duration in milliseconds
-        shrink.setInterpolator(new DecelerateInterpolator());
-        shrink.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
+            fab.clearAnimation();
+            // Scale down animation
+            ScaleAnimation shrink = new ScaleAnimation(1f, 0.2f, 1f, 0.2f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+            shrink.setDuration(150);     // animation duration in milliseconds
+            shrink.setInterpolator(new DecelerateInterpolator());
+            shrink.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
 
-            }
+                }
 
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                // Change FAB color and icon
-                fab.setBackgroundTintList(ContextCompat.getColorStateList(getApplicationContext(), colorIntArray[position]));
-                fab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), iconIntArray[position]));
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    // Change FAB color and icon
+                    fab.setBackgroundTintList(ContextCompat.getColorStateList(getApplicationContext(), colorIntArray[position]));
+                    fab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), iconIntArray[position]));
 
-                // Scale up animation
-                ScaleAnimation expand = new ScaleAnimation(0.2f, 1f, 0.2f, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-                expand.setDuration(100);     // animation duration in milliseconds
-                expand.setInterpolator(new AccelerateInterpolator());
-                fab.startAnimation(expand);
-            }
+                    // Scale up animation
+                    ScaleAnimation expand = new ScaleAnimation(0.2f, 1f, 0.2f, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+                    expand.setDuration(100);     // animation duration in milliseconds
+                    expand.setInterpolator(new AccelerateInterpolator());
+                    fab.startAnimation(expand);
+                }
 
-            @Override
-            public void onAnimationRepeat(Animation animation) {
+                @Override
+                public void onAnimationRepeat(Animation animation) {
 
-            }
-        });
-        fab.startAnimation(shrink);
+                }
+            });
+            fab.startAnimation(shrink);
     }
     @Override
     public void onBackPressed() {
@@ -180,26 +181,10 @@ public class MainTabActivity extends AppCompatActivity{
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main_tab, menu);
-        return true;
+    public void sendMess(String text) {
+        Toast.makeText(getApplicationContext(),text,Toast.LENGTH_LONG).show();
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
     /**
      * A placeholder fragment containing a simple view.
      */
