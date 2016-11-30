@@ -59,7 +59,7 @@ public class FriendcustomListView extends ArrayAdapter<User> {
         }
         h.Frient_name.setText(user.getFullName());
         h.Frient_name.setText(user.getFullName());
-        String url ="http://totnghiep.herokuapp.com"+ user.getAvatarLink();
+        String url = user.getAvatarLink();
         Picasso.with(context).load(url).error(R.drawable.no_images).into(h.Avatar, new com.squareup.picasso.Callback() {
             @Override
             public void onSuccess() {

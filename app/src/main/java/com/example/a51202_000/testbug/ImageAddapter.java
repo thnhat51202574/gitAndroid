@@ -20,21 +20,21 @@ import Model.User;
  */
 
 public class ImageAddapter extends BaseAdapter {
-    private ArrayList<User> users;
+    private ArrayList<String> users_avatar;
     private Context context;
     int resource;
     @Override
     public int getCount() {
-        return users.size();
+        return users_avatar.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return users.get(position);
+        return users_avatar.get(position);
     }
 
-    public ImageAddapter( Context context, int resource, ArrayList<User> users) {
-        this.users = users;
+    public ImageAddapter( Context context, int resource, ArrayList<String> UserAvatar) {
+        this.users_avatar = UserAvatar;
         this.context = context;
         this.resource = resource;
     }
@@ -45,14 +45,14 @@ public class ImageAddapter extends BaseAdapter {
         return 0;
     }
 
-    public void addUser(User user) {
-        users.add(users.size(),user);
+    public void addUser(String user) {
+        users_avatar.add(users_avatar.size(),user);
         this.notifyDataSetChanged();
     }
 
-    public void removeUser(User user) {
-        users.indexOf(user);
-        users.remove(user);
+    public void removeUser(String user) {
+        users_avatar.indexOf(user);
+        users_avatar.remove(user);
         this.notifyDataSetChanged();
     }
 
@@ -62,7 +62,7 @@ public class ImageAddapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         final ViewHolder h;
-        final User user = users.get(position);
+        final String user_linkavatar = users_avatar.get(position);
         if (convertView == null) {
             LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
             convertView = layoutInflater.inflate(resource, parent, false);
@@ -73,7 +73,7 @@ public class ImageAddapter extends BaseAdapter {
             h =(ViewHolder) convertView.getTag();
         }
         if(h!=null) {
-            String url ="http://totnghiep.herokuapp.com"+ user.getAvatarLink();
+            String url =user_linkavatar;
             Picasso.with(context).load(url).error(R.drawable.no_images).into(h.Avatar, new com.squareup.picasso.Callback() {
                 @Override
                 public void onSuccess() {

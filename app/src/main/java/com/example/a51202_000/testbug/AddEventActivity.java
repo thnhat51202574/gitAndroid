@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -67,7 +68,9 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
     private String from_Date, to_Date, from_Time, to_Time;
     private int year, month, day;
     private LatLng startaddress_LatLgn,destination_LatLgn;
+    private GridView gvlistMember;
     private ArrayList<User> ArrayMember;
+    private ArrayList<String> ArListMemAvatar;
     private JSONArray JSONListMember,JSONStartLocs,JSONEndLocs;
     ProgressDialog progressDialog;
     DatePickerDialog.OnDateSetListener from_dateListener,to_dateListener;
@@ -80,9 +83,11 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
         setContentView(R.layout.activity_add_event);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         globalUser = (GlobalUserClass) getApplicationContext();
+        gvlistMember = (GridView) findViewById(R.id.gvlistMember);
         AddEventURL = "http://totnghiep.herokuapp.com/api/event";
         Toast.makeText(getApplicationContext(),globalUser.getCur_user().get_id(),Toast.LENGTH_LONG).show();
         ArrayMember = new ArrayList<>();
+        ArListMemAvatar = new ArrayList<>();
         JSONListMember = new JSONArray();
         JSONStartLocs = new JSONArray();
         JSONEndLocs = new JSONArray();
@@ -314,10 +319,14 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
         }
         else if (requestCode == ADD_MEMBER_REQUEST) {
             ArrayList<String> ListMember = data.getStringArrayListExtra("listMember");
-            Toast.makeText(this, String.valueOf(ListMember.size()), Toast.LENGTH_SHORT).show();
+            ArrayList<String> ListAvatar = data.getStringArrayListExtra("listAvatar");
             for (int i = 0;i < ListMember.size(); i++) {
                 JSONListMember.put(ListMember.get(i));
+                ArListMemAvatar.add(ListAvatar.get(i));
             }
+            ImageAddapter adapter_listmember
+                    = new ImageAddapter(getApplicationContext(), R.layout.single_image_gridview,ArListMemAvatar);
+            gvlistMember.setAdapter(adapter_listmember);
 
         }
     }

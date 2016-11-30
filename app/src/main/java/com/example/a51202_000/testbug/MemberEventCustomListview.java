@@ -86,7 +86,7 @@ public class MemberEventCustomListview extends ArrayAdapter<User> {
         }
         if(h!=null) {
             h.Frient_name.setText(user.getFullName());
-            String url ="http://totnghiep.herokuapp.com"+ user.getAvatarLink();
+            String url =user.getAvatarLink();
             Picasso.with(context).load(url).error(R.drawable.no_images).into(h.Avatar, new com.squareup.picasso.Callback() {
                 @Override
                 public void onSuccess() {

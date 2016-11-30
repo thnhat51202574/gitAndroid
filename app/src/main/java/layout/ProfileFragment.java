@@ -122,14 +122,14 @@ public class ProfileFragment extends Fragment {
     }
 
     private void setContentToView() {
-        String Link = SERVER_PATH + globalUser.getCur_user().getAvatarLink();
+        String Link = globalUser.getCur_user().getAvatarLink();
         Ion.with(avatar)
 //                .placeholder(R.drawable.placeholder_image)
 //                .error(R.drawable.error_image)
 //                .animateLoad(spinAnimation)
 //                .animateIn(fadeInAnimation)
                 .centerCrop()
-                .load(SERVER_PATH + globalUser.getCur_user().getAvatarLink());
+                .load(globalUser.getCur_user().getAvatarLink());
         txtUserNameLogin.setText(globalUser.getCur_user().getName());
         txtUserFullName.setText(globalUser.getCur_user().getFullName());
         txtBrithday.setText(globalUser.getCur_user().getBirthday().toString());

@@ -37,8 +37,8 @@ public class AddMemberEventActivity extends AppCompatActivity {
     private ListView list_frient_search;
     private EditText searchEdittext;
     private GridView gvAvatar;
-    private ArrayList<User> ListmemUser;
-    private ArrayList<String> ListmemUser_id;
+    private ArrayList<String> ListmemUser;
+    private ArrayList<String> ListmemUser_id,ListmemUser_avatar;
     GlobalUserClass globalUser;
     ImageAddapter adapter_listmember;
     @Override
@@ -47,6 +47,7 @@ public class AddMemberEventActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add_member_event);
         ListmemUser = new ArrayList<>();
         ListmemUser_id = new ArrayList<>();
+        ListmemUser_avatar = new ArrayList<>();
         list_frient_search = (ListView) findViewById(R.id.list_frient_search);
         searchEdittext = (EditText) findViewById(R.id.searchNameInput);
         gvAvatar = (GridView) findViewById(R.id.listAvatarUser);
@@ -63,15 +64,15 @@ public class AddMemberEventActivity extends AppCompatActivity {
             adapter.setOnDataChangeListener(new MemberEventCustomListview.OnDataChangeListener(){
                 @Override
                 public void onUserAdd(User user) {
-                    ListmemUser.add(user);
                     ListmemUser_id.add(user.get_id());
-                    adapter_listmember.notifyDataSetChanged();
+                    ListmemUser_avatar.add(user.getAvatarLink());
+                    adapter_listmember.addUser(user.getAvatarLink());
                 }
                 @Override
                 public void onUserRemove(User user) {
-                    ListmemUser.remove(user);
                     ListmemUser_id.remove(user.get_id());
-                    adapter_listmember.removeUser(user);
+                    ListmemUser_avatar.remove(user.getAvatarLink());
+                    adapter_listmember.removeUser(user.getAvatarLink());
                 }
             });
         } else {
@@ -91,6 +92,7 @@ public class AddMemberEventActivity extends AppCompatActivity {
             case R.id.action_ok:
                 Intent output  = new Intent();
                 output.putStringArrayListExtra("listMember",ListmemUser_id);
+                output.putStringArrayListExtra("listAvatar",ListmemUser_avatar);
                 setResult(RESULT_OK,output);
                 finish();
                 Toast.makeText(this, "OK", Toast.LENGTH_SHORT).show();
@@ -142,17 +144,15 @@ public class AddMemberEventActivity extends AppCompatActivity {
             adapter.setOnDataChangeListener(new MemberEventCustomListview.OnDataChangeListener(){
                 @Override
                 public void onUserAdd(User user) {
-                    ListmemUser.add(user);
-                    Log.d("onUserAdd", "onUserAdd: "+ user.getAvatarLink());
-                    adapter_listmember.addUser(user);
-                    adapter_listmember.notifyDataSetChanged();
+                    ListmemUser_id.add(user.get_id());
+                    ListmemUser_avatar.add(user.getAvatarLink());
+                    adapter_listmember.addUser(user.getAvatarLink());
                 }
                 @Override
                 public void onUserRemove(User user) {
-                    ListmemUser.remove(user);
-                    adapter_listmember.removeUser(user);
-                    adapter_listmember.notifyDataSetChanged();
-                    Log.d("onUserRemove", "onUserAdd: "+ user.getFullName());
+                    ListmemUser_id.add(user.get_id());
+                    ListmemUser_avatar.add(user.getAvatarLink());
+                    adapter_listmember.addUser(user.getAvatarLink());
                 }
             });
         }

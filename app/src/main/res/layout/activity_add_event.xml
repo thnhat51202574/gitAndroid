@@ -226,6 +226,25 @@
                     app:cb_color="#18ba4f"
                     android:src="@drawable/event_add_member"
                     app:cb_pressedRingWidth="8dip" />
+                <GridView
+                    android:id="@+id/gvlistMember"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:columnWidth="60dp"
+                    android:paddingTop="3dp"
+                    android:paddingLeft="3dp"
+                    android:verticalSpacing="3dp"
+                    android:numColumns="auto_fit"
+                    android:horizontalSpacing="3dp"
+                    android:layout_centerVertical="true"
+                    android:layout_centerHorizontal="true"
+                    android:stretchMode="spacingWidthUniform"
+                    android:scrollbarAlwaysDrawVerticalTrack="true"
+                    android:scrollbarAlwaysDrawHorizontalTrack="true"
+                    android:visibility="visible"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true" />
             </LinearLayout>
             <LinearLayout
                 xmlns:android="http://schemas.android.com/apk/res/android"
