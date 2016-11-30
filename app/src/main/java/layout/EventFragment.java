@@ -1,24 +1,35 @@
 package layout;
 
+import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.GridView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.example.a51202_000.testbug.EditprofileAcitivity;
 import com.example.a51202_000.testbug.EventcustomListview;
+import com.example.a51202_000.testbug.ImageAddapter;
+import com.example.a51202_000.testbug.MainTabActivity;
+import com.example.a51202_000.testbug.MapsActivity;
 import com.example.a51202_000.testbug.R;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -34,7 +45,7 @@ import java.util.Calendar;
 import Model.Event;
 import Model.User;
 
-public class EventFragment extends Fragment {
+public class EventFragment extends Fragment{
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private SwipeRefreshLayout swipeContainer;
@@ -45,6 +56,7 @@ public class EventFragment extends Fragment {
     private Button btnShow;
     private Button btnHide;
     private TextView textView;
+    ArrayList<Event> events;
     private ListView lv_event;
     ProgressDialog progressDialog;
     public EventFragment() {
@@ -81,6 +93,7 @@ public class EventFragment extends Fragment {
         swipeContainer = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeContainer);
 
         lv_event = (ListView) rootView.findViewById(R.id.list_event);
+        events = new ArrayList<>();
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -100,6 +113,57 @@ public class EventFragment extends Fragment {
 
         new ReadEventJSON().execute("http://totnghiep.herokuapp.com/api/event/");
         return rootView;
+    }
+
+    public void showDialog(ArrayList<Event> Events,int position){
+        Event view_event = Events.get(position);
+        View view = getActivity().getLayoutInflater().inflate (R.layout.bottom_event_dialog, null);
+
+        final Dialog mDetailEventDialog = new Dialog(getActivity(),R.style.MaterialDialogSheet);
+        mDetailEventDialog.setContentView (view);
+        mDetailEventDialog.setCancelable (true);
+        mDetailEventDialog.getWindow ().setLayout (LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+        mDetailEventDialog.getWindow ().setGravity (Gravity.BOTTOM);
+        mDetailEventDialog.show();
+
+        TextView txtEventName =(TextView) view.findViewById(R.id.txtEventName);
+        TextView txtDateStart = (TextView) view.findViewById(R.id.txtDateStart);
+        TextView txtDateEnd = (TextView) view.findViewById(R.id.txtDateEnd);
+        TextView txtAddressStart = (TextView) view.findViewById(R.id.txtLocationStart);
+        TextView txtAddressEnd = (TextView) view.findViewById(R.id.txtLocationEnd);
+        TextView txtDescription = (TextView) view.findViewById(R.id.txtDescription);
+        GridView gvlistMember = (GridView) view.findViewById(R.id.gvlistMember);
+        Button startbtn = (Button) view.findViewById(R.id.START);
+        Button cancelbtn = (Button) view.findViewById(R.id.CANCEL);
+
+        txtEventName.setText(view_event.getEvent_name());
+        txtDateStart.setText(view_event.getFullDateTimeStart());
+        txtDateEnd.setText(view_event.getFullDateTimeEnd());
+        txtAddressStart.setText(view_event.getStartAddress());
+        txtAddressEnd.setText(view_event.getEndAddress());
+        txtDescription.setText(view_event.getEvent_description());
+        ArrayList<User> ListMember = view_event.getList_member();
+        ArrayList<String> ArListMemAvatar = new ArrayList<>();
+        for (int i = 0;i <ListMember.size(); i++) {
+            ArListMemAvatar.add(ListMember.get(i).getAvatarLink());
+        }
+        ImageAddapter adapter_listmember
+                = new ImageAddapter(getActivity().getApplicationContext(), R.layout.single_image_gridview,ArListMemAvatar);
+        gvlistMember.setAdapter(adapter_listmember);
+        startbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent WeGoIntent = new Intent(getActivity(), MapsActivity.class);
+                startActivity(WeGoIntent);
+            }
+        });
+        cancelbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDetailEventDialog.dismiss();
+            }
+        });
     }
 
     private void refreshListEvent() {
@@ -130,7 +194,6 @@ public class EventFragment extends Fragment {
 
         @Override
         protected void onPostExecute(String s) {
-            ArrayList<Event> events = new ArrayList<>();
             super.onPostExecute(s);
             try {
                 //json array
@@ -138,23 +201,7 @@ public class EventFragment extends Fragment {
                 JSONArray arEventJson = object.getJSONArray("events");
                 for (int i = 0; i < arEventJson.length(); i++) {
                     JSONObject eventObject = (JSONObject) arEventJson.getJSONObject(i);
-                    JSONObject userObject = (JSONObject) eventObject.getJSONObject("created");
-                    User user = new User(userObject);
-                    JSONArray arMemIDJson = eventObject.getJSONArray("arUser");
-                    ArrayList<String> listID = new ArrayList<>();
-                    for (int idx = 0; idx < arMemIDJson.length(); idx++) {
-                        JSONObject UserIDObject = (JSONObject) arMemIDJson.getJSONObject(idx);
-                        listID.add(UserIDObject.getString("_id"));
-                    }
-                    events.add(new Event(
-                            eventObject.getString("_id"),
-                            eventObject.getString("eventname"),
-                            user,
-                            listID,
-                            eventObject.getString("starttime"),
-                            eventObject.getString("endtime"),
-                            eventObject.getString("description")
-                    ));
+                    events.add(new Event(eventObject));
                 }
 
             }
@@ -167,7 +214,12 @@ public class EventFragment extends Fragment {
             EventcustomListview adapter = new EventcustomListview(
                     getActivity().getApplicationContext(), R.layout.event_layout,events);
             lv_event.setAdapter(adapter);
-
+            adapter.setOnEachItemChangeListener(new EventcustomListview.OnDataChangeListener() {
+                @Override
+                public void onClick(int Position) {
+                    showDialog(events,Position);
+                }
+            });
             if (progressDialog != null) {
                 progressDialog.dismiss();
             }

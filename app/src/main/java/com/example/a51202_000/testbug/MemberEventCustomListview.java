@@ -12,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mikhaellopez.circularimageview.CircularImageView;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -24,12 +25,24 @@ import Model.User;
 public class MemberEventCustomListview extends ArrayAdapter<User> {
     ArrayList<User> users;
     Context context;
+    ArrayList<User> arUserReturn;
     int resource;
+
+    public interface OnDataChangeListener{
+        public void onUserAdd(User user);
+        public void onUserRemove(User user);
+
+    }
+    OnDataChangeListener mOnDataChangeListener;
+    public void setOnDataChangeListener(OnDataChangeListener onDataChangeListener){
+        mOnDataChangeListener = onDataChangeListener;
+    }
     public MemberEventCustomListview(Context context, int resource, ArrayList<User> objects) {
         super(context, resource, objects);
         this.users = objects;
         this.context = context;
         this.resource = resource;
+        this.arUserReturn = new ArrayList<>();
     }
     static class ViewHolder {
         TextView Frient_name;
@@ -55,9 +68,16 @@ public class MemberEventCustomListview extends ArrayAdapter<User> {
                 public void onClick(View v) {
                     if(h.friendcheckbox.isChecked()) {
                         h.friendcheckbox.setChecked(false);
+                        if(mOnDataChangeListener != null){
+                            mOnDataChangeListener.onUserRemove(user);
+                        }
                     } else {
                         h.friendcheckbox.setChecked(true);
+                        if(mOnDataChangeListener != null){
+                            mOnDataChangeListener.onUserAdd(user);
+                        }
                     }
+
                     Toast.makeText(context,"Chi tiết" + user.get_id(),Toast.LENGTH_LONG).show();
                 }
             });
@@ -66,6 +86,17 @@ public class MemberEventCustomListview extends ArrayAdapter<User> {
         }
         if(h!=null) {
             h.Frient_name.setText(user.getFullName());
+            String url =user.getAvatarLink();
+            Picasso.with(context).load(url).error(R.drawable.no_images).into(h.Avatar, new com.squareup.picasso.Callback() {
+                @Override
+                public void onSuccess() {
+
+                }
+                @Override
+                public void onError() {
+
+                }
+            });
         }
         return convertView;
     }
