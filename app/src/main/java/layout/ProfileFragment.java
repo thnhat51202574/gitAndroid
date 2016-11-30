@@ -134,7 +134,7 @@ public class ProfileFragment extends Fragment {
 //                .animateLoad(spinAnimation)
 //                .animateIn(fadeInAnimation)
                 .centerCrop()
-                .load(SERVER_PATH + globalUser.getCur_user().getAvatarLink());
+                .load(globalUser.getCur_user().getAvatarLink());
         txtUserNameLogin.setText(globalUser.getCur_user().getName());
         txtUserFullName.setText(globalUser.getCur_user().getFullName());
         txtBrithday.setText(android.text.format.DateFormat.format("dd/MM/yyyy", globalUser.getCur_user().getBirthday()));

@@ -124,9 +124,9 @@ public class FriendFrament extends Fragment {
                 e.printStackTrace();
             }
 
-//            FriendcustomListView adapter = new FriendcustomListView(
-//                    getActivity().getApplicationContext(), R.layout.friend_layout,friends);
-//            friends_lv.setAdapter(adapter);
+            FriendcustomListView adapter = new FriendcustomListView(
+                    getActivity().getApplicationContext(), R.layout.friend_layout,friends);
+            friends_lv.setAdapter(adapter);
 
         }
 
