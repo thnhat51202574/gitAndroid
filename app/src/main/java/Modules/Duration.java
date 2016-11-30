@@ -12,4 +12,8 @@ public class Duration {
         this.text = text;
         this.value = value;
     }
+
+    public int getValue() {
+        return value;
+    }
 }
