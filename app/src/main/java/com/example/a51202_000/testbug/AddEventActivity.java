@@ -223,7 +223,7 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
                 PlacePicker.IntentBuilder buider = new PlacePicker.IntentBuilder();
                 Intent intent;
                 try {
-                    intent = buider.build(getApplicationContext());
+                    intent = buider.build(AddEventActivity.this);
                     startActivityForResult(intent, PLACE_PICKER_REQUEST);
                 } catch (GooglePlayServicesNotAvailableException e) {
                     e.printStackTrace();
@@ -240,7 +240,7 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
 
                 Intent intent;
                 try {
-                    intent = buider.build(getApplicationContext());
+                    intent = buider.build(AddEventActivity.this);
                     startActivityForResult(intent, PLACE_DESTINATION_PICKER_REQUEST);
                 } catch (GooglePlayServicesNotAvailableException e) {
                     e.printStackTrace();

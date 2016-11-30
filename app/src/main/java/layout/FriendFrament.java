@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
+import com.example.a51202_000.testbug.FriendcustomListView;
 import com.example.a51202_000.testbug.R;
 
 import org.json.JSONArray;
