@@ -167,6 +167,7 @@ public class EventFragment extends Fragment{
     }
 
     private void refreshListEvent() {
+        events = new ArrayList<>();
         new ReadEventJSON().execute("http://totnghiep.herokuapp.com/api/event/");
         swipeContainer.setRefreshing(false);
     }
