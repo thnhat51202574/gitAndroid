@@ -1,5 +1,6 @@
 package Modules;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 /**
@@ -8,5 +9,5 @@ import java.util.List;
 
 public interface DirectionFinderListener {
     void onDirectionFinderStart();
-    void onDirectionFinderSuccess(List<Route> route);
+    void onDirectionFinderSuccess(List<Route> route) throws UnsupportedEncodingException;
 }

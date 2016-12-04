@@ -39,10 +39,13 @@ import java.util.List;
 import AsyncTask.getNearestLocationTask;
 import Modules.DirectionFinder;
 import Modules.DirectionFinderListener;
+import Modules.EventRoute;
+import Modules.EventRouteFinder;
+import Modules.EventRouterFinderListener;
 import Modules.Route;
 
 
-public class RouteMapEventFragment extends Fragment implements DirectionFinderListener {
+public class RouteMapEventFragment extends Fragment implements DirectionFinderListener, EventRouterFinderListener {
     private List<Marker> originMarkers = new ArrayList<>();
     private List<Marker> destinationMarkers = new ArrayList<>();
     private List<Polyline> polylinePaths = new ArrayList<>();
@@ -198,12 +201,12 @@ public class RouteMapEventFragment extends Fragment implements DirectionFinderLi
     }
 
     @Override
-    public void onDirectionFinderSuccess(List<Route> routes) {
+    public void onDirectionFinderSuccess(List<Route> routes) throws UnsupportedEncodingException {
         progressDialog.dismiss();
         polylinePaths = new ArrayList<>();
         originMarkers = new ArrayList<>();
         destinationMarkers = new ArrayList<>();
-
+        new EventRouteFinder(RouteMapEventFragment.this,routes).execute();
         for (Route route : routes) {
             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(route.startLocation, 16));
 //            ((TextView) findViewById(R.id.tvDuration)).setText(route.duration.text);
@@ -229,6 +232,16 @@ public class RouteMapEventFragment extends Fragment implements DirectionFinderLi
             polylinePaths.add(googleMap.addPolyline(polylineOptions));
         }
     }
+    @Override
+    public void onEventRouterFinderStart() {
+        progressDialog = ProgressDialog.show(getActivity(), "Vui lòng đợi.",
+                "Tìm gợi ý..!", true);
+    }
 
+    @Override
+    public void onEventRouterFinderFinish(ArrayList<EventRoute> arEventRoutes) {
+        progressDialog.dismiss();
+        String a = "";
+    }
 
 }

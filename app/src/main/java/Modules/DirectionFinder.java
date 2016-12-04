@@ -79,11 +79,13 @@ public class DirectionFinder {
                 parseJSon(res);
             } catch (JSONException e) {
                 e.printStackTrace();
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
             }
         }
     }
 
-    private void parseJSon(String data) throws JSONException {
+    private void parseJSon(String data) throws JSONException, UnsupportedEncodingException {
         if (data == null)
             return;
 
@@ -111,8 +113,6 @@ public class DirectionFinder {
             route.points = decodePolyLine(overview_polylineJson.getString("points"));
             routes.add(route);
         }
-
-
         listener.onDirectionFinderSuccess(routes);
     }
 
