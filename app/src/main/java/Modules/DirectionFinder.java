@@ -90,6 +90,7 @@ public class DirectionFinder {
             return;
 
         List<Route> routes = new ArrayList<Route>();
+        List<Route> arRoutes = new ArrayList<Route>();
         JSONObject jsonData = new JSONObject(data);
         JSONArray jsonRoutes = jsonData.getJSONArray("routes");
         for (int i = 0; i < jsonRoutes.length(); i++) {
@@ -112,8 +113,28 @@ public class DirectionFinder {
             route.endLocation = new LatLng(jsonEndLocation.getDouble("lat"), jsonEndLocation.getDouble("lng"));
             route.points = decodePolyLine(overview_polylineJson.getString("points"));
             routes.add(route);
+            JSONArray stepObj = jsonLegs.getJSONObject(0).getJSONArray("steps");
+            for (int idx = 0; idx < stepObj.length(); idx++) {
+                Route route_ = new Route();
+                JSONObject jsoneachStep = stepObj.getJSONObject(idx);
+                JSONObject each_polylineJson = jsoneachStep.getJSONObject("polyline");
+                JSONObject jsoneachDistance = jsoneachStep.getJSONObject("distance");
+                JSONObject jsoneachDuration = jsoneachStep.getJSONObject("duration");
+                JSONObject jsoneachEndLocation = jsoneachStep.getJSONObject("end_location");
+                JSONObject jsoneachStartLocation = jsoneachStep.getJSONObject("start_location");
+
+                route_.distance = new Distance(jsoneachDistance.getString("text"), jsoneachDistance.getInt("value"));
+                route_.duration = new Duration(jsoneachDuration.getString("text"), jsoneachDuration.getInt("value"));
+                route_.endAddress = "";
+                route_.startAddress = "";
+                route_.startLocation = new LatLng(jsoneachStartLocation.getDouble("lat"), jsoneachStartLocation.getDouble("lng"));
+                route_.endLocation = new LatLng(jsoneachEndLocation.getDouble("lat"), jsoneachEndLocation.getDouble("lng"));
+                route_.points = decodePolyLine(each_polylineJson.getString("points"));
+                arRoutes.add(route_);
+            }
+
         }
-        listener.onDirectionFinderSuccess(routes);
+        listener.onDirectionFinderSuccess(routes,arRoutes);
     }
 
     private List<LatLng> decodePolyLine(final String poly) {

@@ -21,17 +21,48 @@ public class EventRoute {
     public LatLng startLocation;
     public Address AddressAroundLastLocation;
 
+    public ArrayList<Route> getListRouteInEvent() {
+        return ListRouteInEvent;
+    }
+
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public Distance getDistance() {
+        return distance;
+    }
+
+    public String getEndAddress() {
+        return endAddress;
+    }
+
+    public LatLng getEndLocation() {
+        return endLocation;
+    }
+
+    public String getStartAddress() {
+        return startAddress;
+    }
+
+    public LatLng getStartLocation() {
+        return startLocation;
+    }
+
+    public Address getAddressAroundLastLocation() {
+        return AddressAroundLastLocation;
+    }
+
     public EventRoute(ArrayList<Route> listRouteInEvent, Duration duration, Distance distance,
-                      String endAddress, LatLng endLocation, String startAddress, LatLng startLocation) {
+                       String startAddress, LatLng startLocation,String endAddress, LatLng endLocation) {
         this.ListRouteInEvent = listRouteInEvent;
         this.duration = duration;
         this.distance = distance;
         this.endAddress = endAddress;
         this.endLocation = endLocation;
         this.startAddress = startAddress;
+
         this.startLocation = startLocation;
     }
-
-
 
 }
