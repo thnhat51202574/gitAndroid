@@ -119,6 +119,7 @@ public class EventFragment extends Fragment{
 
     public void showDialog(ArrayList<Event> Events,int position){
         final Event view_event = Events.get(position);
+        final String event_id = view_event.get_id();
         View view = getActivity().getLayoutInflater().inflate (R.layout.bottom_event_dialog, null);
 
         final Dialog mDetailEventDialog = new Dialog(getActivity(),R.style.MaterialDialogSheet);
@@ -157,7 +158,7 @@ public class EventFragment extends Fragment{
             @Override
             public void onClick(View v) {
                 Intent WeGoIntent = new Intent(getActivity(), MapsActivity.class);
-                WeGoIntent.putExtra("event_id", view_event.get_id());
+                WeGoIntent.putExtra("event_id", event_id);
                 WeGoIntent.putExtra("currentUser_id",globalUser.getCur_user().get_id());
                 startActivity(WeGoIntent);
             }
