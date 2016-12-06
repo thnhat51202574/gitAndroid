@@ -40,6 +40,8 @@ import com.github.nkzawa.socketio.client.Socket;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import globalClass.GlobalUserClass;
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,LocationListener,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
@@ -57,6 +59,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     };
     private static final int INITIAL_REQUEST=1337;
     private GoogleMap mMap;
+    private String Event_id;
+    private String User_id;
+    GlobalUserClass globalUser;
     LocationRequest mLocationRequest;
     GoogleApiClient mGoogleApiClient;
     Location mCurrentLocation,mLastLocation;
@@ -75,11 +80,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-        final Bundle extras = getIntent().getExtras();
-        if(extras!= null) {
-            UName = extras.getString("username");
-            Log.e("TAG", "NAME ...............: " +UName);
+        globalUser = (GlobalUserClass) getApplicationContext();
+
+        if(savedInstanceState == null) {
+            final Bundle extras = getIntent().getExtras();
+            if(extras!= null) {
+                Event_id = extras.getString("event_id");
+                User_id = extras.getString("currentUser_id");
+                Log.e("TAG", " event_id...............: " + Event_id);
+                Log.e("TAG", " user_id...............: " + User_id);
+            } else {
+                //do something to get back to previous activity
+            }
+        } else {
+
         }
+
         if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(this)
                     .addConnectionCallbacks(this)
@@ -92,7 +108,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         Log.e("TAG", "onCreatea");
-        mSocket.on("newmessageadd",onNewmessage);
+        mSocket.on("connect",onConnection);
+        mSocket.on("updatejoin",onNewmessage);
+        mSocket.on("updatejoin",onUserJoinOrOut);
         mSocket.on("disMess",onUserdisconnect);
         mSocket.connect();
         //listening
@@ -294,6 +312,45 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     } catch (JSONException e) {
                         return;
                     }
+                }
+            });
+        }
+    };
+
+    private Emitter.Listener onConnection = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    String lat = String.valueOf(mCurrentLocation.getLatitude());
+                    String lng = String.valueOf(mCurrentLocation.getLongitude());
+                    try {
+                        JSONObject dataInsert = new JSONObject();
+                        //create JSONdata to send to server
+                        dataInsert.put("uname",globalUser.getCur_user().getName());
+                        dataInsert.put("uid",globalUser.getCur_user().get_id());
+                        dataInsert.put("eventid",Event_id);
+                        dataInsert.put("lng",lng);
+                        dataInsert.put("lat",lat);
+                        mSocket.emit("addUsertoliveEvent", dataInsert);
+                    } catch (JSONException e){
+                        Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_LONG).show();
+                    }
+
+                }
+            });
+        }
+    };
+
+
+    private Emitter.Listener onUserJoinOrOut = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    //
                 }
             });
         }
