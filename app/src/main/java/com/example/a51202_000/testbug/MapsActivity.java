@@ -57,6 +57,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     };
     private static final int INITIAL_REQUEST=1337;
     private GoogleMap mMap;
+    private String Event_id;
+    private String User_id;
     LocationRequest mLocationRequest;
     GoogleApiClient mGoogleApiClient;
     Location mCurrentLocation,mLastLocation;
@@ -75,11 +77,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-        final Bundle extras = getIntent().getExtras();
-        if(extras!= null) {
-            UName = extras.getString("username");
-            Log.e("TAG", "NAME ...............: " +UName);
+
+        if(savedInstanceState == null) {
+            final Bundle extras = getIntent().getExtras();
+            if(extras!= null) {
+                Event_id = extras.getString("event_id");
+                User_id = extras.getString("currentUser_id");
+                Log.e("TAG", " event_id...............: " + Event_id);
+                Log.e("TAG", " user_id...............: " + User_id);
+            } else {
+                //do something to get back to previous activity
+            }
+        } else {
+
         }
+
         if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(this)
                     .addConnectionCallbacks(this)
