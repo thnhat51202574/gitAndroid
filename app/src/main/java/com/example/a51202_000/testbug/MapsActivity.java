@@ -40,6 +40,8 @@ import com.github.nkzawa.socketio.client.Socket;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import globalClass.GlobalUserClass;
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,LocationListener,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
@@ -59,6 +61,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private String Event_id;
     private String User_id;
+    GlobalUserClass globalUser;
     LocationRequest mLocationRequest;
     GoogleApiClient mGoogleApiClient;
     Location mCurrentLocation,mLastLocation;
@@ -77,6 +80,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+        globalUser = (GlobalUserClass) getApplicationContext();
 
         if(savedInstanceState == null) {
             final Bundle extras = getIntent().getExtras();
@@ -104,7 +108,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         Log.e("TAG", "onCreatea");
-        mSocket.on("newmessageadd",onNewmessage);
+        mSocket.on("connect",onConnection);
+        mSocket.on("updatejoin",onNewmessage);
+        mSocket.on("updatejoin",onUserJoinOrOut);
         mSocket.on("disMess",onUserdisconnect);
         mSocket.connect();
         //listening
@@ -306,6 +312,45 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     } catch (JSONException e) {
                         return;
                     }
+                }
+            });
+        }
+    };
+
+    private Emitter.Listener onConnection = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    String lat = String.valueOf(mCurrentLocation.getLatitude());
+                    String lng = String.valueOf(mCurrentLocation.getLongitude());
+                    try {
+                        JSONObject dataInsert = new JSONObject();
+                        //create JSONdata to send to server
+                        dataInsert.put("uname",globalUser.getCur_user().getName());
+                        dataInsert.put("uid",globalUser.getCur_user().get_id());
+                        dataInsert.put("eventid",Event_id);
+                        dataInsert.put("lng",lng);
+                        dataInsert.put("lat",lat);
+                        mSocket.emit("addUsertoliveEvent", dataInsert);
+                    } catch (JSONException e){
+                        Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_LONG).show();
+                    }
+
+                }
+            });
+        }
+    };
+
+
+    private Emitter.Listener onUserJoinOrOut = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    //
                 }
             });
         }
