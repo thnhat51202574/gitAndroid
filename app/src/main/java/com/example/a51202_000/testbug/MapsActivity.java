@@ -127,28 +127,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onConnected(Bundle bundle) {
-        Log.e("TAG", "onConnected - isConnected ...............: " + mGoogleApiClient.isConnected());
-        Log.e("TAG", "haspermission ...............: " +canAccessLocation() );
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
         addUsertoliveEvent();
         createLocationRequest();
-//        if(!canAccessLocation()){
-//            ActivityCompat.requestPermissions(this,
-//                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-//                    INITIAL_REQUEST);
-//        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         mSocket.connect();
-        if(!canAccessLocation()){
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    INITIAL_REQUEST);
-        }
     }
 
     protected void createLocationRequest() {
@@ -209,11 +197,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             LatLng myLocation = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
             Marker newmarker = ListMarkerByUser.get(globalUser.getCur_user().get_id());
             if(newmarker == null) {
-                newmarker = mMap.addMarker(new MarkerOptions().position(myLocation).title(globalUser.getCur_user().getName()));
+                newmarker = mMap.addMarker(new MarkerOptions().position(myLocation)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.start_marker)).title(globalUser.getCur_user().getName()));
             } else {
                 newmarker.remove();
 //                Toast.makeText(getApplicationContext(),lat +',' + lng,Toast.LENGTH_LONG).show();
-                newmarker = mMap.addMarker(new MarkerOptions().position(myLocation).title(globalUser.getCur_user().getName()));
+                newmarker = mMap.addMarker(new MarkerOptions().position(myLocation)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.start_marker)).title(globalUser.getCur_user().getName()));
             }
             ListMarkerByUser.put(globalUser.getCur_user().get_id(),newmarker);
             mMap.moveCamera(CameraUpdateFactory.newLatLng(myLocation));
@@ -223,14 +213,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Toast.makeText(getApplicationContext(), "Location Null", Toast.LENGTH_LONG).show();
         }
     }
-    private boolean canAccessLocation() {
-        return(hasPermission(Manifest.permission.ACCESS_FINE_LOCATION));
-    }
-    private boolean hasPermission(String perm) {
-        int permissionCheck = ContextCompat.checkSelfPermission(getApplicationContext(),
-                Manifest.permission.WRITE_CALENDAR);
-        return (permissionCheck == PackageManager.PERMISSION_GRANTED);
-    }
+
     private Emitter.Listener useroutListener = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
@@ -258,6 +241,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         }
                         ListMarkerByUser.put(userid,LastMarker);
                         Toast.makeText(getApplicationContext(),message,Toast.LENGTH_LONG).show();
+
                     } catch (JSONException e) {
                         return;
                     }
@@ -290,6 +274,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         }
                         ListMarkerByUser.put(userid,newmarker);
                         Toast.makeText(getApplicationContext(),username + " cập nhật vị trí",Toast.LENGTH_LONG).show();
+                        Log.d("========>", "run: "+ListMarkerByUser.size());
                     } catch (JSONException e) {
                         return;
                     }

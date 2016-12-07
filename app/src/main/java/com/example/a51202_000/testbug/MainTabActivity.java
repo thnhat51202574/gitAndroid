@@ -1,9 +1,12 @@
 package com.example.a51202_000.testbug;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -57,10 +60,16 @@ public class MainTabActivity extends AppCompatActivity implements HomeFragment.c
     ProfileFragment profileFragment;
     FriendFrament friendFragment;
     GlobalUserClass globalUser;
+    private static final int INITIAL_REQUEST=1337;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_tab);
+        if(!canAccessLocation()){
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    INITIAL_REQUEST);
+        }
         globalUser = (GlobalUserClass) getApplicationContext();
 //        screen holdon
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -173,6 +182,14 @@ public class MainTabActivity extends AppCompatActivity implements HomeFragment.c
                 }
             });
             fab.startAnimation(shrink);
+    }
+    private boolean canAccessLocation() {
+        return(hasPermission(Manifest.permission.ACCESS_FINE_LOCATION));
+    }
+    private boolean hasPermission(String perm) {
+        int permissionCheck = ContextCompat.checkSelfPermission(getApplicationContext(),
+                Manifest.permission.WRITE_CALENDAR);
+        return (permissionCheck == PackageManager.PERMISSION_GRANTED);
     }
     @Override
     public void onBackPressed() {
