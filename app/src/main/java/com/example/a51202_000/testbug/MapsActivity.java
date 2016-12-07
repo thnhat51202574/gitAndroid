@@ -94,7 +94,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         mSocket.connect();
         mSocket.on("updatejoin",updatejoinListener);
-        mSocket.on("sendUserPosition",updateUserPositionListener);
+        mSocket.on("updateUserPosition",updateUserPositionListener);
         mSocket.on("userout",useroutListener);
         if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -345,7 +345,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     };
     private void addUsertoliveEvent(){
-        Log.d("==========>", "run: onConnection ");
+
         String lat = String.valueOf(mLastLocation.getLatitude());
         String lng = String.valueOf(mLastLocation.getLongitude());
         try {
