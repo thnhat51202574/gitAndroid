@@ -44,6 +44,7 @@ import java.util.Calendar;
 
 import Model.Event;
 import Model.User;
+import globalClass.GlobalUserClass;
 
 public class EventFragment extends Fragment{
     // TODO: Rename parameter arguments, choose names that match
@@ -57,6 +58,7 @@ public class EventFragment extends Fragment{
     private Button btnHide;
     private TextView textView;
     ArrayList<Event> events;
+    GlobalUserClass globalUser;
     private ListView lv_event;
     ProgressDialog progressDialog;
     public EventFragment() {
@@ -91,7 +93,7 @@ public class EventFragment extends Fragment{
         View rootView =inflater.inflate(R.layout.fragment_event, container, false);
 
         swipeContainer = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeContainer);
-
+        globalUser = (GlobalUserClass) getActivity().getApplicationContext();
         lv_event = (ListView) rootView.findViewById(R.id.list_event);
         events = new ArrayList<>();
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -111,12 +113,13 @@ public class EventFragment extends Fragment{
         progressDialog.setMessage("Đang tải dữ liệu....");
         progressDialog.show();
 
-        new ReadEventJSON().execute("http://totnghiep.herokuapp.com/api/event/");
+        new ReadEventJSON().execute("http://totnghiep.herokuapp.com/api/event/createdby/");
         return rootView;
     }
 
     public void showDialog(ArrayList<Event> Events,int position){
-        Event view_event = Events.get(position);
+        final Event view_event = Events.get(position);
+        final String event_id = view_event.get_id();
         View view = getActivity().getLayoutInflater().inflate (R.layout.bottom_event_dialog, null);
 
         final Dialog mDetailEventDialog = new Dialog(getActivity(),R.style.MaterialDialogSheet);
@@ -155,6 +158,8 @@ public class EventFragment extends Fragment{
             @Override
             public void onClick(View v) {
                 Intent WeGoIntent = new Intent(getActivity(), MapsActivity.class);
+                WeGoIntent.putExtra("event_id", event_id);
+                WeGoIntent.putExtra("currentUser_id",globalUser.getCur_user().get_id());
                 startActivity(WeGoIntent);
             }
         });
@@ -168,7 +173,7 @@ public class EventFragment extends Fragment{
 
     private void refreshListEvent() {
         events = new ArrayList<>();
-        new ReadEventJSON().execute("http://totnghiep.herokuapp.com/api/event/");
+        new ReadEventJSON().execute("http://totnghiep.herokuapp.com/api/event/createdby/");
         swipeContainer.setRefreshing(false);
     }
 
@@ -231,7 +236,8 @@ public class EventFragment extends Fragment{
             StringBuilder result = new StringBuilder();
             BufferedReader bufferedReader = null;
             try {
-                URL url = new URL(urlpath);
+                String path = globalUser.getCur_user().get_id();
+                URL url = new URL(urlpath + path);
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setReadTimeout(10000);
                 urlConnection.setConnectTimeout(10000);

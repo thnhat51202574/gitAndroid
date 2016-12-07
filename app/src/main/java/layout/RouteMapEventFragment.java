@@ -37,14 +37,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import AsyncTask.getNearestLocationTask;
+import Model.Event;
 import Modules.DirectionFinder;
 import Modules.DirectionFinderListener;
+import Modules.EventRoute;
+import Modules.EventRouteFinder;
+import Modules.EventRouterFinderListener;
 import Modules.Route;
 
 
-public class RouteMapEventFragment extends Fragment implements DirectionFinderListener {
+public class RouteMapEventFragment extends Fragment implements DirectionFinderListener, EventRouterFinderListener {
     private List<Marker> originMarkers = new ArrayList<>();
     private List<Marker> destinationMarkers = new ArrayList<>();
+    private List<Marker> stopMarkers = new ArrayList<>();
     private List<Polyline> polylinePaths = new ArrayList<>();
     private ProgressDialog progressDialog;
 
@@ -198,12 +203,12 @@ public class RouteMapEventFragment extends Fragment implements DirectionFinderLi
     }
 
     @Override
-    public void onDirectionFinderSuccess(List<Route> routes) {
+    public void onDirectionFinderSuccess(List<Route> routes, List<Route> arRoute) throws UnsupportedEncodingException {
         progressDialog.dismiss();
         polylinePaths = new ArrayList<>();
         originMarkers = new ArrayList<>();
         destinationMarkers = new ArrayList<>();
-
+        new EventRouteFinder(RouteMapEventFragment.this,arRoute).execute();
         for (Route route : routes) {
             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(route.startLocation, 16));
 //            ((TextView) findViewById(R.id.tvDuration)).setText(route.duration.text);
@@ -229,6 +234,23 @@ public class RouteMapEventFragment extends Fragment implements DirectionFinderLi
             polylinePaths.add(googleMap.addPolyline(polylineOptions));
         }
     }
+    @Override
+    public void onEventRouterFinderStart() {
+        progressDialog = ProgressDialog.show(getActivity(), "Vui lòng đợi.",
+                "Tìm gợi ý..!", true);
+    }
 
+    @Override
+    public void onEventRouterFinderFinish(ArrayList<EventRoute> arEventRoutes) {
+        stopMarkers = new ArrayList<>();
+        for (int i = 0; i < arEventRoutes.size(); i++) {
+            EventRoute eachRoute = arEventRoutes.get(i);
+            stopMarkers.add(googleMap.addMarker(new MarkerOptions()
+//                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.start_marker))
+                    .position(eachRoute.getEndLocation())));
+        }
+        progressDialog.dismiss();
+        String a = "";
+    }
 
 }
