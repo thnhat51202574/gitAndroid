@@ -22,6 +22,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -40,12 +41,14 @@ import com.github.nkzawa.socketio.client.Socket;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import globalClass.GlobalUserClass;
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,LocationListener,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private static final int MILLISECONDS_PER_SECOND = 1000;
 
-    public static final int UPDATE_INTERVAL_IN_SECONDS = 5;
+    public static final int UPDATE_INTERVAL_IN_SECONDS = 10;
     private static final long UPDATE_INTERVAL =  MILLISECONDS_PER_SECOND * UPDATE_INTERVAL_IN_SECONDS;
 
     private static final int FASTEST_INTERVAL_IN_SECONDS = 1;
@@ -57,15 +60,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     };
     private static final int INITIAL_REQUEST=1337;
     private GoogleMap mMap;
+    private String Event_id;
+    private String User_id;
+    GlobalUserClass globalUser;
     LocationRequest mLocationRequest;
     GoogleApiClient mGoogleApiClient;
     Location mCurrentLocation,mLastLocation;
-    String UName;
     HashMap<String,Marker> ListMarkerByUser = new HashMap<String,Marker>();
     private Socket mSocket;
     {
         try {
             mSocket = IO.socket("http://totnghiep.herokuapp.com/");
+//            mSocket = IO.socket("http://192.168.1.113:3000/");
             Log.e("TAG", "success ...............: ");
         } catch (URISyntaxException e) {
             Log.e("TAG", "erorsocket ...............: " + e.toString());
@@ -75,11 +81,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-        final Bundle extras = getIntent().getExtras();
-        if(extras!= null) {
-            UName = extras.getString("username");
-            Log.e("TAG", "NAME ...............: " +UName);
+        globalUser = (GlobalUserClass) getApplicationContext();
+
+        if(savedInstanceState == null) {
+            final Bundle extras = getIntent().getExtras();
+            if (extras != null) {
+                Event_id = extras.getString("event_id");
+                User_id = extras.getString("currentUser_id");
+            } else {
+
+            }
         }
+        mSocket.connect();
+        mSocket.on("updatejoin",updatejoinListener);
+        mSocket.on("sendUserPosition",updateUserPositionListener);
+        mSocket.on("userout",useroutListener);
         if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(this)
                     .addConnectionCallbacks(this)
@@ -91,15 +107,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        Log.e("TAG", "onCreatea");
-        mSocket.on("newmessageadd",onNewmessage);
-        mSocket.on("disMess",onUserdisconnect);
-        mSocket.connect();
+
         //listening
         //end listening socket
 
     }
-
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -117,52 +129,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onConnected(Bundle bundle) {
         Log.e("TAG", "onConnected - isConnected ...............: " + mGoogleApiClient.isConnected());
         Log.e("TAG", "haspermission ...............: " +canAccessLocation() );
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                mGoogleApiClient);
+        addUsertoliveEvent();
+        createLocationRequest();
+//        if(!canAccessLocation()){
+//            ActivityCompat.requestPermissions(this,
+//                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+//                    INITIAL_REQUEST);
+//        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mSocket.connect();
         if(!canAccessLocation()){
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     INITIAL_REQUEST);
         }
-
-
-
     }
-    @Override
-    public void onRequestPermissionsResult(int requestCode,String permissions[], int[] grantResults) {
-        Log.e("TAG", "requestcode - ...............: " + grantResults[0]);
-        Log.e("TAG", "requestcode - ...............: " + PackageManager.PERMISSION_GRANTED);
-        switch (requestCode) {
-            case INITIAL_REQUEST: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
-                    mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                            mGoogleApiClient);
-//                    if (mLastLocation != null) {
-//                        String lat = String.valueOf(mLastLocation.getLatitude());
-//                        String lng = String.valueOf(mLastLocation.getLongitude());
-//                        Log.e("TAG", "Latitude - ...............: " + lat);
-//                        Log.e("TAG", "Longitude - ...............: " + lng);
-//                        LatLng myLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-//                        mMap.addMarker(new MarkerOptions().position(myLocation).title("Marker in My location"));
-//                        mMap.moveCamera(CameraUpdateFactory.newLatLng(myLocation));
-//                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLocation,16));
-//
-//                    }
-                    createLocationRequest();
-
-                } else {
-
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
-                }
-                return;
-            }
-
-            // other 'case' lines to check for other
-            // permissions this app might request
-        }
-    }
     protected void createLocationRequest() {
         mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(10000);
@@ -185,10 +173,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //        mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
         updateUI();
     }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
         mSocket.disconnect();
+        mSocket.close();
     }
     protected void onStart() {
         mGoogleApiClient.connect();
@@ -196,6 +186,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
     protected void onStop() {
         mGoogleApiClient.disconnect();
+        mSocket.close();
+        mSocket.disconnect();
         super.onStop();
     }
     private void updateUI() {
@@ -208,26 +200,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //                    + lat, Toast.LENGTH_LONG).show();
             try {
                 JSONObject dataInsert = new JSONObject();
-                //create JSONdata to send to server
-                dataInsert.put("uname",UName);
                 dataInsert.put("lng",lng);
                 dataInsert.put("lat",lat);
-                mSocket.emit("newmessage", dataInsert);
+                mSocket.emit("sendUserPosition", dataInsert);
             } catch (JSONException e){
                 Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_LONG).show();
             }
-
             LatLng myLocation = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
-            Marker newmarker = ListMarkerByUser.get(UName);
+            Marker newmarker = ListMarkerByUser.get(globalUser.getCur_user().get_id());
             if(newmarker == null) {
-                Toast.makeText(getApplicationContext(),"NOCHANGE",Toast.LENGTH_LONG).show();
-                newmarker = mMap.addMarker(new MarkerOptions().position(myLocation).title(UName));
+                newmarker = mMap.addMarker(new MarkerOptions().position(myLocation).title(globalUser.getCur_user().getName()));
             } else {
                 newmarker.remove();
-                Toast.makeText(getApplicationContext(),lat +',' + lng,Toast.LENGTH_LONG).show();
-                newmarker = mMap.addMarker(new MarkerOptions().position(myLocation).title(UName));
+//                Toast.makeText(getApplicationContext(),lat +',' + lng,Toast.LENGTH_LONG).show();
+                newmarker = mMap.addMarker(new MarkerOptions().position(myLocation).title(globalUser.getCur_user().getName()));
             }
-            ListMarkerByUser.put(UName,newmarker);
+            ListMarkerByUser.put(globalUser.getCur_user().get_id(),newmarker);
             mMap.moveCamera(CameraUpdateFactory.newLatLng(myLocation));
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLocation,16));
         } else {
@@ -243,31 +231,65 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Manifest.permission.WRITE_CALENDAR);
         return (permissionCheck == PackageManager.PERMISSION_GRANTED);
     }
-    private Emitter.Listener onNewmessage = new Emitter.Listener() {
+    private Emitter.Listener useroutListener = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-//                    ListUser = (ListView) findViewById(R.id.listUser);
                     JSONObject data = (JSONObject) args[0];
-                    String name;
+                    String message, userid, username;
+                    Double Lastlng;
+                    Double Lastlat;
+                    try {
+                        username = data.getString("username");
+                        message = data.getString("message");
+                        userid = data.getString("userid");
+                        Marker LastMarker = ListMarkerByUser.get(userid);
+                        if(LastMarker == null) {
+                           return;
+                        } else {
+                            Lastlng = LastMarker.getPosition().longitude;
+                            Lastlat = LastMarker.getPosition().latitude;
+                            LatLng LastPosition = new LatLng(Lastlat,Lastlng);
+                            LastMarker.remove();
+                            LastMarker = mMap.addMarker(new MarkerOptions().position(LastPosition)
+                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.start_marker)).title(username));
+                        }
+                        ListMarkerByUser.put(userid,LastMarker);
+                        Toast.makeText(getApplicationContext(),message,Toast.LENGTH_LONG).show();
+                    } catch (JSONException e) {
+                        return;
+                    }
+                }
+            });
+        }
+    };
+    private Emitter.Listener updateUserPositionListener = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    JSONObject data = (JSONObject) args[0];
+                    String userid, username;
                     Double lng;
                     Double lat;
                     try {
-                        name = data.getString("name");
+                        userid = data.getString("userid");
+                        username = data.getString("username");
                         lng = data.getDouble("lng");
                         lat = data.getDouble("lat");
                         LatLng myLocation = new LatLng(lat,lng);
-                        Marker newmarker = ListMarkerByUser.get(name);
+                        Marker newmarker = ListMarkerByUser.get(userid);
                         if(newmarker == null) {
-                            newmarker = mMap.addMarker(new MarkerOptions().position(myLocation).title(name));
+                            newmarker = mMap.addMarker(new MarkerOptions().position(myLocation).title(username));
                         } else {
                             newmarker.remove();
-                            newmarker = mMap.addMarker(new MarkerOptions().position(myLocation).title(name));
+                            newmarker = mMap.addMarker(new MarkerOptions().position(myLocation).title(username));
                         }
-                        ListMarkerByUser.put(name,newmarker);
-//                        Toast.makeText(getApplicationContext(),name,Toast.LENGTH_LONG).show();
+                        ListMarkerByUser.put(userid,newmarker);
+                        Toast.makeText(getApplicationContext(),username + " cập nhật vị trí",Toast.LENGTH_LONG).show();
                     } catch (JSONException e) {
                         return;
                     }
@@ -275,22 +297,33 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             });
         }
     };
-    private Emitter.Listener onUserdisconnect = new Emitter.Listener() {
+
+    private Emitter.Listener updatejoinListener = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     JSONObject data = (JSONObject) args[0];
-                    String name;
+                    String message, userid, username;
+                    Double lng;
+                    Double lat;
                     try {
-                        name = data.getString("name");
-                        Marker newmarker = ListMarkerByUser.get(name);
-                        if(newmarker != null) {
+                        message = data.getString("message");
+                        userid = data.getString("userid");
+                        username = data.getString("username");
+                        lng = data.getDouble("lng");
+                        lat = data.getDouble("lat");
+                        LatLng myLocation = new LatLng(lat,lng);
+                        Marker newmarker = ListMarkerByUser.get(userid);
+                        if(newmarker == null) {
+                            newmarker = mMap.addMarker(new MarkerOptions().position(myLocation).title(username));
+                        } else {
                             newmarker.remove();
+                            newmarker = mMap.addMarker(new MarkerOptions().position(myLocation).title(username));
                         }
-                        ListMarkerByUser.remove(name);
-                        Toast.makeText(getApplicationContext(),name + " disconect",Toast.LENGTH_LONG).show();
+                        ListMarkerByUser.put(userid,newmarker);
+                        Toast.makeText(getApplicationContext(),message,Toast.LENGTH_LONG).show();
                     } catch (JSONException e) {
                         return;
                     }
@@ -298,4 +331,34 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             });
         }
     };
+
+
+    private Emitter.Listener onUserJoinOrOut = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    //
+                }
+            });
+        }
+    };
+    private void addUsertoliveEvent(){
+        Log.d("==========>", "run: onConnection ");
+        String lat = String.valueOf(mLastLocation.getLatitude());
+        String lng = String.valueOf(mLastLocation.getLongitude());
+        try {
+            JSONObject dataInsert = new JSONObject();
+            //create JSONdata to send to server
+            dataInsert.put("uname",globalUser.getCur_user().getName());
+            dataInsert.put("uid",globalUser.getCur_user().get_id());
+            dataInsert.put("eventid",Event_id);
+            dataInsert.put("lng",lng);
+            dataInsert.put("lat",lat);
+            mSocket.emit("addUsertoliveEvent", dataInsert);
+        } catch (JSONException e){
+            Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_LONG).show();
+        }
+    }
 }
