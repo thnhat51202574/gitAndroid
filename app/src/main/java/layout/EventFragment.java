@@ -237,7 +237,8 @@ public class EventFragment extends Fragment{
             BufferedReader bufferedReader = null;
             try {
                 String path = globalUser.getCur_user().get_id();
-                URL url = new URL(urlpath + path);
+                //URL url = new URL(urlpath + path);
+                URL url = new URL("http://totnghiep.herokuapp.com/api/event/");
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setReadTimeout(10000);
                 urlConnection.setConnectTimeout(10000);

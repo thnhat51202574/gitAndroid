@@ -32,11 +32,14 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import org.json.JSONObject;
+
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
 import AsyncTask.getNearestLocationTask;
+import Model.Address;
 import Model.Event;
 import Modules.DirectionFinder;
 import Modules.DirectionFinderListener;
@@ -208,7 +211,7 @@ public class RouteMapEventFragment extends Fragment implements DirectionFinderLi
         polylinePaths = new ArrayList<>();
         originMarkers = new ArrayList<>();
         destinationMarkers = new ArrayList<>();
-        new EventRouteFinder(RouteMapEventFragment.this,arRoute).execute();
+        new EventRouteFinder(RouteMapEventFragment.this,arRoute,getActivity()).execute();
         for (Route route : routes) {
             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(route.startLocation, 16));
 //            ((TextView) findViewById(R.id.tvDuration)).setText(route.duration.text);
@@ -248,9 +251,22 @@ public class RouteMapEventFragment extends Fragment implements DirectionFinderLi
             stopMarkers.add(googleMap.addMarker(new MarkerOptions()
 //                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.start_marker))
                     .position(eachRoute.getEndLocation())));
+            ArrayList<Address>  listAdderss = eachRoute.getAddressAroundLastLocation();
+            for (int idx = 0; idx < listAdderss.size(); idx++) {
+                Address eachAddress = listAdderss.get(idx);
+                LatLng mylocation = eachAddress.getLocs();
+                MarkerOptions marker = new MarkerOptions().position(mylocation).title(eachAddress.getName());
+                marker.icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons("restaurant",50,50)));
+
+                Marker _marker = googleMap.addMarker(marker);
+            }
         }
         progressDialog.dismiss();
-        String a = "";
+    }
+    public Bitmap resizeMapIcons(String iconName,int width, int height){
+        Bitmap imageBitmap = BitmapFactory.decodeResource(getActivity().getResources(),getActivity().getResources().getIdentifier(iconName, "drawable", getActivity().getPackageName()));
+        Bitmap resizedBitmap = Bitmap.createScaledBitmap(imageBitmap, width, height, false);
+        return resizedBitmap;
     }
 
 }

@@ -70,8 +70,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Socket mSocket;
     {
         try {
-            mSocket = IO.socket("http://totnghiep.herokuapp.com/");
-//            mSocket = IO.socket("http://192.168.1.113:3000/");
+          //  mSocket = IO.socket("http://totnghiep.herokuapp.com/");
+           mSocket = IO.socket("http://192.168.1.113:3000/");
             Log.e("TAG", "success ...............: ");
         } catch (URISyntaxException e) {
             Log.e("TAG", "erorsocket ...............: " + e.toString());
@@ -94,7 +94,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         mSocket.connect();
         mSocket.on("updatejoin",updatejoinListener);
-        mSocket.on("sendUserPosition",updateUserPositionListener);
+        mSocket.on("updateUserPosition",updateUserPositionListener);
         mSocket.on("userout",useroutListener);
         if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -127,28 +127,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onConnected(Bundle bundle) {
-        Log.e("TAG", "onConnected - isConnected ...............: " + mGoogleApiClient.isConnected());
-        Log.e("TAG", "haspermission ...............: " +canAccessLocation() );
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
         addUsertoliveEvent();
         createLocationRequest();
-//        if(!canAccessLocation()){
-//            ActivityCompat.requestPermissions(this,
-//                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-//                    INITIAL_REQUEST);
-//        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         mSocket.connect();
-        if(!canAccessLocation()){
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    INITIAL_REQUEST);
-        }
     }
 
     protected void createLocationRequest() {
@@ -209,28 +197,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             LatLng myLocation = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
             Marker newmarker = ListMarkerByUser.get(globalUser.getCur_user().get_id());
             if(newmarker == null) {
-                newmarker = mMap.addMarker(new MarkerOptions().position(myLocation).title(globalUser.getCur_user().getName()));
+                newmarker = mMap.addMarker(new MarkerOptions().position(myLocation)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.start_marker)).title(globalUser.getCur_user().getName()));
             } else {
                 newmarker.remove();
 //                Toast.makeText(getApplicationContext(),lat +',' + lng,Toast.LENGTH_LONG).show();
-                newmarker = mMap.addMarker(new MarkerOptions().position(myLocation).title(globalUser.getCur_user().getName()));
+                newmarker = mMap.addMarker(new MarkerOptions().position(myLocation)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.start_marker)).title(globalUser.getCur_user().getName()));
             }
             ListMarkerByUser.put(globalUser.getCur_user().get_id(),newmarker);
             mMap.moveCamera(CameraUpdateFactory.newLatLng(myLocation));
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLocation,16));
         } else {
             Log.e("TAG", "location is null ...............");
-            Toast.makeText(getApplicationContext(), "Location Null", Toast.LENGTH_LONG).show();
+//            Toast.makeText(getApplicationContext(), "Location Null", Toast.LENGTH_LONG).show();
         }
     }
-    private boolean canAccessLocation() {
-        return(hasPermission(Manifest.permission.ACCESS_FINE_LOCATION));
-    }
-    private boolean hasPermission(String perm) {
-        int permissionCheck = ContextCompat.checkSelfPermission(getApplicationContext(),
-                Manifest.permission.WRITE_CALENDAR);
-        return (permissionCheck == PackageManager.PERMISSION_GRANTED);
-    }
+
     private Emitter.Listener useroutListener = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
@@ -254,10 +237,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             LatLng LastPosition = new LatLng(Lastlat,Lastlng);
                             LastMarker.remove();
                             LastMarker = mMap.addMarker(new MarkerOptions().position(LastPosition)
-                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.start_marker)).title(username));
+                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_disconect)).title(username));
                         }
                         ListMarkerByUser.put(userid,LastMarker);
-                        Toast.makeText(getApplicationContext(),message,Toast.LENGTH_LONG).show();
+//                        Toast.makeText(getApplicationContext(),message,Toast.LENGTH_LONG).show();
+
                     } catch (JSONException e) {
                         return;
                     }
@@ -289,7 +273,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             newmarker = mMap.addMarker(new MarkerOptions().position(myLocation).title(username));
                         }
                         ListMarkerByUser.put(userid,newmarker);
-                        Toast.makeText(getApplicationContext(),username + " cập nhật vị trí",Toast.LENGTH_LONG).show();
+//                        Toast.makeText(getApplicationContext(),username + " cập nhật vị trí",Toast.LENGTH_LONG).show();
                     } catch (JSONException e) {
                         return;
                     }
@@ -323,7 +307,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             newmarker = mMap.addMarker(new MarkerOptions().position(myLocation).title(username));
                         }
                         ListMarkerByUser.put(userid,newmarker);
-                        Toast.makeText(getApplicationContext(),message,Toast.LENGTH_LONG).show();
+//                        Toast.makeText(getApplicationContext(),message,Toast.LENGTH_LONG).show();
                     } catch (JSONException e) {
                         return;
                     }
@@ -345,7 +329,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     };
     private void addUsertoliveEvent(){
-        Log.d("==========>", "run: onConnection ");
+
         String lat = String.valueOf(mLastLocation.getLatitude());
         String lng = String.valueOf(mLastLocation.getLongitude());
         try {
@@ -358,7 +342,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             dataInsert.put("lat",lat);
             mSocket.emit("addUsertoliveEvent", dataInsert);
         } catch (JSONException e){
-            Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_LONG).show();
+//            Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_LONG).show();
         }
     }
 }

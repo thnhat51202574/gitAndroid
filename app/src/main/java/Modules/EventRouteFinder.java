@@ -1,10 +1,23 @@
 package Modules;
 
+import android.content.Context;
+
 import com.google.android.gms.maps.model.LatLng;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.Ion;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+
+import AsyncTask.getAroundLocation;
+import Model.Address;
 
 /**
  * Created by 51202_000 on 04/12/2016.
@@ -13,16 +26,26 @@ import java.util.List;
 public class EventRouteFinder {
     private static final String DIRECTION_URL_API = "https://maps.googleapis.com/maps/api/directions/json?";
     private static final String GOOGLE_API_KEY = "AIzaSyCRtFrFmd_KSJuTfi6jc1121xzaIaNmolY";
+    HashMap<Route,ArrayList<Address>> ListAddress = new HashMap<>();
     private List<Route> arRoute;
     private EventRouterFinderListener listener;
-    public EventRouteFinder(EventRouterFinderListener listener, List<Route> arParamsRoute) {
+    private Context mcontext;
+    public EventRouteFinder(EventRouterFinderListener listener, List<Route> arParamsRoute, Context context) {
         this.listener = listener;
         this.arRoute = arParamsRoute;
+        this.mcontext = context;
     }
 
     public void execute() throws UnsupportedEncodingException {
         listener.onEventRouterFinderStart();
-        this.getDistanceAfterTime(2400);
+        getAroundLocation aroundLocation = new getAroundLocation(arRoute, new getAroundLocation.OnArrountCompleted() {
+            @Override
+            public void getListAddress(HashMap<Route,ArrayList<Address>> result) {
+                ListAddress = result;
+                getDistanceAfterTime(600);
+            }
+        });
+        aroundLocation.execute("http://totnghiep.herokuapp.com/api/ListAddressByLocation");
 
 //        new DirectionFinder.DownloadRawData().execute(createUrl());
     }
@@ -45,15 +68,19 @@ public class EventRouteFinder {
             time_value += cur_route.getDuration().getValue();
             Routes.add(cur_route);
             if (time_value >= value) {
-                LatLng end_route = cur_route.getEndLocation();
-                String end_address = cur_route.getEndAddress();
-                EventRoute tmp_eventRout = new EventRoute(Routes,new Duration(time_value),new Distance(distance),
-                        startAddress, start_route,end_address, end_route);
-                routeReturn.add(tmp_eventRout);
-                Routes = new ArrayList<>();
-                distance = 0;
-                time_value = 0;
-                start = true;
+                ArrayList<Address> listAddress = ListAddress.get(cur_route);
+                if(listAddress.size()>0) {
+                    LatLng end_route = cur_route.getEndLocation();
+                    String end_address = cur_route.getEndAddress();
+                    EventRoute tmp_eventRout = new EventRoute(Routes,new Duration(time_value),new Distance(distance),
+                            startAddress, start_route,end_address, end_route,listAddress);
+                    routeReturn.add(tmp_eventRout);
+                    Routes = new ArrayList<>();
+                    distance = 0;
+                    time_value = 0;
+                    start = true;
+                }
+
             }
         }
         listener.onEventRouterFinderFinish(routeReturn);
