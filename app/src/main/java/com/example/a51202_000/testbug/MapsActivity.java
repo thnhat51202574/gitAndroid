@@ -70,8 +70,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Socket mSocket;
     {
         try {
-            mSocket = IO.socket("http://totnghiep.herokuapp.com/");
-//            mSocket = IO.socket("http://192.168.1.113:3000/");
+          //  mSocket = IO.socket("http://totnghiep.herokuapp.com/");
+           mSocket = IO.socket("http://192.168.1.113:3000/");
             Log.e("TAG", "success ...............: ");
         } catch (URISyntaxException e) {
             Log.e("TAG", "erorsocket ...............: " + e.toString());
@@ -210,7 +210,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLocation,16));
         } else {
             Log.e("TAG", "location is null ...............");
-            Toast.makeText(getApplicationContext(), "Location Null", Toast.LENGTH_LONG).show();
+//            Toast.makeText(getApplicationContext(), "Location Null", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -237,10 +237,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             LatLng LastPosition = new LatLng(Lastlat,Lastlng);
                             LastMarker.remove();
                             LastMarker = mMap.addMarker(new MarkerOptions().position(LastPosition)
-                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.start_marker)).title(username));
+                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_disconect)).title(username));
                         }
                         ListMarkerByUser.put(userid,LastMarker);
-                        Toast.makeText(getApplicationContext(),message,Toast.LENGTH_LONG).show();
+//                        Toast.makeText(getApplicationContext(),message,Toast.LENGTH_LONG).show();
 
                     } catch (JSONException e) {
                         return;
@@ -273,8 +273,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             newmarker = mMap.addMarker(new MarkerOptions().position(myLocation).title(username));
                         }
                         ListMarkerByUser.put(userid,newmarker);
-                        Toast.makeText(getApplicationContext(),username + " cập nhật vị trí",Toast.LENGTH_LONG).show();
-                        Log.d("========>", "run: "+ListMarkerByUser.size());
+//                        Toast.makeText(getApplicationContext(),username + " cập nhật vị trí",Toast.LENGTH_LONG).show();
                     } catch (JSONException e) {
                         return;
                     }
@@ -308,7 +307,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             newmarker = mMap.addMarker(new MarkerOptions().position(myLocation).title(username));
                         }
                         ListMarkerByUser.put(userid,newmarker);
-                        Toast.makeText(getApplicationContext(),message,Toast.LENGTH_LONG).show();
+//                        Toast.makeText(getApplicationContext(),message,Toast.LENGTH_LONG).show();
                     } catch (JSONException e) {
                         return;
                     }
@@ -343,7 +342,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             dataInsert.put("lat",lat);
             mSocket.emit("addUsertoliveEvent", dataInsert);
         } catch (JSONException e){
-            Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_LONG).show();
+//            Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_LONG).show();
         }
     }
 }
