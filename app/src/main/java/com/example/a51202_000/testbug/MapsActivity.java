@@ -70,8 +70,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Socket mSocket;
     {
         try {
-          //  mSocket = IO.socket("http://totnghiep.herokuapp.com/");
-           mSocket = IO.socket("http://totnghiep.herokuapp.com//");
+            mSocket = IO.socket("http://totnghiep.herokuapp.com/");
             Log.e("TAG", "success ...............: ");
         } catch (URISyntaxException e) {
             Log.e("TAG", "erorsocket ...............: " + e.toString());
@@ -240,7 +239,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_disconect)).title(username));
                         }
                         ListMarkerByUser.put(userid,LastMarker);
-//                        Toast.makeText(getApplicationContext(),message,Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(),message,Toast.LENGTH_LONG).show();
 
                     } catch (JSONException e) {
                         return;
@@ -273,7 +272,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             newmarker = mMap.addMarker(new MarkerOptions().position(myLocation).title(username));
                         }
                         ListMarkerByUser.put(userid,newmarker);
-//                        Toast.makeText(getApplicationContext(),username + " cập nhật vị trí",Toast.LENGTH_LONG).show();
+//                      Toast.makeText(getApplicationContext(),username + " cập nhật vị trí",Toast.LENGTH_LONG).show();
                     } catch (JSONException e) {
                         return;
                     }
@@ -307,7 +306,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             newmarker = mMap.addMarker(new MarkerOptions().position(myLocation).title(username));
                         }
                         ListMarkerByUser.put(userid,newmarker);
-//                        Toast.makeText(getApplicationContext(),message,Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(),message,Toast.LENGTH_LONG).show();
                     } catch (JSONException e) {
                         return;
                     }

@@ -183,6 +183,12 @@ public class MainTabActivity extends AppCompatActivity implements HomeFragment.c
             });
             fab.startAnimation(shrink);
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
     private boolean canAccessLocation() {
         return(hasPermission(Manifest.permission.ACCESS_FINE_LOCATION));
     }
