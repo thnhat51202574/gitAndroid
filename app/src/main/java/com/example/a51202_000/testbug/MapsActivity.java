@@ -272,7 +272,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             newmarker = mMap.addMarker(new MarkerOptions().position(myLocation).title(username));
                         }
                         ListMarkerByUser.put(userid,newmarker);
-                        Toast.makeText(getApplicationContext(),username + " cập nhật vị trí",Toast.LENGTH_LONG).show();
+//                      Toast.makeText(getApplicationContext(),username + " cập nhật vị trí",Toast.LENGTH_LONG).show();
                     } catch (JSONException e) {
                         return;
                     }
