@@ -144,11 +144,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onResume() {
         super.onResume();
         mSocket.connect();
-        if(!canAccessLocation()){
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    INITIAL_REQUEST);
-        }
+//        if(!canAccessLocation()){
+//            ActivityCompat.requestPermissions(this,
+//                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+//                    INITIAL_REQUEST);
+//        }
     }
 
     protected void createLocationRequest() {
