@@ -88,6 +88,13 @@ public class EventcustomListview extends ArrayAdapter<Event> {
         } else {
             h =(ViewHolder) convertView.getTag();
         }
+        if(!event.isowner()) {
+            h.btn1.setVisibility(View.GONE);
+            h.btn2.setVisibility(View.GONE);
+        } else {
+            h.btn1.setVisibility(View.VISIBLE);
+            h.btn2.setVisibility(View.VISIBLE);
+        }
         Date  dateStarttime = event.getEvent_startTime();
         String Date_inWeek = new SimpleDateFormat("EE").format(dateStarttime);
         String Date_inMonth = (String) android.text.format.DateFormat.format("dd", dateStarttime);
