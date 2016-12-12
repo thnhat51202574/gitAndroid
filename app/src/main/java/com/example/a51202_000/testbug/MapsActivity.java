@@ -71,7 +71,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     {
         try {
           //  mSocket = IO.socket("http://totnghiep.herokuapp.com/");
-           mSocket = IO.socket("http://192.168.1.113:3000/");
+           mSocket = IO.socket("http://totnghiep.herokuapp.com//");
             Log.e("TAG", "success ...............: ");
         } catch (URISyntaxException e) {
             Log.e("TAG", "erorsocket ...............: " + e.toString());

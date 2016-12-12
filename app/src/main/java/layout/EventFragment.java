@@ -113,7 +113,7 @@ public class EventFragment extends Fragment{
         progressDialog.setMessage("Đang tải dữ liệu....");
         progressDialog.show();
 
-        new ReadEventJSON().execute("http://totnghiep.herokuapp.com/api/event/createdby/");
+        new ReadEventJSON().execute("http://totnghiep.herokuapp.com/api/event/");
         return rootView;
     }
 
@@ -173,7 +173,7 @@ public class EventFragment extends Fragment{
 
     private void refreshListEvent() {
         events = new ArrayList<>();
-        new ReadEventJSON().execute("http://totnghiep.herokuapp.com/api/event/createdby/");
+        new ReadEventJSON().execute("http://totnghiep.herokuapp.com/api/event/");
         swipeContainer.setRefreshing(false);
     }
 
@@ -205,6 +205,7 @@ public class EventFragment extends Fragment{
                 //json array
                 JSONObject object = new JSONObject(s);
                 JSONArray arEventJson = object.getJSONArray("events");
+//                JSONArray arEventMember = object.getJSONArray("member");
                 for (int i = 0; i < arEventJson.length(); i++) {
                     JSONObject eventObject = (JSONObject) arEventJson.getJSONObject(i);
                     events.add(new Event(eventObject));
