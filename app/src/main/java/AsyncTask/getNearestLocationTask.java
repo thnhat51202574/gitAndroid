@@ -135,37 +135,6 @@ public class getNearestLocationTask extends AsyncTask<String, Void, String> {
                 bufferedReader.close();
         }
         return result.toString();
-//        return "[\n" +
-//                "    {\n" +
-//                "      \"_id\": \"580e4ec4ed2a54120c924650\",\n" +
-//                "      \"name\": \"Btown - Healthy Drinks & Cakes\",\n" +
-//                "      \"address\": \"68 Út Tịch, P. 4 , Quận Tân Bình , TP. HCM \",\n" +
-//                "      \"locs\": [\n" +
-//                "        106.6586208,\n" +
-//                "        10.7958213\n" +
-//                "      ],\n" +
-//                "      \"rate\": 7.1,\n" +
-//                "      \"type\": 2,\n" +
-//                "      \"__v\": 0,\n" +
-//                "      \"picture\": [\n" +
-//                "        \"/images/foody-mobile-t0sb71vf-jpg-708-635993321789397171.jpg\"\n" +
-//                "      ]\n" +
-//                "    },\n" +
-//                "    {\n" +
-//                "      \"_id\": \"580e4ec4ed2a54120c92464e\",\n" +
-//                "      \"name\": \"Đạt Thành - Hủ Tiếu Nam Vang - Cách Mạng Tháng 8\",\n" +
-//                "      \"address\": \"607 Cách Mạng Tháng 8 , Quận 10 , TP. HCM \",\n" +
-//                "      \"locs\": [\n" +
-//                "        106.667815,\n" +
-//                "        10.784823\n" +
-//                "      ],\n" +
-//                "      \"rate\": 7,\n" +
-//                "      \"type\": 2,\n" +
-//                "      \"__v\": 0,\n" +
-//                "      \"picture\": [\n" +
-//                "        \"/images/foody-mobile-mobile-jpg-411-635767031415006760.jpg\"\n" +
-//                "      ]\n" +
-//                "    }]";
     }
     public Bitmap resizeMapIcons(String iconName,int width, int height){
         Bitmap imageBitmap = BitmapFactory.decodeResource(this.ActivityContext.getResources(),this.ActivityContext.getResources().getIdentifier(iconName, "drawable", this.ActivityContext.getPackageName()));

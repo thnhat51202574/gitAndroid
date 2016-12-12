@@ -85,7 +85,6 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
         globalUser = (GlobalUserClass) getApplicationContext();
         gvlistMember = (GridView) findViewById(R.id.gvlistMember);
         AddEventURL = "http://totnghiep.herokuapp.com/api/event";
-        Toast.makeText(getApplicationContext(),globalUser.getCur_user().get_id(),Toast.LENGTH_LONG).show();
         ArrayMember = new ArrayList<>();
         ArListMemAvatar = new ArrayList<>();
         JSONListMember = new JSONArray();

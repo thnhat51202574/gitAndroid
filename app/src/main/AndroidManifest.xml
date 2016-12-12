@@ -46,7 +46,6 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
         <activity android:name=".MapsActivity">
             <intent-filter>
@@ -84,6 +83,7 @@
             android:name=".AddEventActivity"
             android:label="Thêm chuyến đi"
             android:theme="@style/AddEventActionbar">
+
             <action android:name="android.intent.action.SEND" />
 
             <category android:name="android.intent.category.DEFAULT" />
