@@ -18,6 +18,7 @@ import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +30,8 @@ import android.view.animation.DecelerateInterpolator;
 import android.view.animation.ScaleAnimation;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.miguelcatalan.materialsearchview.MaterialSearchView;
 
 import java.util.ArrayList;
 
@@ -60,6 +63,7 @@ public class MainTabActivity extends AppCompatActivity implements HomeFragment.c
     ProfileFragment profileFragment;
     FriendFrament friendFragment;
     GlobalUserClass globalUser;
+    MaterialSearchView searchView;
     private static final int INITIAL_REQUEST=1337;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +80,7 @@ public class MainTabActivity extends AppCompatActivity implements HomeFragment.c
 //        end holdon
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        searchView = (MaterialSearchView) findViewById(R.id.search_view);
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
@@ -143,7 +148,14 @@ public class MainTabActivity extends AppCompatActivity implements HomeFragment.c
         });
 
     }
-
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_login, menu);
+        MenuItem item = menu.findItem(R.id.action_login);
+        searchView.setMenuItem(item);
+        return true;
+    }
     protected void animateFab(final int position) {
         final int[] colorIntArray = {R.color.hindfocus,R.color.btnbackground,R.color.orange,R.color.orange};
         final int[] iconIntArray = {R.drawable.ic_home_black_24dp, R.drawable.fab_ic_add, R.drawable.fab_ic_add,R.drawable.fab_ic_edit};

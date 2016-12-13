@@ -288,6 +288,9 @@ public class EventFragment extends Fragment{
                             .show();
                 }
             });
+            if (progressDialog != null) {
+                progressDialog.dismiss();
+            }
         }
 
 
@@ -378,6 +381,9 @@ public class EventFragment extends Fragment{
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
+            }
+            if (progressDialog != null) {
+                progressDialog.dismiss();
             }
 
         }
