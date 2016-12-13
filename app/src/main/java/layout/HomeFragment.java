@@ -37,7 +37,6 @@ import java.util.HashMap;
 
 import AsyncTask.getNearestLocationTask;
 import Model.Address;
-import globalClass.GlobalUserClass;
 
 public class HomeFragment extends Fragment implements GoogleMap.OnMarkerClickListener, getNearestLocationTask.OnTaskCompleted, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
@@ -67,13 +66,9 @@ public class HomeFragment extends Fragment implements GoogleMap.OnMarkerClickLis
         return fragment;
     }
 
-    comuticateParent callback;
-    Button btn1;
-    TextView textView;
     MapView mMapView;
     GoogleApiClient mGoogleApiClient;
     Location mLastLocation;
-    LocationRequest mLocationRequest;
     public GoogleMap googleMap;
     private View hiddenPanel;
     private Button upbtn, downbtn;
@@ -238,8 +233,6 @@ public class HomeFragment extends Fragment implements GoogleMap.OnMarkerClickLis
     @Override
     public boolean onMarkerClick(Marker marker){
         image_progressbar.setVisibility(View.VISIBLE);
-        final GlobalUserClass globalUser = (GlobalUserClass) getActivity().getApplicationContext();
-        Toast.makeText(getActivity(),globalUser.getCur_user().get_id(),Toast.LENGTH_LONG).show();
         Address choose_address = this.listAddressbyMaker.get(marker);
         address_name.setText(choose_address.getName());
         address_rate.setText(String.valueOf(choose_address.getRate()));
@@ -276,15 +269,15 @@ public class HomeFragment extends Fragment implements GoogleMap.OnMarkerClickLis
         Log.d("Connect", "failed ");
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        Activity activity;
-        if (context instanceof Activity){
-            activity=(Activity) context;
-            callback = (comuticateParent) getActivity();
-        }
-    }
+//    @Override
+//    public void onAttach(Context context) {
+//        super.onAttach(context);
+//        Activity activity;
+//        if (context instanceof Activity){
+//            activity=(Activity) context;
+//            callback = (comuticateParent) getActivity();
+//        }
+//    }
     public void receiveMess(String Text) {
         Toast.makeText(getActivity(),Text,Toast.LENGTH_LONG).show();
 //        textView.setText(Text);
