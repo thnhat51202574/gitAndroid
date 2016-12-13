@@ -31,11 +31,17 @@ public class EventcustomListview extends ArrayAdapter<Event> {
 
     public interface OnDataChangeListener{
         public void onClick(int Position);
-
+    }
+    public interface OnDeleteListener{
+        public void onBeginDelete(int Position);
     }
     OnDataChangeListener onItemclickListener;
+    OnDeleteListener mListenerDelete;
     public void setOnEachItemChangeListener(OnDataChangeListener onDataChangeListener){
         onItemclickListener = onDataChangeListener;
+    }
+    public void setOnDeleteItemListener(OnDeleteListener onDeleteItemListener) {
+        mListenerDelete = onDeleteItemListener;
     }
     public EventcustomListview(Context context, int resource, ArrayList<Event> objects) {
         super(context, resource, objects);
@@ -81,7 +87,7 @@ public class EventcustomListview extends ArrayAdapter<Event> {
 
                 @Override
                 public void onClick(View v) {
-                    Toast.makeText(context, "Xóa" + event.get_id(), Toast.LENGTH_SHORT).show();
+                    mListenerDelete.onBeginDelete(position);
                 }
             });
             convertView.setTag(h);

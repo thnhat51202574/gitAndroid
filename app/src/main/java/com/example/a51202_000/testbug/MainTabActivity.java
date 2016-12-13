@@ -125,16 +125,12 @@ public class MainTabActivity extends AppCompatActivity implements HomeFragment.c
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               Snackbar.make(view,Integer.toString(mViewPager.getCurrentItem()), Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
                 switch (mViewPager.getCurrentItem()) {
                     case 0:
                         homeFragment.receiveMess("ĐÂY LA TIN NHẮN TỪ HOME ACTIVITY");
                         break;
                     case 1:
-                        Intent intent_add_event = new Intent(MainTabActivity.this, AddEventActivity.class);
-                        intent_add_event.putExtra("userid",globalUser.get_id());
-                        startActivity(intent_add_event);
+                        eventFragment.AddEvent();
                         break;
                     case 2:
                         break;
