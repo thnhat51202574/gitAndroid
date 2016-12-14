@@ -329,7 +329,7 @@ public class EditprofileAcitivity extends AppCompatActivity {
                     globalUser.getCur_user().setBirthday(userBrithday);
 
                     Intent resultIntent = new Intent();
-                    resultIntent.putExtra("RESULTS", "update Userinfo success");
+                    resultIntent.putExtra("RESULTS", "sửa thông tin thành công");
                     setResult(RESULT_OK, resultIntent);
                     finish();
                 }
@@ -340,7 +340,7 @@ public class EditprofileAcitivity extends AppCompatActivity {
 
             }catch(JSONException ex)
             {
-                Toast.makeText(getApplicationContext(),"Lỗi Update, thử lại sau!", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(),"Lỗi, thử lại sau!", Toast.LENGTH_LONG).show();
             }
 
         }

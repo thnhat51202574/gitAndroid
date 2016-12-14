@@ -2,12 +2,18 @@ package layout;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,13 +23,19 @@ import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.a51202_000.testbug.AddEventActivity;
 import com.example.a51202_000.testbug.EditprofileAcitivity;
 import com.example.a51202_000.testbug.EventcustomListview;
 import com.example.a51202_000.testbug.ImageAddapter;
 import com.example.a51202_000.testbug.MainTabActivity;
 import com.example.a51202_000.testbug.MapsActivity;
 import com.example.a51202_000.testbug.R;
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.Ion;
+import com.koushikdutta.ion.ProgressCallback;
+import com.koushikdutta.ion.Response;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import org.json.JSONArray;
@@ -32,23 +44,30 @@ import org.json.JSONObject;
 import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.concurrent.Future;
 
 import Model.Event;
 import Model.User;
 import globalClass.GlobalUserClass;
 
+import static android.app.Activity.RESULT_OK;
+
 public class EventFragment extends Fragment{
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+    private static final int ADDEVENTCODE = 307;
     private SwipeRefreshLayout swipeContainer;
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -57,6 +76,7 @@ public class EventFragment extends Fragment{
     private Button btnShow;
     private Button btnHide;
     private TextView textView;
+    EventcustomListview adapter;
     ArrayList<Event> events;
     GlobalUserClass globalUser;
     private ListView lv_event;
@@ -176,8 +196,28 @@ public class EventFragment extends Fragment{
         new ReadEventJSON().execute("http://totnghiep.herokuapp.com/api/event/createdby/");
         swipeContainer.setRefreshing(false);
     }
+    public void AddEvent() {
+        Intent intent_add_event = new Intent(getActivity(), AddEventActivity.class);
+        intent_add_event.putExtra("userid",globalUser.get_id());
+        startActivityForResult(intent_add_event, ADDEVENTCODE);
+    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode,resultCode, data );
 
+        if(resultCode != RESULT_OK) {
+            return;
+        }
+        if (requestCode == ADDEVENTCODE) {
+            final Bundle extras = data.getExtras();
+            if (extras != null) {
+                events = new ArrayList<>();
+                new ReadEventJSON().execute("http://totnghiep.herokuapp.com/api/event/createdby/");
+                swipeContainer.setRefreshing(false);
+            }
+        }
 
+    }
     public void receiveMess(String Text) {
         textView.setText(Text);
     }
@@ -205,9 +245,15 @@ public class EventFragment extends Fragment{
                 //json array
                 JSONObject object = new JSONObject(s);
                 JSONArray arEventJson = object.getJSONArray("events");
+                JSONArray arEventMember = object.getJSONArray("member");
                 for (int i = 0; i < arEventJson.length(); i++) {
                     JSONObject eventObject = (JSONObject) arEventJson.getJSONObject(i);
-                    events.add(new Event(eventObject));
+                    events.add(new Event(eventObject,true));
+                }
+
+                for (int i = 0; i < arEventMember.length(); i++) {
+                    JSONObject eventObject = (JSONObject) arEventMember.getJSONObject(i);
+                    events.add(new Event(eventObject,false));
                 }
 
             }
@@ -217,13 +263,29 @@ public class EventFragment extends Fragment{
                 e.printStackTrace();
             }
 
-            EventcustomListview adapter = new EventcustomListview(
+            adapter = new EventcustomListview(
                     getActivity().getApplicationContext(), R.layout.event_layout,events);
             lv_event.setAdapter(adapter);
             adapter.setOnEachItemChangeListener(new EventcustomListview.OnDataChangeListener() {
                 @Override
                 public void onClick(int Position) {
                     showDialog(events,Position);
+                }
+            });
+            adapter.setOnDeleteItemListener(new EventcustomListview.OnDeleteListener() {
+                @Override
+                public void onBeginDelete(int Position) {
+                    final Event event = events.get(Position);
+                    new AlertDialog.Builder(getActivity())
+                            .setMessage("Bạn muốn xóa sự kiện " + event.getEvent_name())
+                            .setCancelable(false)
+                            .setPositiveButton("Có", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    new DeleteEvent(event).execute("http://totnghiep.herokuapp.com/api/event/");
+                                }
+                            })
+                            .setNegativeButton("Không", null)
+                            .show();
                 }
             });
             if (progressDialog != null) {
@@ -237,8 +299,8 @@ public class EventFragment extends Fragment{
             BufferedReader bufferedReader = null;
             try {
                 String path = globalUser.getCur_user().get_id();
-                //URL url = new URL(urlpath + path);
-                URL url = new URL("http://totnghiep.herokuapp.com/api/event/");
+                URL url = new URL(urlpath + path);
+//                URL url = new URL("http://totnghiep.herokuapp.com/api/event/");
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setReadTimeout(10000);
                 urlConnection.setConnectTimeout(10000);
@@ -257,5 +319,74 @@ public class EventFragment extends Fragment{
             }
             return result.toString();
         }
+    }
+    class DeleteEvent extends AsyncTask<String, Intent, String> {
+        private Event mEvent;
+        public DeleteEvent(Event event) {
+            mEvent = event;
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                return deleteEvent(params[0]);
+            } catch (IOException ex) {
+                return "Network error!";
+            }
+        }
+
+        private String deleteEvent(String urlpath) throws IOException {
+            StringBuilder result = new StringBuilder();
+            BufferedReader bufferedReader = null;
+            try {
+                String path = globalUser.getCur_user().get_id();
+                URL url = new URL(urlpath + mEvent.get_id());
+//               URL url = new URL("http://192.168.1.113:3000/api/event/" + mEvent.get_id());
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setReadTimeout(10000);
+                urlConnection.setConnectTimeout(10000);
+                urlConnection.setRequestMethod("DELETE");
+                urlConnection.setRequestProperty("Content-Type","application/json"); //set header
+                urlConnection.connect();
+                InputStream inputStream = urlConnection.getInputStream();
+                bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                String line;
+                while ((line = bufferedReader.readLine()) != null) {
+                    result.append(line).append("\n");
+                }
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                if(bufferedReader != null)
+                    bufferedReader.close();
+            }
+            return result.toString();
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            try {
+                JSONObject obj = new JSONObject(s);
+                String CODE = obj.getString("CODE");
+                String MESS = obj.getString("message");
+                Toast.makeText(getActivity().getApplicationContext(),MESS,Toast.LENGTH_LONG).show();
+                if(CODE.equals("SUCCESS")) {
+                    events.remove(mEvent);
+                    adapter.notifyDataSetChanged();
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            if (progressDialog != null) {
+                progressDialog.dismiss();
+            }
+
+        }
+
     }
 }

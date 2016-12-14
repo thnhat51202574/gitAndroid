@@ -70,8 +70,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Socket mSocket;
     {
         try {
-          //  mSocket = IO.socket("http://totnghiep.herokuapp.com/");
-           mSocket = IO.socket("http://192.168.1.113:3000/");
+            mSocket = IO.socket("http://totnghiep.herokuapp.com/");
             Log.e("TAG", "success ...............: ");
         } catch (URISyntaxException e) {
             Log.e("TAG", "erorsocket ...............: " + e.toString());
@@ -198,12 +197,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Marker newmarker = ListMarkerByUser.get(globalUser.getCur_user().get_id());
             if(newmarker == null) {
                 newmarker = mMap.addMarker(new MarkerOptions().position(myLocation)
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.start_marker)).title(globalUser.getCur_user().getName()));
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.current_marker)).title(globalUser.getCur_user().getName()));
             } else {
                 newmarker.remove();
 //                Toast.makeText(getApplicationContext(),lat +',' + lng,Toast.LENGTH_LONG).show();
                 newmarker = mMap.addMarker(new MarkerOptions().position(myLocation)
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.start_marker)).title(globalUser.getCur_user().getName()));
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.current_marker)).title(globalUser.getCur_user().getName()));
             }
             ListMarkerByUser.put(globalUser.getCur_user().get_id(),newmarker);
             mMap.moveCamera(CameraUpdateFactory.newLatLng(myLocation));
@@ -240,7 +239,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_disconect)).title(username));
                         }
                         ListMarkerByUser.put(userid,LastMarker);
-//                        Toast.makeText(getApplicationContext(),message,Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(),message,Toast.LENGTH_LONG).show();
 
                     } catch (JSONException e) {
                         return;
@@ -267,13 +266,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         LatLng myLocation = new LatLng(lat,lng);
                         Marker newmarker = ListMarkerByUser.get(userid);
                         if(newmarker == null) {
-                            newmarker = mMap.addMarker(new MarkerOptions().position(myLocation).title(username));
+                            newmarker = mMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.friend_marker))
+                                    .position(myLocation).title(username));
                         } else {
                             newmarker.remove();
-                            newmarker = mMap.addMarker(new MarkerOptions().position(myLocation).title(username));
+                            newmarker = mMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.friend_marker))
+                                    .position(myLocation).title(username));
                         }
                         ListMarkerByUser.put(userid,newmarker);
-//                        Toast.makeText(getApplicationContext(),username + " cập nhật vị trí",Toast.LENGTH_LONG).show();
+//                      Toast.makeText(getApplicationContext(),username + " cập nhật vị trí",Toast.LENGTH_LONG).show();
                     } catch (JSONException e) {
                         return;
                     }
@@ -301,13 +302,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         LatLng myLocation = new LatLng(lat,lng);
                         Marker newmarker = ListMarkerByUser.get(userid);
                         if(newmarker == null) {
-                            newmarker = mMap.addMarker(new MarkerOptions().position(myLocation).title(username));
+                            newmarker = mMap.addMarker(new MarkerOptions().position(myLocation)
+                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.friend_marker)).title(username));
                         } else {
                             newmarker.remove();
-                            newmarker = mMap.addMarker(new MarkerOptions().position(myLocation).title(username));
+                            newmarker = mMap.addMarker(new MarkerOptions()
+                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.friend_marker)).position(myLocation).title(username));
                         }
                         ListMarkerByUser.put(userid,newmarker);
-//                        Toast.makeText(getApplicationContext(),message,Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(),message,Toast.LENGTH_LONG).show();
                     } catch (JSONException e) {
                         return;
                     }

@@ -219,11 +219,11 @@ public class RouteMapEventFragment extends Fragment implements DirectionFinderLi
 
             originMarkers.add(googleMap.addMarker(new MarkerOptions()
                     .title(route.startAddress)
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.start_marker))
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.start_marker1))
                     .position(route.startLocation)));
             destinationMarkers.add(googleMap.addMarker(new MarkerOptions()
                     .title(route.endAddress)
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.end_marker))
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.end_marker1))
                     .position(route.endLocation)));
 
             PolylineOptions polylineOptions = new PolylineOptions().

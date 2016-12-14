@@ -27,8 +27,9 @@ public class Event {
     private Date event_startTime;
     private Date event_endTime;
     private String event_description;
+    private boolean isowner;
 
-    public Event(JSONObject object) throws JSONException, ParseException {
+    public Event(JSONObject object, boolean owner) throws JSONException, ParseException {
         if((object.has("_id")) && (!object.isNull("_id"))){
             this._id = object.getString("_id");
         } else {this._id ="";}
@@ -97,8 +98,13 @@ public class Event {
             format.setTimeZone(TimeZone.getTimeZone("Asia/Saigon"));
             this.event_endTime = format.parse(birthday_);
         }
+        this.isowner = owner;
+
     }
 
+    public boolean isowner() {
+        return isowner;
+    }
     public String get_id() {
         return _id;
     }

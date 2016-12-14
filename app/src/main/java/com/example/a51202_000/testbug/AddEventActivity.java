@@ -494,11 +494,13 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
                 JSONObject resultObject = new JSONObject(result);
                 String message = resultObject.getString("message");
                 Toast.makeText(getApplicationContext(),message,Toast.LENGTH_LONG).show();
+                Intent resultIntent = new Intent();
+                resultIntent.putExtra("RESULTS", "thêm thành công");
+                setResult(RESULT_OK, resultIntent);
+                finish();
             } catch (JSONException ex){
                 ex.printStackTrace();
             }
-
-
         }
 
         private String SetData(String urlPath) throws IOException, JSONException {
