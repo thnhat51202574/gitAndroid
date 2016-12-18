@@ -79,6 +79,7 @@ public class MainTabActivity extends AppCompatActivity implements HomeFragment.c
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 //        end holdon
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setLogo(R.mipmap.ic_launcher);
         setSupportActionBar(toolbar);
         searchView = (MaterialSearchView) findViewById(R.id.search_view);
         // Create the adapter that will return a fragment for each of the three
@@ -151,8 +152,8 @@ public class MainTabActivity extends AppCompatActivity implements HomeFragment.c
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_login, menu);
-        MenuItem item = menu.findItem(R.id.action_login);
+        inflater.inflate(R.menu.menu_search, menu);
+        MenuItem item = menu.findItem(R.id.action_search);
         searchView.setMenuItem(item);
         return true;
     }
