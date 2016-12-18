@@ -51,7 +51,7 @@
         <activity android:name=".RegisterActivity" />
         <activity
             android:name=".MainTabActivity"
-            android:label="@string/title_activity_main_tab"
+            android:label="Wego"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
