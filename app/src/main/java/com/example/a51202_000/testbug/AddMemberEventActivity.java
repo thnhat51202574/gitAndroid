@@ -110,7 +110,7 @@ public class AddMemberEventActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(String... params) {
             try {
-                return getListEventString(params[0]);
+                return getListUserString(params[0]);
             } catch (IOException ex) {
                 return "Network error!";
             }
@@ -158,7 +158,7 @@ public class AddMemberEventActivity extends AppCompatActivity {
         }
 
 
-        private String getListEventString(String urlpath) throws IOException{
+        private String getListUserString(String urlpath) throws IOException{
             StringBuilder result = new StringBuilder();
             BufferedReader bufferedReader = null;
             try {
