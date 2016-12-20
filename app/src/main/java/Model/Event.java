@@ -24,12 +24,14 @@ public class Event {
     private LatLng endLatLng;
     private User event_owner;
     private ArrayList<User> list_member;
+    private ArrayList<Address> list_address;
     private Date event_startTime;
     private Date event_endTime;
     private String event_description;
+    private String StringJson;
     private boolean isowner;
 
-    public Event(JSONObject object, boolean owner) throws JSONException, ParseException {
+    public Event(JSONObject object, String stringEvent,boolean owner) throws JSONException, ParseException {
         if((object.has("_id")) && (!object.isNull("_id"))){
             this._id = object.getString("_id");
         } else {this._id ="";}
@@ -98,8 +100,17 @@ public class Event {
             format.setTimeZone(TimeZone.getTimeZone("Asia/Saigon"));
             this.event_endTime = format.parse(birthday_);
         }
+        if((object.has("arAddress")) && (!object.isNull("arAddress"))){
+            JSONArray arAddress = object.getJSONArray("arAddress");
+            list_address = new ArrayList<>();
+            for (int i = 0; i<arAddress.length(); i++) {
+                JSONObject addressObj = arAddress.getJSONObject(i);
+                Address each_address = new Address(addressObj);
+                list_address.add(each_address);
+            }
+        } else {list_address = new ArrayList<>();}
+        this.StringJson = stringEvent;
         this.isowner = owner;
-
     }
 
     public boolean isowner() {
@@ -123,6 +134,14 @@ public class Event {
 
     public String getStartAddress() {
         return startAddress;
+    }
+
+    public ArrayList<Address> getList_address() {
+        return list_address;
+    }
+
+    public String getStringJson() {
+        return StringJson;
     }
 
     public void setStartAddress(String startAddress) {

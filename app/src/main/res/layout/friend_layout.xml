@@ -19,7 +19,7 @@
         <com.mikhaellopez.circularimageview.CircularImageView
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:src="@drawable/avatar"
+            android:src="@drawable/noavatar"
             app:civ_border_color="#41ce28"
             app:civ_border_width="0dp"
             android:id="@+id/frient_avatar"/>

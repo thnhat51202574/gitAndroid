@@ -140,7 +140,7 @@ public class EventFragment extends Fragment{
     public void showDialog(ArrayList<Event> Events,int position){
         final Event view_event = Events.get(position);
         final String event_id = view_event.get_id();
-        View view = getActivity().getLayoutInflater().inflate (R.layout.bottom_event_dialog, null);
+        final View view = getActivity().getLayoutInflater().inflate (R.layout.bottom_event_dialog, null);
 
         final Dialog mDetailEventDialog = new Dialog(getActivity(),R.style.MaterialDialogSheet);
         mDetailEventDialog.setContentView (view);
@@ -178,6 +178,7 @@ public class EventFragment extends Fragment{
             @Override
             public void onClick(View v) {
                 Intent WeGoIntent = new Intent(getActivity(), MapsActivity.class);
+                WeGoIntent.putExtra("eventString",view_event.getStringJson());
                 WeGoIntent.putExtra("event_id", event_id);
                 WeGoIntent.putExtra("currentUser_id",globalUser.getCur_user().get_id());
                 startActivity(WeGoIntent);
@@ -248,12 +249,14 @@ public class EventFragment extends Fragment{
                 JSONArray arEventMember = object.getJSONArray("member");
                 for (int i = 0; i < arEventJson.length(); i++) {
                     JSONObject eventObject = (JSONObject) arEventJson.getJSONObject(i);
-                    events.add(new Event(eventObject,true));
+                    String eventString = eventObject.toString();
+                    events.add(new Event(eventObject,eventString,true));
                 }
 
                 for (int i = 0; i < arEventMember.length(); i++) {
                     JSONObject eventObject = (JSONObject) arEventMember.getJSONObject(i);
-                    events.add(new Event(eventObject,false));
+                    String eventString = eventObject.toString();
+                    events.add(new Event(eventObject,eventString,false));
                 }
 
             }

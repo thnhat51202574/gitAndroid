@@ -64,9 +64,6 @@ public class getNearestLocationTask extends AsyncTask<String, Void, String> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        progressDialog = new ProgressDialog(this.ActivityContext);
-        progressDialog.setMessage("Loading data....");
-        progressDialog.show();
     }
 
     @Override
@@ -102,9 +99,6 @@ public class getNearestLocationTask extends AsyncTask<String, Void, String> {
         }
         catch (JSONException e) {
             e.printStackTrace();
-        }
-        if (progressDialog != null) {
-            progressDialog.dismiss();
         }
 
     }

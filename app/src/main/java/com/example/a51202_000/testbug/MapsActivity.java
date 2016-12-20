@@ -20,6 +20,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -31,6 +32,7 @@ import com.google.android.gms.common.api.Status;
 
 import java.net.URISyntaxException;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -41,9 +43,10 @@ import com.github.nkzawa.socketio.client.Socket;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import Model.Event;
 import globalClass.GlobalUserClass;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,LocationListener,
+public class MapsActivity extends FragmentActivity implements LocationListener,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private static final int MILLISECONDS_PER_SECOND = 1000;
@@ -62,10 +65,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private String Event_id;
     private String User_id;
+    MapView mMapView;
     GlobalUserClass globalUser;
     LocationRequest mLocationRequest;
     GoogleApiClient mGoogleApiClient;
     Location mCurrentLocation,mLastLocation;
+    Event cur_event;
     HashMap<String,Marker> ListMarkerByUser = new HashMap<String,Marker>();
     private Socket mSocket;
     {
@@ -85,8 +90,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if(savedInstanceState == null) {
             final Bundle extras = getIntent().getExtras();
             if (extras != null) {
+                String cur_event_string = extras.getString("eventString");
                 Event_id = extras.getString("event_id");
                 User_id = extras.getString("currentUser_id");
+                try {
+                    JSONObject eventobj = new JSONObject(cur_event_string);
+                    cur_event = new Event(eventobj,cur_event_string,false);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
             } else {
 
             }
@@ -103,21 +118,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     .build();
         }
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+//        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+//                .findFragmentById(R.id.map);
+        mMapView = (MapView) findViewById(R.id.mapView);
 
-        //listening
-        //end listening socket
+        mMapView.onCreate(savedInstanceState);
 
+        mMapView.onResume();
+        mMapView.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(GoogleMap googleMap) {
+                mMap = googleMap;
+            }
+        });
     }
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
 
-        // Add a marker in Sydney and move the camera
-
-    }
 
     @Override
     public void onConnectionSuspended(int i) {

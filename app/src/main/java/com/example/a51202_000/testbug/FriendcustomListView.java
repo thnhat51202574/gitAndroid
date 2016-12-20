@@ -57,21 +57,23 @@ public class FriendcustomListView extends ArrayAdapter<User> {
         } else {
             h =(ViewHolder) convertView.getTag();
         }
-        h.Frient_name.setText(user.getFullName());
-        h.Frient_name.setText(user.getFullName());
+        String userNamedisplay = user.getFullName();
+        if(userNamedisplay.isEmpty()) userNamedisplay = user.getName();
+        h.Frient_name.setText(userNamedisplay);
         String url = user.getAvatarLink();
-        Picasso.with(context).load(url).error(R.drawable.no_images).into(h.Avatar, new com.squareup.picasso.Callback() {
-            @Override
-            public void onSuccess() {
+        if(!url.isEmpty()) {
+            Picasso.with(context).load(url).error(R.drawable.no_images).into(h.Avatar, new com.squareup.picasso.Callback() {
+                @Override
+                public void onSuccess() {
 
-            }
-            @Override
-            public void onError() {
+                }
 
-            }
-        });
+                @Override
+                public void onError() {
+
+                }
+            });
+        }
         return convertView;
-
-
     }
 }
