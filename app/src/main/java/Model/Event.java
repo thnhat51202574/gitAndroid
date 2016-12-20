@@ -29,9 +29,14 @@ public class Event {
     private Date event_endTime;
     private String event_description;
     private String StringJson;
+    private ArrayList<LatLng> arLocs;
     private boolean isowner;
 
-    public Event(JSONObject object, String stringEvent,boolean owner) throws JSONException, ParseException {
+    public ArrayList<LatLng> getArLocs() {
+        return arLocs;
+    }
+
+    public Event(JSONObject object, String stringEvent, boolean owner) throws JSONException, ParseException {
         if((object.has("_id")) && (!object.isNull("_id"))){
             this._id = object.getString("_id");
         } else {this._id ="";}
@@ -109,6 +114,18 @@ public class Event {
                 list_address.add(each_address);
             }
         } else {list_address = new ArrayList<>();}
+
+        if((object.has("detailLocs")) && (!object.isNull("detailLocs"))){
+            JSONArray arLocsjson = object.getJSONArray("detailLocs");
+            arLocs = new ArrayList<>();
+            for (int i = 0; i<arLocsjson.length(); i++) {
+                JSONArray addressObj = arLocsjson.getJSONArray(i);
+                LatLng curLatLng = new LatLng(addressObj.getDouble(0),addressObj.getDouble(1));
+                arLocs.add(curLatLng);
+            }
+        } else {arLocs = new ArrayList<>();}
+
+
         this.StringJson = stringEvent;
         this.isowner = owner;
     }

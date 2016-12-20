@@ -289,9 +289,11 @@ public class RouteMapEventFragment extends Fragment implements GoogleMap.OnMarke
                     color(ContextCompat.getColor(getActivity(),R.color.colorAccent)).
                     width(5);
 
-            for (int i = 0; i < route.points.size(); i++)
-                polylineOptions.add(route.points.get(i));
-
+            for (int i = 0; i < route.getPoints().size(); i++) {
+                LatLng cur_point = route.getPoints().get(i);
+                polylineOptions.add(cur_point);
+                ((AddEventActivity) getActivity()).points.add(cur_point) ;
+            }
             polylinePaths.add(googleMap.addPolyline(polylineOptions));
         }
     }
@@ -389,7 +391,8 @@ public class RouteMapEventFragment extends Fragment implements GoogleMap.OnMarke
                                 RouteMapEventFragment.ListAddressChoose.put(LastMarker,choose_address);
                                 slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
                                 ListAddressId.add(choose_address.get_id());
-                                ((AddEventActivity) getActivity()).arStopAddressId.add(choose_address.get_id());
+                                if(!((AddEventActivity) getActivity()).arStopAddressId.contains(choose_address.get_id()))
+                                    ((AddEventActivity) getActivity()).arStopAddressId.add(choose_address.get_id());
                             }
                         });
                         panel.findViewById(R.id.CancelBtnAdd).setOnClickListener(new View.OnClickListener(){
@@ -407,6 +410,7 @@ public class RouteMapEventFragment extends Fragment implements GoogleMap.OnMarke
                                 RouteMapEventFragment.ListAddressChoose.put(LastMarker,choose_address);
                                 slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
                                 ListAddressId.remove(choose_address.get_id());
+                                if(((AddEventActivity) getActivity()).arStopAddressId.contains(choose_address.get_id()))
                                 ((AddEventActivity) getActivity()).arStopAddressId.remove(choose_address.get_id());
                             }
                         });

@@ -63,6 +63,22 @@ public class MemberEventCustomListview extends ArrayAdapter<User> {
             h.Frient_name = (TextView)  convertView.findViewById(R.id.friend_name);
             h.Avatar =(CircularImageView) convertView.findViewById(R.id.frient_avatar);
             h.friendcheckbox = (CheckBox) convertView.findViewById(R.id.checkUser);
+            h.friendcheckbox.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(h.friendcheckbox.isChecked()) {
+                        h.friendcheckbox.setChecked(false);
+                        if(mOnDataChangeListener != null){
+                            mOnDataChangeListener.onUserRemove(user);
+                        }
+                    } else {
+                        h.friendcheckbox.setChecked(true);
+                        if(mOnDataChangeListener != null){
+                            mOnDataChangeListener.onUserAdd(user);
+                        }
+                    }
+                }
+            });
             convertView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -77,8 +93,6 @@ public class MemberEventCustomListview extends ArrayAdapter<User> {
                             mOnDataChangeListener.onUserAdd(user);
                         }
                     }
-
-                    Toast.makeText(context,"Chi tiết" + user.get_id(),Toast.LENGTH_LONG).show();
                 }
             });
         } else {

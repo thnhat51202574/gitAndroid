@@ -46,6 +46,7 @@ import java.net.URL;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.TimeZone;
 
 import Model.User;
@@ -78,6 +79,7 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
     String AddEventURL;
     Button OkButton;
     static public ArrayList<String> arStopAddressId;
+    static public ArrayList<LatLng> points;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,6 +100,7 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
         DateStart = (EditText) findViewById(R.id.DateStart);
         TimeStart = (EditText) findViewById(R.id.TimeStart);
         arStopAddressId = new  ArrayList<>();
+        points = new ArrayList<>();
         from_dateListener = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePickerDialog view, int year_, int monthOfYear, int dayOfMonth) {
@@ -334,14 +337,14 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
     }
 
     public void setStartAddress(LatLng start_) throws JSONException {
-        JSONStartLocs.put(start_.longitude);
-        JSONStartLocs.put(start_.latitude);
+        JSONStartLocs.put(0,start_.longitude);
+        JSONStartLocs.put(1,start_.latitude);
         this.startaddress_LatLgn = start_;
     }
 
     public void setDestination(LatLng destination) throws JSONException {
-        JSONEndLocs.put(destination.longitude);
-        JSONEndLocs.put(destination.latitude);
+        JSONEndLocs.put(0,destination.longitude);
+        JSONEndLocs.put(1,destination.latitude);
         this.destination_LatLgn = destination;
     }
 
@@ -517,6 +520,15 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
                 for (int idx = 0; idx < arStopAddressId.size(); idx++ ){
                     JsonListStopId.put(arStopAddressId.get(idx));
                 }
+                JSONArray listDetailLongLocs = new JSONArray();
+                JSONArray listDetailLatLocs = new JSONArray();
+
+                for (int idx = 0; idx < points.size(); idx++ ){
+                    LatLng cur_locs = points.get(idx);
+
+                    listDetailLongLocs.put(String.valueOf(cur_locs.longitude));
+                    listDetailLatLocs.put(String.valueOf(cur_locs.latitude));
+                }
                 //create JSONdata to send to server
                 dataInsert.put("eventname",nameEvent.getText());
                 dataInsert.put("createID",globalUser.getCur_user().get_id());
@@ -529,7 +541,9 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
                 dataInsert.put("startLocs",JSONStartLocs);
                 dataInsert.put("endLocs",JSONEndLocs);
                 dataInsert.put("description",EventDescription.getText());
-
+                dataInsert.put("detailLongLocs",listDetailLongLocs);
+                dataInsert.put("detailLatLocs",listDetailLatLocs);
+                String toserver = dataInsert.toString();
                 //initialize and config request , then connect the server.
                 URL url = new URL(urlPath);
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
