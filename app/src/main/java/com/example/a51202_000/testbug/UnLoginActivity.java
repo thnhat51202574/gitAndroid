@@ -1,6 +1,7 @@
 package com.example.a51202_000.testbug;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -10,10 +11,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+
 import layout.HomeFragment;
 
 public class UnLoginActivity extends AppCompatActivity {
     HomeFragment homeFragment;
+    SharedPreferences pref;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,6 +31,15 @@ public class UnLoginActivity extends AppCompatActivity {
 
         ft.replace(R.id.mapView, homeFragment).addToBackStack("MapFragment");
         ft.commit();
+
+        pref = getApplicationContext().getSharedPreferences("MyPref", 0);
+        String Username = pref.getString("username", "");
+        String Password = pref.getString("password", "");
+        if(!Username.equals("") && !Password.equals("")) {
+            Intent intent = new Intent(UnLoginActivity.this, MainActivity.class);
+            startActivity(intent);
+            finish();
+        }
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

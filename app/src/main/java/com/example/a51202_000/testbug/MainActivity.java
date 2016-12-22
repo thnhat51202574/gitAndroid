@@ -5,10 +5,12 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -38,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
     private View mLoginFormView;
     private View mProgressView;
     private static String loginURL = "http://totnghiep.herokuapp.com/api/login/user";
-
+    SharedPreferences pref;
 
 
     EditText name;
@@ -78,7 +80,14 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
+        pref = getApplicationContext().getSharedPreferences("MyPref", 0);
+        String Username = pref.getString("username", "");
+        String Password = pref.getString("password", "");
+        if(!Username.equals("") && !Password.equals("")) {
+            edtEmail.setText(Username);
+            edtPass.setText(Password);
+            btnLogin.performClick();
+        }
     }
 
     /**
@@ -118,6 +127,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onLoginSuccess() {
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putString("username", edtEmail.getText().toString());
+        editor.putString("password", edtPass.getText().toString());
+        editor.commit();
         btnLogin.setEnabled(true);
         finish();
     }
@@ -229,8 +242,8 @@ public class MainActivity extends AppCompatActivity {
                 //initialize and config request , then connect the server.
                 URL url = new URL(urlPath);
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setReadTimeout(10000); //milliseconds
-                urlConnection.setConnectTimeout(10000);
+                urlConnection.setReadTimeout(5000); //milliseconds
+                urlConnection.setConnectTimeout(5000);
                 urlConnection.setRequestMethod("POST");
                 urlConnection.setDoOutput(true); //enable output data
                 urlConnection.setRequestProperty("Content-Type","application/json"); //set header

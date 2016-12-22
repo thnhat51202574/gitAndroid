@@ -9,5 +9,5 @@ import java.util.List;
 
 public interface DirectionFinderListener {
     void onDirectionFinderStart();
-    void onDirectionFinderSuccess(List<Route> route,List<Route> arRoute) throws UnsupportedEncodingException;
+    void onDirectionFinderSuccess(List<Route> route,List<Route> arRoute, String points) throws UnsupportedEncodingException;
 }

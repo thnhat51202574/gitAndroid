@@ -79,7 +79,10 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
     String AddEventURL;
     Button OkButton;
     static public ArrayList<String> arStopAddressId;
-    static public ArrayList<LatLng> points;
+    static private String points;
+    static public void setPoints(String mPoints) {
+        points = mPoints;
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -100,7 +103,7 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
         DateStart = (EditText) findViewById(R.id.DateStart);
         TimeStart = (EditText) findViewById(R.id.TimeStart);
         arStopAddressId = new  ArrayList<>();
-        points = new ArrayList<>();
+        points = "";
         from_dateListener = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePickerDialog view, int year_, int monthOfYear, int dayOfMonth) {
@@ -520,15 +523,7 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
                 for (int idx = 0; idx < arStopAddressId.size(); idx++ ){
                     JsonListStopId.put(arStopAddressId.get(idx));
                 }
-                JSONArray listDetailLongLocs = new JSONArray();
-                JSONArray listDetailLatLocs = new JSONArray();
 
-                for (int idx = 0; idx < points.size(); idx++ ){
-                    LatLng cur_locs = points.get(idx);
-
-                    listDetailLongLocs.put(String.valueOf(cur_locs.longitude));
-                    listDetailLatLocs.put(String.valueOf(cur_locs.latitude));
-                }
                 //create JSONdata to send to server
                 dataInsert.put("eventname",nameEvent.getText());
                 dataInsert.put("createID",globalUser.getCur_user().get_id());
@@ -541,8 +536,7 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
                 dataInsert.put("startLocs",JSONStartLocs);
                 dataInsert.put("endLocs",JSONEndLocs);
                 dataInsert.put("description",EventDescription.getText());
-                dataInsert.put("detailLongLocs",listDetailLongLocs);
-                dataInsert.put("detailLatLocs",listDetailLatLocs);
+                dataInsert.put("points",points);
                 String toserver = dataInsert.toString();
                 //initialize and config request , then connect the server.
                 URL url = new URL(urlPath);

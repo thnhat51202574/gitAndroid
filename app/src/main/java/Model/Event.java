@@ -11,7 +11,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.TimeZone;
+
+import Modules.DirectionFinder;
 
 /**
  * Created by 51202_000 on 01/11/2016.
@@ -29,10 +32,10 @@ public class Event {
     private Date event_endTime;
     private String event_description;
     private String StringJson;
-    private ArrayList<LatLng> arLocs;
+    private List<LatLng> arLocs;
     private boolean isowner;
 
-    public ArrayList<LatLng> getArLocs() {
+    public List<LatLng> getArLocs() {
         return arLocs;
     }
 
@@ -74,12 +77,12 @@ public class Event {
 
         if((object.has("startLocs")) && (!object.isNull("startLocs"))){
             JSONArray start_Locs = object.getJSONArray("startLocs");
-            startLatlng = new LatLng(start_Locs.getDouble(0),start_Locs.getDouble(1));
+            startLatlng = new LatLng(start_Locs.getDouble(1),start_Locs.getDouble(0));
         } else {startLatlng =null;}
 
         if((object.has("endLocs")) && (!object.isNull("endLocs"))){
             JSONArray end_locs = object.getJSONArray("endLocs");
-            endLatLng = new LatLng(end_locs.getDouble(0),end_locs.getDouble(1));
+            endLatLng = new LatLng(end_locs.getDouble(1),end_locs.getDouble(0));
         } else {endLatLng =null;}
 
         if((object.has("starttime")) && (!object.isNull("starttime"))){
@@ -115,14 +118,9 @@ public class Event {
             }
         } else {list_address = new ArrayList<>();}
 
-        if((object.has("detailLocs")) && (!object.isNull("detailLocs"))){
-            JSONArray arLocsjson = object.getJSONArray("detailLocs");
-            arLocs = new ArrayList<>();
-            for (int i = 0; i<arLocsjson.length(); i++) {
-                JSONArray addressObj = arLocsjson.getJSONArray(i);
-                LatLng curLatLng = new LatLng(addressObj.getDouble(0),addressObj.getDouble(1));
-                arLocs.add(curLatLng);
-            }
+        if((object.has("points")) && (!object.isNull("points"))){
+            String stringPoints = object.getString("points");
+            arLocs = DirectionFinder.decodePolyLine(stringPoints);
         } else {arLocs = new ArrayList<>();}
 
 

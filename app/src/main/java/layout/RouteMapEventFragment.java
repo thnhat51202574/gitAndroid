@@ -266,7 +266,7 @@ public class RouteMapEventFragment extends Fragment implements GoogleMap.OnMarke
     }
 
     @Override
-    public void onDirectionFinderSuccess(List<Route> routes, List<Route> arRoute) throws UnsupportedEncodingException {
+    public void onDirectionFinderSuccess(List<Route> routes, List<Route> arRoute,String points_) throws UnsupportedEncodingException {
         progressDialog.dismiss();
         polylinePaths = new ArrayList<>();
         originMarkers = new ArrayList<>();
@@ -292,8 +292,8 @@ public class RouteMapEventFragment extends Fragment implements GoogleMap.OnMarke
             for (int i = 0; i < route.getPoints().size(); i++) {
                 LatLng cur_point = route.getPoints().get(i);
                 polylineOptions.add(cur_point);
-                ((AddEventActivity) getActivity()).points.add(cur_point) ;
             }
+            ((AddEventActivity) getActivity()).setPoints(points_) ;
             polylinePaths.add(googleMap.addPolyline(polylineOptions));
         }
     }

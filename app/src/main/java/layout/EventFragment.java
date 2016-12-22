@@ -258,7 +258,6 @@ public class EventFragment extends Fragment{
                     String eventString = eventObject.toString();
                     events.add(new Event(eventObject,eventString,false));
                 }
-
             }
             catch (JSONException e) {
                 e.printStackTrace();
