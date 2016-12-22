@@ -10,6 +10,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="60dp"
+        android:visibility="gone"
         android:orientation="vertical"
         android:id="@+id/griview"
     >
@@ -26,10 +27,11 @@
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
         android:stretchMode="spacingWidthUniform"
-        android:visibility="visible"
+        android:visibility="gone"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        />
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
@@ -41,6 +43,7 @@
             android:layout_width="match_parent"
             android:padding="5dp"
             android:textSize="15sp"
+            android:visibility="gone"
             android:layout_height="wrap_content"
             android:background="@null"
             android:hint="Nhập tên để tìm"/>

@@ -90,7 +90,7 @@ public class User {
 
         if((object.has("avatarLink")) && (!object.isNull("avatarLink"))){
             this.avatarLink = object.getString("avatarLink");
-        } else {this.avatarLink ="";}
+        } else {this.avatarLink ="http://res.cloudinary.com/totnghiep/image/upload/v1482381832/noavatar_enjvmc.jpg";}
 
         if((object.has("birthday")) && (!object.isNull("birthday"))){
 

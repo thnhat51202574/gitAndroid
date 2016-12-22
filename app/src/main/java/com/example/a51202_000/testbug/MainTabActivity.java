@@ -33,6 +33,7 @@ import android.widget.Toast;
 
 import com.miguelcatalan.materialsearchview.MaterialSearchView;
 
+import java.io.FileReader;
 import java.util.ArrayList;
 
 import globalClass.GlobalUserClass;
@@ -139,6 +140,7 @@ public class MainTabActivity extends AppCompatActivity implements HomeFragment.c
                         eventFragment.AddEvent();
                         break;
                     case 2:
+                        friendFragment.AddFriend();
                         break;
                     case 3:
                         profileFragment.startEditProfile();

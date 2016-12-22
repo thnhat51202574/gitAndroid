@@ -93,6 +93,7 @@ public class DirectionFinder {
         List<Route> arRoutes = new ArrayList<Route>();
         JSONObject jsonData = new JSONObject(data);
         JSONArray jsonRoutes = jsonData.getJSONArray("routes");
+        String points = "";
         for (int i = 0; i < jsonRoutes.length(); i++) {
             JSONObject jsonRoute = jsonRoutes.getJSONObject(i);
             Route route = new Route();
@@ -132,12 +133,13 @@ public class DirectionFinder {
                 route_.points = decodePolyLine(each_polylineJson.getString("points"));
                 arRoutes.add(route_);
             }
+            points = overview_polylineJson.getString("points");
 
         }
-        listener.onDirectionFinderSuccess(routes,arRoutes);
+        listener.onDirectionFinderSuccess(routes,arRoutes,points);
     }
 
-    private List<LatLng> decodePolyLine(final String poly) {
+    static public List<LatLng> decodePolyLine(final String poly) {
         int len = poly.length();
         int index = 0;
         List<LatLng> decoded = new ArrayList<LatLng>();

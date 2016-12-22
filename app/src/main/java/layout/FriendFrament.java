@@ -1,5 +1,6 @@
 package layout;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -9,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
+import com.example.a51202_000.testbug.AddFriendActivity;
 import com.example.a51202_000.testbug.FriendcustomListView;
 import com.example.a51202_000.testbug.R;
 
@@ -28,6 +30,8 @@ import java.util.ArrayList;
 import Model.User;
 import globalClass.GlobalUserClass;
 
+import static android.app.Activity.RESULT_OK;
+
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
@@ -37,10 +41,11 @@ import globalClass.GlobalUserClass;
  * create an instance of this fragment.
  */
 public class FriendFrament extends Fragment {
-
+    private static final int ADDFRIENDCODE = 1307;
     private OnFragmentInteractionListener mListener;
     private ListView friends_lv;
     GlobalUserClass globalUser;
+    ArrayList<User> friends;
     public FriendFrament() {
     }
     public static FriendFrament newInstance(String param1, String param2) {
@@ -64,6 +69,7 @@ public class FriendFrament extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_friend_frament, container, false);
         friends_lv = (ListView) rootView.findViewById(R.id.list_frient);
         globalUser = (GlobalUserClass) getActivity().getApplicationContext();
+        friends = new ArrayList<>();
         ArrayList<User> listfriend = globalUser.getCur_user().getFriends_list();
         if((listfriend.size())>0) {
             FriendcustomListView adapter = new FriendcustomListView(
@@ -75,13 +81,35 @@ public class FriendFrament extends Fragment {
         return rootView;
     }
 
+    public void AddFriend() {
+        Intent intent_add_event = new Intent(getActivity(), AddFriendActivity.class);
+        startActivityForResult(intent_add_event,ADDFRIENDCODE);
+//        intent_add_event.putExtra("userid",globalUser.get_id());
+//        startActivityForResult(intent_add_event, ADDEVENTCODE);
+    }
+
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
         }
     }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode,resultCode, data );
 
+        if(resultCode != RESULT_OK) {
+            return;
+        }
+        if (requestCode == ADDFRIENDCODE) {
+            final Bundle extras = data.getExtras();
+            if (extras != null) {
+                friends = new ArrayList<>();
+                new ReadFriendJSON().execute("http://totnghiep.herokuapp.com/api/user/"+globalUser.getCur_user().get_id());
+            }
+        }
+
+    }
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
@@ -104,7 +132,7 @@ public class FriendFrament extends Fragment {
 
         @Override
         protected void onPostExecute(String s) {
-            ArrayList<User> friends = new ArrayList<>();
+            friends = new ArrayList<>();
             super.onPostExecute(s);
             try {
                 //json array

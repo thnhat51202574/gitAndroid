@@ -11,7 +11,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.TimeZone;
+
+import Modules.DirectionFinder;
 
 /**
  * Created by 51202_000 on 01/11/2016.
@@ -24,12 +27,19 @@ public class Event {
     private LatLng endLatLng;
     private User event_owner;
     private ArrayList<User> list_member;
+    private ArrayList<Address> list_address;
     private Date event_startTime;
     private Date event_endTime;
     private String event_description;
+    private String StringJson;
+    private List<LatLng> arLocs;
     private boolean isowner;
 
-    public Event(JSONObject object, boolean owner) throws JSONException, ParseException {
+    public List<LatLng> getArLocs() {
+        return arLocs;
+    }
+
+    public Event(JSONObject object, String stringEvent, boolean owner) throws JSONException, ParseException {
         if((object.has("_id")) && (!object.isNull("_id"))){
             this._id = object.getString("_id");
         } else {this._id ="";}
@@ -67,12 +77,12 @@ public class Event {
 
         if((object.has("startLocs")) && (!object.isNull("startLocs"))){
             JSONArray start_Locs = object.getJSONArray("startLocs");
-            startLatlng = new LatLng(start_Locs.getDouble(0),start_Locs.getDouble(1));
+            startLatlng = new LatLng(start_Locs.getDouble(1),start_Locs.getDouble(0));
         } else {startLatlng =null;}
 
         if((object.has("endLocs")) && (!object.isNull("endLocs"))){
             JSONArray end_locs = object.getJSONArray("endLocs");
-            endLatLng = new LatLng(end_locs.getDouble(0),end_locs.getDouble(1));
+            endLatLng = new LatLng(end_locs.getDouble(1),end_locs.getDouble(0));
         } else {endLatLng =null;}
 
         if((object.has("starttime")) && (!object.isNull("starttime"))){
@@ -98,8 +108,24 @@ public class Event {
             format.setTimeZone(TimeZone.getTimeZone("Asia/Saigon"));
             this.event_endTime = format.parse(birthday_);
         }
-        this.isowner = owner;
+        if((object.has("arAddress")) && (!object.isNull("arAddress"))){
+            JSONArray arAddress = object.getJSONArray("arAddress");
+            list_address = new ArrayList<>();
+            for (int i = 0; i<arAddress.length(); i++) {
+                JSONObject addressObj = arAddress.getJSONObject(i);
+                Address each_address = new Address(addressObj);
+                list_address.add(each_address);
+            }
+        } else {list_address = new ArrayList<>();}
 
+        if((object.has("points")) && (!object.isNull("points"))){
+            String stringPoints = object.getString("points");
+            arLocs = DirectionFinder.decodePolyLine(stringPoints);
+        } else {arLocs = new ArrayList<>();}
+
+
+        this.StringJson = stringEvent;
+        this.isowner = owner;
     }
 
     public boolean isowner() {
@@ -123,6 +149,14 @@ public class Event {
 
     public String getStartAddress() {
         return startAddress;
+    }
+
+    public ArrayList<Address> getList_address() {
+        return list_address;
+    }
+
+    public String getStringJson() {
+        return StringJson;
     }
 
     public void setStartAddress(String startAddress) {
