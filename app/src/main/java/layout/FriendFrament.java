@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,6 +45,7 @@ public class FriendFrament extends Fragment {
     private static final int ADDFRIENDCODE = 1307;
     private OnFragmentInteractionListener mListener;
     private ListView friends_lv;
+    FriendcustomListView adapter;
     GlobalUserClass globalUser;
     ArrayList<User> friends;
     public FriendFrament() {
@@ -72,12 +74,13 @@ public class FriendFrament extends Fragment {
         friends = new ArrayList<>();
         ArrayList<User> listfriend = globalUser.getCur_user().getFriends_list();
         if((listfriend.size())>0) {
-            FriendcustomListView adapter = new FriendcustomListView(
+             adapter = new FriendcustomListView(
                     getActivity().getApplicationContext(), R.layout.friend_layout,listfriend);
             friends_lv.setAdapter(adapter);
         } else {
             new ReadFriendJSON().execute("http://totnghiep.herokuapp.com/api/user/"+globalUser.getCur_user().get_id());
         }
+
         return rootView;
     }
 
@@ -152,10 +155,15 @@ public class FriendFrament extends Fragment {
                 e.printStackTrace();
             }
 
-            FriendcustomListView adapter = new FriendcustomListView(
+             adapter = new FriendcustomListView(
                     getActivity().getApplicationContext(), R.layout.friend_layout,friends);
             friends_lv.setAdapter(adapter);
-
+            adapter.setonUnfriendClickListener(new FriendcustomListView.OnUnfriendClickListener() {
+                @Override
+                public void onClick(User user, int Position) {
+                    Log.d("USEID",user.get_id());
+                }
+            });
         }
 
 

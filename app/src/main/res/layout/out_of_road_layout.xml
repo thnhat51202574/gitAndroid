@@ -12,22 +12,23 @@
         android:orientation="horizontal"
         android:layout_margin="5dp"
         android:layout_gravity="center"
-        android:paddingLeft="20dp">
+        android:paddingLeft="20dp"
+        >
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center|right"
             >
-            <com.mikhaellopez.circularimageview.CircularImageView
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:src="@drawable/noavatar"
-                app:civ_border_color="#41ce28"
-                app:civ_border_width="0dp"
-                android:id="@+id/frient_avatar"/>
+        <com.mikhaellopez.circularimageview.CircularImageView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/noavatar"
+            app:civ_border_color="#41ce28"
+            app:civ_border_width="0dp"
+            android:id="@+id/frient_avatar"/>
 
-            <TextView
+        <TextView
             android:layout_marginLeft="10dp"
             android:id="@+id/friend_name"
             android:layout_width="match_parent"
@@ -36,7 +37,7 @@
             android:gravity="top"
             android:text="Hoàng Nhật"
             android:textSize="15sp"/>
-        </LinearLayout>
+            </LinearLayout>
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -46,13 +47,20 @@
             android:gravity="center|right"
             >
             <at.markushi.ui.CircleButton
-                android:id="@+id/unfriend"
-                android:layout_width="40dip"
-                android:layout_height="40dip"
-                app:cb_color="@color/indigo"
-                android:src="@drawable/ic_unfriend"
+                android:id="@+id/callbtn"
+                android:layout_width="55dip"
+                android:layout_height="55dip"
+                app:cb_color="#99CC00"
+                android:src="@drawable/call"
                 app:cb_pressedRingWidth="8dip" />
-        </LinearLayout>
+            <at.markushi.ui.CircleButton
+                android:id="@+id/findbtn"
+                android:layout_width="55dip"
+                android:layout_height="55dip"
+                app:cb_color="@color/primary_darker"
+                android:src="@drawable/ic_place_location"
+                app:cb_pressedRingWidth="8dip" />
+            </LinearLayout>
     </RelativeLayout>
 
 </LinearLayout>

@@ -320,17 +320,24 @@ tools:context="com.example.a51202_000.testbug.MapsActivity">
                     android:layout_alignParentRight="true"
                     android:layout_alignParentEnd="true" />
             </RelativeLayout>
-            <RelativeLayout
+            <LinearLayout
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="4dp"
-                android:layout_marginLeft="4dp">
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Ẩn"
-                    android:id="@+id/downbtn" />
-            </RelativeLayout>
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:weightSum="1">
+                <at.markushi.ui.CircleButton
+                    android:id="@+id/OkBtnAdd"
+                    android:layout_width="64dip"
+                    android:layout_height="64dip"
+                    app:cb_color="#99CC00"
+                    android:visibility="gone"
+                    android:src="@drawable/add_event_ic_tick"
+                    app:cb_pressedRingWidth="8dip" />
+
+            </LinearLayout>
         </LinearLayout>
     </com.sothree.slidinguppanel.SlidingUpPanelLayout>
 

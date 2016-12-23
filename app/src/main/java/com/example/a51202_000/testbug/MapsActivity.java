@@ -1,6 +1,9 @@
 package com.example.a51202_000.testbug;
 
 import android.Manifest;
+import android.app.Dialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -12,16 +15,22 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.net.Uri;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -61,19 +70,21 @@ import com.squareup.picasso.Target;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import AsyncTask.getNearestLocation;
 import Model.Address;
 import Model.Event;
 import Model.User;
 import Modules.MDistance;
+import at.markushi.ui.CircleButton;
 import globalClass.GlobalUserClass;
 
 public class MapsActivity extends FragmentActivity implements LocationListener,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,GoogleMap.OnMarkerClickListener {
 
     private static final int MILLISECONDS_PER_SECOND = 1000;
-
+    private static final int MY_PERMISSIONS_REQUEST_CALL_PHONE = 21212;
     public static final int UPDATE_INTERVAL_IN_SECONDS = 10;
-    public static final int MIN_DISTANCE_TO_ALERT = 30;
+    public static final int MIN_DISTANCE_TO_ALERT = 24;
     private static final long UPDATE_INTERVAL =  MILLISECONDS_PER_SECOND * UPDATE_INTERVAL_IN_SECONDS;
 
     private static final int FASTEST_INTERVAL_IN_SECONDS = 1;
@@ -98,12 +109,15 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     static private HashMap<Marker,Address> ListMarkerChoose;
     static private HashMap<String, User> ListCurUser;
     static private HashMap<String, Bitmap> listBitmap;
+    static private ArrayList<User> arUserOutofRoad;
+    static private ArrayList<Marker> nearestLocation;
     ImageView address_picture;
     private View image_progressbar;
     SwitchCompat watchlocation;
     TextView address_name, address_rate, address_position, address_phone, address_type, address_detail,idaddresshidde;
     TextView info_detail, info_warning, nummember, totalmember;
     Boolean watchlocation_flag;
+    CircleButton addStopLocation;
     private Socket mSocket;
     {
         try {
@@ -134,6 +148,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         nummember = (TextView) findViewById(R.id.detainum);
         totalmember = (TextView) findViewById(R.id.detaitotalnum);
         watchlocation = (SwitchCompat) findViewById(R.id.watchmylocation);
+        addStopLocation = (CircleButton) findViewById(R.id.OkBtnAdd) ;
         watchlocation_flag = true;
         watchlocation.setChecked(watchlocation_flag);
         watchlocation.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -162,6 +177,8 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         ListMarkerChoose = new HashMap<>();
         ListCurUser = new HashMap<>();
         listBitmap = new HashMap<>();
+        arUserOutofRoad = new ArrayList<>();
+        nearestLocation = new ArrayList<>();
         if(savedInstanceState == null) {
             final Bundle extras = getIntent().getExtras();
             if (extras != null) {
@@ -193,7 +210,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         mSocket.on("updatejoin",updatejoinListener);
         mSocket.on("updateUserPosition",updateUserPositionListener);
         mSocket.on("userout",useroutListener);
-        mSocket.on("alerttoOwner",alerttoOwnerListener);
+        mSocket.on("receivenotifyNearStopLocation",receivenotifyNearStopLocationListener);
         if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(this)
                     .addConnectionCallbacks(this)
@@ -250,49 +267,92 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
     @Override
     public boolean onMarkerClick(final Marker marker){
-        final Object obj = this.ListMarkerChoose.get(marker);
-        Address choose_address = null;
-        if (obj instanceof Address) {
-            choose_address = (Address) obj;
-        }
-        if(!(choose_address == null)) {
-            image_progressbar.setVisibility(View.VISIBLE);
-            address_name.setText(choose_address.getName());
-            address_rate.setText(String.valueOf(choose_address.getRate()));
-            address_position.setText(choose_address.getAddress());
-            address_phone.setText(choose_address.getPhone());
-            address_detail.setText(choose_address.getdetail());
-            address_type.setText("Nhà hàng");
-            //idaddresshidde.setText(choose_address.get_id());
+            final Object obj = this.ListMarkerChoose.get(marker);
+            Address choose_address = null;
+            if (obj instanceof Address) {
+                choose_address = (Address) obj;
+            }
+            if(!(choose_address == null)) {
+                image_progressbar.setVisibility(View.VISIBLE);
+                address_name.setText(choose_address.getName());
+                address_rate.setText(String.valueOf(choose_address.getRate()));
+                address_position.setText(choose_address.getAddress());
+                address_phone.setText(choose_address.getPhone());
+                address_detail.setText(choose_address.getdetail());
+                address_type.setText("Nhà hàng");
+                //idaddresshidde.setText(choose_address.get_id());
 
-            String url = "http://totnghiep.herokuapp.com" + choose_address.getArImage();
-            Picasso.with(this).load(url).error(R.drawable.no_images).into(address_picture, new com.squareup.picasso.Callback() {
-                @Override
-                public void onSuccess() {
-                    image_progressbar.setVisibility(View.GONE);
-                }
+                String url = "http://totnghiep.herokuapp.com" + choose_address.getArImage();
+                Picasso.with(this).load(url).error(R.drawable.no_images).into(address_picture, new com.squareup.picasso.Callback() {
+                    @Override
+                    public void onSuccess() {
+                        image_progressbar.setVisibility(View.GONE);
+                    }
 
-                @Override
-                public void onError() {
-                    image_progressbar.setVisibility(View.GONE);
-                }
-            });
-            slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-            slidingLayout.addPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
+                    @Override
+                    public void onError() {
+                        image_progressbar.setVisibility(View.GONE);
+                    }
+                });
+                slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+                slidingLayout.addPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
 
-                @Override
-                public void onPanelSlide(View panel, float slideOffset) {
+                    @Override
+                    public void onPanelSlide(View panel, float slideOffset) {
 
-                }
+                    }
 
-                @Override
-                public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState, SlidingUpPanelLayout.PanelState newState) {
+                    @Override
+                    public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState, SlidingUpPanelLayout.PanelState newState) {
+                        if(nearestLocation.contains(marker)) {
+                            //choose to stop
+                            addStopLocation.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    new AlertDialog.Builder(MapsActivity.this)
+                                    .setMessage("Bạn chắc chắn chọn điểm dừng gần nhất này ?")
+                                    .setCancelable(false)
+                                    .setPositiveButton("Có", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
 
-                }
-            });
-        }   else {
-            Log.d("TAG","NULL");
-        }
+                                            //remove all marker except current marker
+                                            for (int index = 0; index < nearestLocation.size();index ++) {
+                                                Marker marker_inArray = nearestLocation.get(index);
+                                                if(!marker_inArray.equals(marker)) {
+                                                    ListMarkerChoose.remove(marker_inArray);
+                                                    marker_inArray.remove();
+                                                }
+
+                                            }
+                                            nearestLocation.clear();
+                                            //change icon current marker
+                                            marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker_choose_stop));
+                                            //notify to all member include user out of road
+                                            Address choose_address_local = ListMarkerChoose.get(marker);
+                                            String objString = choose_address_local.getAddressStringObj();
+                                            JSONObject dataInsert = null;
+                                            try {
+                                                dataInsert = new JSONObject(objString);
+                                                mSocket.emit("notifyNearStopLocation", dataInsert);
+                                            } catch (JSONException e) {
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                    })
+                                    .setNegativeButton("Không", null)
+                                    .show();
+                                    slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
+                                }
+                            });
+                            addStopLocation.setVisibility(View.VISIBLE);
+                        } else {
+                            addStopLocation.setVisibility(View.INVISIBLE);
+                        }
+                    }
+                });
+            }   else {
+                Log.d("TAG","NULL");
+            }
         return false;
     }
     @Override
@@ -346,6 +406,14 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         super.onDestroy();
         mSocket.disconnect();
         mSocket.close();
+        }
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        this.finish();
+        mGoogleApiClient.disconnect();
+        mSocket.disconnect();
+        mSocket.close();
     }
     protected void onStart() {
         mGoogleApiClient.connect();
@@ -361,27 +429,8 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             String lat = String.valueOf(mCurrentLocation.getLatitude());
             String lng = String.valueOf(mCurrentLocation.getLongitude());
 
-//            Toast.makeText(getApplicationContext(), "Longitude: " + lng + "\nLatitude: "
-//                    + lat, Toast.LENGTH_LONG).show();
-            try {
-                JSONObject dataInsert = new JSONObject();
-                dataInsert.put("lng",lng);
-                dataInsert.put("lat",lat);
-                mSocket.emit("sendUserPosition", dataInsert);
-            } catch (JSONException e){
-                Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_LONG).show();
-            }
             LatLng myLocation = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
             Marker newmarker = ListMarkerByUser.get(globalUser.getCur_user().get_id());
-
-//            Bitmap bitmap_marker = listBitmap.get(globalUser.getCur_user().get_id());
-//
-//            if(bitmap_marker == null) {
-//                target = new PicassoMarker();
-//                Picasso.with(this).load(globalUser.getCur_user().getAvatarLink()).into(target);
-//                bitmap_marker = addBorderToCircularBitmap(target.getMbitmap(),5,R.color.usercolor);
-//                listBitmap.put(globalUser.getCur_user().get_id(),bitmap_marker);
-//            }
 
             if(newmarker == null) {
 
@@ -397,11 +446,24 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             info_detail.setText(String.valueOf(distance2Route));
 
             System.out.println("distance = " + distance2Route);
-            if(distance2Route > MIN_DISTANCE_TO_ALERT) {
-                JSONObject dataAlert = new JSONObject();
-                dataAlert.put("distance",distance2Route);
-                mSocket.emit("alertOutOfRoute", dataAlert);
+
+            try {
+
+                JSONObject dataInsert = new JSONObject();
+                dataInsert.put("lng",lng);
+                dataInsert.put("lat",lat);
+                if(distance2Route > MIN_DISTANCE_TO_ALERT) {
+                    dataInsert.put("isOutofRoad",true);
+                } else {
+                    dataInsert.put("isOutofRoad",false);
+                }
+                dataInsert.put("distance",distance2Route);
+
+                mSocket.emit("sendUserPosition", dataInsert);
+            } catch (JSONException e){
+                Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_LONG).show();
             }
+
             if(watchlocation_flag) {
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(myLocation));
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLocation, 16));
@@ -428,6 +490,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                         message = data.getString("message");
                         userid = data.getString("userid");
                         numOnline = data.getString("numOnline");
+                        User socket_user = ListCurUser.get(userid);
                         nummember.setText(numOnline);
                         Marker LastMarker = ListMarkerByUser.get(userid);
                         if(LastMarker == null) {
@@ -441,39 +504,11 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_disconect)).title(username));
                         }
                         ListMarkerByUser.put(userid,LastMarker);
+                        if(arUserOutofRoad.contains(socket_user)) {
+                            arUserOutofRoad.remove(socket_user);
+                        }
                         Toast.makeText(getApplicationContext(),message,Toast.LENGTH_LONG).show();
 
-                    } catch (JSONException e) {
-                        return;
-                    }
-                }
-            });
-        }
-    };
-
-    private Emitter.Listener alerttoOwnerListener = new Emitter.Listener() {
-        @Override
-        public void call(final Object... args) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    JSONObject data = (JSONObject) args[0];
-                    String message;
-                    final String userid;
-                    try {
-                        message = data.getString("message");
-                        userid = data.getString("userid");
-                        info_warning.setText(message);
-                        info_warning.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                Marker LastMarker = ListMarkerByUser.get(userid);
-                                if(!watchlocation_flag) {
-                                    mMap.moveCamera(CameraUpdateFactory.newLatLng(LastMarker.getPosition()));
-                                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LastMarker.getPosition(), 16));
-                                }
-                            }
-                        });
                     } catch (JSONException e) {
                         return;
                     }
@@ -489,27 +524,30 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                 @Override
                 public void run() {
                     JSONObject data = (JSONObject) args[0];
-                    String userid, username;
+                    final String userid, username;
                     Double lng;
                     Double lat;
+                    Boolean isOutofRoad;
+                    Double distance;
                     try {
                         userid = data.getString("userid");
                         username = data.getString("username");
                         lng = data.getDouble("lng");
                         lat = data.getDouble("lat");
+                        isOutofRoad = data.getBoolean("isRoutofRoad");
+                        distance = data.getDouble("distance");
                         LatLng myLocation = new LatLng(lat,lng);
                         Marker newmarker = ListMarkerByUser.get(userid);
 
                         Bitmap bitmap_marker_ = listBitmap.get(userid);
+                        User socket_user = ListCurUser.get(userid);
 
                         if(bitmap_marker_ == null) {
                             PicassoMarker target_ = new PicassoMarker();
-                            Picasso.with(MapsActivity.this).load(ListCurUser.get(userid).getAvatarLink()).into(target_);
+                            Picasso.with(MapsActivity.this).load(socket_user.getAvatarLink()).into(target_);
                             bitmap_marker_ = target_.getMbitmap();
                             listBitmap.put(userid,bitmap_marker_);
                         }
-
-
 
                         if(newmarker == null) {
                             newmarker = mMap.addMarker(new MarkerOptions().position(myLocation).title(username));
@@ -519,8 +557,29 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                             newmarker.setPosition(myLocation);
                             newmarker.setIcon(BitmapDescriptorFactory.fromBitmap(bitmap_marker_));
                         }
+                        if(cur_event.isowner(globalUser.getCur_user().get_id())) {
+                            if (isOutofRoad) {
+                                info_warning.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        if (arUserOutofRoad.size() > 0)
+                                            showDialog(arUserOutofRoad);
+                                    }
+                                });
 
-//                      Toast.makeText(getApplicationContext(),username + " cập nhật vị trí",Toast.LENGTH_LONG).show();
+                                if (!arUserOutofRoad.contains(socket_user)) {
+                                    arUserOutofRoad.add(socket_user);
+                                }
+                                info_warning.setText(arUserOutofRoad.size() + "thành viên đang bị lạc!");
+
+                            } else {
+                                if (arUserOutofRoad.contains(socket_user)) {
+                                    arUserOutofRoad.remove(socket_user);
+                                    info_detail.setText(username + "đã trở lại đúng đường ");
+                                    info_warning.setText("");
+                                }
+                            }
+                        }
                     } catch (JSONException e) {
                         return;
                     }
@@ -583,13 +642,41 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     };
 
 
-    private Emitter.Listener onUserJoinOrOut = new Emitter.Listener() {
+    private Emitter.Listener receivenotifyNearStopLocationListener = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    //
+                    final JSONObject data = (JSONObject) args[0];
+                    new AlertDialog.Builder(MapsActivity.this)
+                    .setMessage("Có người đi lạc. Cả đội tập trung vào địa điểm được đánh dấu nhé.")
+                    .setCancelable(false)
+                    .setPositiveButton("Có", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            //draw new address
+                            Address nearStopAddress = null;
+                            try {
+                                nearStopAddress = new Address(data.getJSONObject("address"));
+                                LatLng mylocation = nearStopAddress.getLocs();
+                                MarkerOptions marker = new MarkerOptions().position(mylocation)
+                                    .title(nearStopAddress.getName())
+                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_choose_stop));
+                                Marker _marker = mMap.addMarker(marker);
+                                //turn of watch location
+                                watchlocation_flag = false;
+                                watchlocation.setChecked(false);
+                                //move camera to new address
+                                mMap.moveCamera(CameraUpdateFactory.newLatLng(mylocation));
+                                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mylocation, 16));
+                                ListMarkerChoose.put(_marker,nearStopAddress);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    })
+                    .show();
+
                 }
             });
         }
@@ -700,5 +787,106 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
         // Return the bordered circular bitmap
         return dstBitmap;
+    }
+    public void showDialog(ArrayList<User> arUser){
+        final View view = this.getLayoutInflater().inflate (R.layout.out_of_road_dialog, null);
+
+        final Dialog mDetailEventDialog = new Dialog(this,R.style.MaterialDialogSheet);
+        mDetailEventDialog.setContentView (view);
+        mDetailEventDialog.setCancelable (true);
+        mDetailEventDialog.getWindow ().setLayout (LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+        mDetailEventDialog.getWindow ().setGravity (Gravity.BOTTOM);
+        mDetailEventDialog.show();
+
+        Button choosenearstop = (Button) view.findViewById(R.id.choosenearstop);
+        Button CANCELbtn = (Button) view.findViewById(R.id.CANCEL);
+
+
+        //draw nearlocation
+        choosenearstop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Marker newmarker = ListMarkerByUser.get(globalUser.getCur_user().get_id());
+                getNearestLocation aroundLocation = new getNearestLocation(newmarker.getPosition(), new getNearestLocation.OnArrountCompleted() {
+                    @Override
+                    public void getListAddress(ArrayList<Address> result) {
+                        ArrayList<Address> mArAddress = result;
+                        for (int i = 0;i < mArAddress.size();i++) {
+                            Address eachAddress = mArAddress.get(i);
+                            LatLng mylocation = eachAddress.getLocs();
+                            MarkerOptions marker = new MarkerOptions().position(mylocation)
+                                    .title(eachAddress.getName()).icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons("restaurant",50,50)));
+                            Marker _marker = mMap.addMarker(marker);
+                            if(!nearestLocation.contains(_marker)) {
+                                nearestLocation.add(_marker);
+                                ListMarkerChoose.put(_marker,eachAddress);
+                            }
+                        }
+                        mDetailEventDialog.dismiss();
+                    }
+            });
+                aroundLocation.execute("http://totnghiep.herokuapp.com/api/ListAddressByLocation");
+            }
+        });
+
+        ListView gvlistMember = (ListView) view.findViewById(R.id.gvlistMember);
+        UserOutOfRoadCustomListview adapter = new UserOutOfRoadCustomListview(getApplicationContext(), R.layout.out_of_road_layout,arUser);
+        gvlistMember.setAdapter(adapter);
+        adapter.setOnEachItemChangeListener(new UserOutOfRoadCustomListview.OnClickListener() {
+            @Override
+            public void onCallClick(final User mUser, int Position) {
+                if(ContextCompat.checkSelfPermission(MapsActivity.this,
+                        Manifest.permission.CALL_PHONE)
+                        != PackageManager.PERMISSION_GRANTED) {
+
+                    ActivityCompat.requestPermissions(MapsActivity.this,
+                            new String[]{Manifest.permission.CALL_PHONE},
+                            MY_PERMISSIONS_REQUEST_CALL_PHONE);
+                } else {
+                    MapsActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Intent callIntent = new Intent(Intent.ACTION_CALL);
+                            callIntent.setData(Uri.parse("tel:"+ mUser.getPhone()));
+                            startActivity(callIntent);
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onFindLocationClick(User mUser, int Position) {
+                Marker user_marker = ListMarkerByUser.get(mUser.get_id());
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(user_marker.getPosition()));
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(user_marker.getPosition(), 16));
+            }
+        });
+        Button startbtn = (Button) view.findViewById(R.id.START);
+        Button cancelbtn = (Button) view.findViewById(R.id.CANCEL);
+
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_CALL_PHONE: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                } else {
+
+                }
+                return;
+            }
+        }
+    }
+    public Bitmap resizeMapIcons(String iconName,int width, int height){
+        Bitmap imageBitmap = BitmapFactory.decodeResource(getResources(),getResources().getIdentifier(iconName, "drawable", getPackageName()));
+        Bitmap resizedBitmap = Bitmap.createScaledBitmap(imageBitmap, width, height, false);
+        return resizedBitmap;
     }
 }

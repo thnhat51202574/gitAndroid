@@ -131,6 +131,9 @@ public class Event {
     public boolean isowner() {
         return isowner;
     }
+    public boolean isowner(String _id) {
+        return (_id.equals(this.event_owner.get_id()) );
+    }
     public String get_id() {
         return _id;
     }

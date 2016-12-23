@@ -21,6 +21,7 @@ public class Address {
     private Double rate,latitue,longtitue;
     private int type;
     private ArrayList<String> arImage;
+    private String AddressStringObj;
     public Address() {
         this._id = "";
         this.name = this.address = this.phonenumber = this.detail = this.website = "";
@@ -28,6 +29,11 @@ public class Address {
         this.type = 0;
         this.arImage = new ArrayList<String>();
     }
+
+    public String getAddressStringObj() {
+        return AddressStringObj;
+    }
+
     public Address(JSONObject object) throws JSONException {
         if((object.has("_id")) && (!object.isNull("_id"))){
             this._id = object.getString("_id");
@@ -68,6 +74,9 @@ public class Address {
                 this.arImage.add(pictureUrl);
             }
         } else this.arImage = new ArrayList<String>();
+        this.AddressStringObj = object.toString();
+
+
     }
     public LatLng getLocs() {
         return new LatLng(this.latitue,this.longtitue);

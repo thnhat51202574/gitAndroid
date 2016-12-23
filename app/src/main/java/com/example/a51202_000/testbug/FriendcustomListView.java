@@ -16,6 +16,7 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 
 import Model.User;
+import at.markushi.ui.CircleButton;
 
 /**
  * Created by 51202_000 on 15/11/2016.
@@ -25,6 +26,13 @@ public class FriendcustomListView extends ArrayAdapter<User> {
     ArrayList<User> users;
     Context context;
     int resource;
+    public interface OnUnfriendClickListener{
+        void onClick(User user,int Position);
+    }
+    public OnUnfriendClickListener mListener;
+    public void setonUnfriendClickListener(OnUnfriendClickListener onUnfriendClickListener){
+        mListener = onUnfriendClickListener;
+    }
     public FriendcustomListView(Context context, int resource, ArrayList<User> objects) {
         super(context, resource, objects);
         this.users = objects;
@@ -34,11 +42,12 @@ public class FriendcustomListView extends ArrayAdapter<User> {
     static class ViewHolder {
         TextView Frient_name;
         CircularImageView Avatar;
+        CircleButton unfriend;
     }
 
     @NonNull
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
         final ViewHolder h;
         final User user = users.get(position);
         if (convertView == null){
@@ -48,10 +57,11 @@ public class FriendcustomListView extends ArrayAdapter<User> {
             h = new ViewHolder();
             h.Frient_name = (TextView)  convertView.findViewById(R.id.friend_name);
             h.Avatar =(CircularImageView) convertView.findViewById(R.id.frient_avatar);
-            convertView.setOnClickListener(new View.OnClickListener() {
+            h.unfriend = (CircleButton) convertView.findViewById(R.id.unfriend);
+            h.unfriend.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(View v) {
-                    Toast.makeText(context,"Chi tiết" + user.get_id(),Toast.LENGTH_LONG).show();
+                public void onClick(View view) {
+                    mListener.onClick(user,position);
                 }
             });
         } else {
