@@ -247,8 +247,16 @@ public class EditprofileAcitivity extends AppCompatActivity {
         avatar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(i,CHOOSE_FILE_IMAGE);
+                Intent intent = new Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                intent.setType("image/*");
+                intent.putExtra("crop", "true");
+                intent.putExtra("scale", true);
+                intent.putExtra("outputX", 512);
+                intent.putExtra("outputY", 512);
+                intent.putExtra("aspectX", 1);
+                intent.putExtra("aspectY", 1);
+                intent.putExtra("return-data", true);
+                startActivityForResult(intent,CHOOSE_FILE_IMAGE);
             }
         });
         // ATTENTION: This was auto-generated to implement the App Indexing API.
@@ -263,10 +271,13 @@ public class EditprofileAcitivity extends AppCompatActivity {
             return;
         }
         if (requestCode == CHOOSE_FILE_IMAGE) {
+            final Bundle extras = data.getExtras();
+            if (extras != null) {
                 //Get image
                 String path;
-                final Uri selectedImageUri = data.getData();
-                path = getPathFromURI(selectedImageUri);
+                final Bitmap newProfilePic = extras.getParcelable("data");
+                Uri imageURI = getImageUri(getApplicationContext(),newProfilePic);
+                path = getPathFromURI(imageURI);
                 final File f = new File(path);
                 Future uploading = Ion.with(getApplicationContext())
                         .load("http://totnghiep.herokuapp.com/upload")
@@ -280,12 +291,12 @@ public class EditprofileAcitivity extends AppCompatActivity {
 
                                 Ion.getDefault(getApplicationContext()).getCache().clear();
                                 Ion.getDefault(getApplicationContext()).getBitmapCache().clear();
-                                avatar.setImageURI(selectedImageUri);
+                                avatar.setImageBitmap(newProfilePic);
                                 deleteImage(f);
                             }
                         });
 
-
+                }
         }
 
     }
