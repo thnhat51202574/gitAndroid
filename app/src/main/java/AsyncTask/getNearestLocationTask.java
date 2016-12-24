@@ -90,7 +90,7 @@ public class getNearestLocationTask extends AsyncTask<String, Void, String> {
 //                  draw to map
                 LatLng mylocation = address_tmp.getLocs();
                 MarkerOptions marker = new MarkerOptions().position(mylocation).title(address_tmp.getName());
-                marker.icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons("restaurant",50,50)));
+                marker.icon(BitmapDescriptorFactory.fromResource(R.drawable.restaurant_marker));
 
                 Marker _marker = googleMap.addMarker(marker);
                 result.put(_marker,address_tmp);
@@ -133,6 +133,8 @@ public class getNearestLocationTask extends AsyncTask<String, Void, String> {
     public Bitmap resizeMapIcons(String iconName,int width, int height){
         Bitmap imageBitmap = BitmapFactory.decodeResource(this.ActivityContext.getResources(),this.ActivityContext.getResources().getIdentifier(iconName, "drawable", this.ActivityContext.getPackageName()));
         Bitmap resizedBitmap = Bitmap.createScaledBitmap(imageBitmap, width, height, false);
+        imageBitmap.recycle();
+        imageBitmap = null;
         return resizedBitmap;
     }
 }

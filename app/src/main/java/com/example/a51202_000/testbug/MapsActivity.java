@@ -816,7 +816,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                             Address eachAddress = mArAddress.get(i);
                             LatLng mylocation = eachAddress.getLocs();
                             MarkerOptions marker = new MarkerOptions().position(mylocation)
-                                    .title(eachAddress.getName()).icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons("restaurant",50,50)));
+                                    .title(eachAddress.getName()).icon(BitmapDescriptorFactory.fromResource(R.drawable.restaurant_marker));
                             Marker _marker = mMap.addMarker(marker);
                             if(!nearestLocation.contains(_marker)) {
                                 nearestLocation.add(_marker);
@@ -889,4 +889,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         Bitmap resizedBitmap = Bitmap.createScaledBitmap(imageBitmap, width, height, false);
         return resizedBitmap;
     }
+
+
 }

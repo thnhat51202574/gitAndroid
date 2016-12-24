@@ -16,28 +16,16 @@
             android:orientation="vertical"
             android:layout_marginTop="20dp"
             >
-            <ImageView
-                android:layout_width="150dp"
-                android:layout_height="150dp"
+            <com.mikhaellopez.circularimageview.CircularImageView
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:src="@drawable/noavatar"
+                app:civ_border_color="#41ce28"
+                app:civ_border_width="0dp"
                 android:layout_gravity="center"
-                android:id="@+id/avatar"
-                android:src="@drawable/avatar"
-                android:scaleType="centerCrop"/>
-            <com.dd.CircularProgressButton
-                android:id="@+id/circularButton1"
-                android:layout_marginTop="4dp"
-                android:visibility="gone"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/WhiteColor"
-                android:textSize="13sp"
-                android:layout_gravity="center"
-                app:cpb_cornerRadius="48dp"
-                app:cpb_iconComplete="@drawable/add_event_ic_tick"
-                app:cpb_iconError="@drawable/add_event_ic_cancel"
-                app:cpb_textIdle="Tải hình" />
+                android:id="@+id/avatar"/>
             <TextView
-                android:text="Hoàng Nhật"
+                android:text=""
                 android:textColor="@color/colorPrimary"
                 android:textSize="18dp"
                 android:textAlignment="center"
@@ -67,7 +55,7 @@
                         android:layout_alignParentStart="true" />
 
                     <TextView
-                        android:text="Hoàng Nhật"
+                        android:text=""
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="30dp"
@@ -96,7 +84,7 @@
                         android:layout_alignParentStart="true" />
 
                     <TextView
-                        android:text="(+84) 1667191726"
+                        android:text=""
                         android:layout_below="@+id/name"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -126,7 +114,7 @@
                         android:layout_alignParentStart="true" />
 
                     <TextView
-                        android:text="29/04/1994"
+                        android:text=""
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="30dp"
@@ -155,7 +143,7 @@
                         android:layout_alignParentStart="true" />
 
                     <TextView
-                        android:text="40/1 Thủ Khoa Huân, P8, Tân Bình"
+                        android:text=""
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="30dp"

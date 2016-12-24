@@ -1,10 +1,12 @@
 package layout;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +16,7 @@ import android.widget.ListView;
 import com.example.a51202_000.testbug.AddFriendActivity;
 import com.example.a51202_000.testbug.FriendcustomListView;
 import com.example.a51202_000.testbug.R;
+
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -27,7 +30,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
+import AsyncTask.unFriendTask;
 
+import Model.Event;
 import Model.User;
 import globalClass.GlobalUserClass;
 
@@ -43,6 +48,7 @@ import static android.app.Activity.RESULT_OK;
  */
 public class FriendFrament extends Fragment {
     private static final int ADDFRIENDCODE = 1307;
+    private static final String UNFRIEND_URL = "http://totnghiep.herokuapp.com/api/user/unfriend";
     private OnFragmentInteractionListener mListener;
     private ListView friends_lv;
     FriendcustomListView adapter;
@@ -160,9 +166,35 @@ public class FriendFrament extends Fragment {
             friends_lv.setAdapter(adapter);
             adapter.setonUnfriendClickListener(new FriendcustomListView.OnUnfriendClickListener() {
                 @Override
-                public void onClick(User user, int Position) {
-                    Log.d("USEID",user.get_id());
-                }
+                public void onClick(final User user, final int Position) {
+                    String userNamedisplay = user.getFullName();
+                    if(userNamedisplay.isEmpty()) userNamedisplay = user.getName();
+                        new AlertDialog.Builder(getActivity())
+                                .setMessage("Bạn muốn huỷ bạn bè với" + userNamedisplay)
+                                .setCancelable(false)
+                                .setPositiveButton("Có", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        //unfriend
+                                        unFriendTask unFriendTask_ = new unFriendTask(globalUser.getCur_user().get_id(),user.get_id());
+                                        unFriendTask_.execute(UNFRIEND_URL);
+                                        unFriendTask_.setOnUnfriendListener(new unFriendTask.OnUnfriendListener() {
+                                            @Override
+                                            public void unfriendSuccess() {
+                                                //refresh list friend
+                                                friends = new ArrayList<>();
+                                                new ReadFriendJSON().execute("http://totnghiep.herokuapp.com/api/user/"+globalUser.getCur_user().get_id());
+                                            }
+
+                                            @Override
+                                            public void unfriendFail() {
+                                                Log.d("USEID","unfriend Fail");
+                                            }
+                                        });
+                                    }
+                                })
+                                .setNegativeButton("Không", null)
+                                .show();
+                    }
             });
         }
 

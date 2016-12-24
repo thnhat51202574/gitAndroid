@@ -317,7 +317,7 @@ public class RouteMapEventFragment extends Fragment implements GoogleMap.OnMarke
                 LatLng mylocation = eachAddress.getLocs();
                 MarkerOptions marker = new MarkerOptions().position(mylocation).title(eachAddress.getName());
 
-                marker.icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons("restaurant",50,50)));
+                marker.icon(BitmapDescriptorFactory.fromResource(R.drawable.restaurant_marker));
                 Marker _marker = googleMap.addMarker(marker);
                 ListAddressChoose.put(_marker,eachAddress);
                 mMarkerbyid.put(eachAddress.get_id(),_marker);

@@ -23,7 +23,7 @@ import at.markushi.ui.CircleButton;
  */
 
 public class FriendcustomListView extends ArrayAdapter<User> {
-    ArrayList<User> users;
+    public ArrayList<User> users;
     Context context;
     int resource;
     public interface OnUnfriendClickListener{
@@ -58,31 +58,34 @@ public class FriendcustomListView extends ArrayAdapter<User> {
             h.Frient_name = (TextView)  convertView.findViewById(R.id.friend_name);
             h.Avatar =(CircularImageView) convertView.findViewById(R.id.frient_avatar);
             h.unfriend = (CircleButton) convertView.findViewById(R.id.unfriend);
+
+        } else {
+            h =(ViewHolder) convertView.getTag();
+        }
+        if(h!=null) {
             h.unfriend.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     mListener.onClick(user,position);
                 }
             });
-        } else {
-            h =(ViewHolder) convertView.getTag();
-        }
-        String userNamedisplay = user.getFullName();
-        if(userNamedisplay.isEmpty()) userNamedisplay = user.getName();
-        h.Frient_name.setText(userNamedisplay);
-        String url = user.getAvatarLink();
-        if(!url.isEmpty()) {
-            Picasso.with(context).load(url).error(R.drawable.no_images).into(h.Avatar, new com.squareup.picasso.Callback() {
-                @Override
-                public void onSuccess() {
+            String userNamedisplay = user.getFullName();
+            if (userNamedisplay.isEmpty()) userNamedisplay = user.getName();
+            h.Frient_name.setText(userNamedisplay);
+            String url = user.getAvatarLink();
+            if (!url.isEmpty()) {
+                Picasso.with(context).load(url).error(R.drawable.no_images).into(h.Avatar, new com.squareup.picasso.Callback() {
+                    @Override
+                    public void onSuccess() {
 
-                }
+                    }
 
-                @Override
-                public void onError() {
+                    @Override
+                    public void onError() {
 
-                }
-            });
+                    }
+                });
+            }
         }
         return convertView;
     }

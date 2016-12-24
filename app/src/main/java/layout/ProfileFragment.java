@@ -24,6 +24,8 @@ import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 import com.koushikdutta.ion.ProgressCallback;
 import com.koushikdutta.ion.Response;
+import com.mikhaellopez.circularimageview.CircularImageView;
+import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -50,7 +52,7 @@ public class ProfileFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-    private ImageView avatar;
+    private CircularImageView avatar;
     private TextView txtUserFullName,txtUserNameLogin, txtAddress, txtBrithday,txtPhone;
     private OnFragmentInteractionListener mListener;
     private CircularProgressButton chooseImgBtn;
@@ -95,7 +97,7 @@ public class ProfileFragment extends Fragment {
 
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_user_profile, container, false);
-        avatar = (ImageView) rootView.findViewById(R.id.avatar);
+        avatar = (CircularImageView) rootView.findViewById(R.id.avatar);
         txtUserNameLogin = (TextView) rootView.findViewById(R.id.txtUserNameLoginFg);
         txtUserFullName = (TextView) rootView.findViewById(R.id.txtUserNameFg);
         txtAddress = (TextView) rootView.findViewById(R.id.txtAddressFg);
@@ -104,23 +106,22 @@ public class ProfileFragment extends Fragment {
 
 
         globalUser = (GlobalUserClass) getActivity().getApplicationContext();
-        chooseImgBtn  = (CircularProgressButton) rootView.findViewById(R.id.circularButton1);
 
         setContentToView();
-        chooseImgBtn.setIndeterminateProgressMode(true);
-        avatar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                chooseImgBtn.setVisibility(View.VISIBLE);
-            }
-        });
-        chooseImgBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                chooseImgBtn .setProgress(0);
-                pickImage(CHOOSE_FILE_IMAGE);
-            }
-        });
+//        chooseImgBtn.setIndeterminateProgressMode(true);
+//        avatar.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                chooseImgBtn.setVisibility(View.VISIBLE);
+//            }
+//        });
+//        chooseImgBtn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                chooseImgBtn .setProgress(0);
+//                pickImage(CHOOSE_FILE_IMAGE);
+//            }
+//        });
 
         return rootView;
     }
@@ -128,13 +129,7 @@ public class ProfileFragment extends Fragment {
     public void setContentToView() {
 
         String Link = globalUser.getCur_user().getAvatarLink();
-        Ion.with(avatar)
-//                .placeholder(R.drawable.placeholder_image)
-//                .error(R.drawable.error_image)
-//                .animateLoad(spinAnimation)
-//                .animateIn(fadeInAnimation)
-                .centerCrop()
-                .load(globalUser.getCur_user().getAvatarLink());
+        Picasso.with(getActivity()).load(Link).into(avatar);
         txtUserNameLogin.setText(globalUser.getCur_user().getName());
         txtUserFullName.setText(globalUser.getCur_user().getFullName());
         txtBrithday.setText(android.text.format.DateFormat.format("dd/MM/yyyy", globalUser.getCur_user().getBirthday()));
@@ -146,97 +141,18 @@ public class ProfileFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode,resultCode, data );
 
-        Toast.makeText(getActivity().getApplicationContext(),"onActivityResult",Toast.LENGTH_LONG).show();
         if(resultCode != RESULT_OK) {
             return;
         }
- //       Toast.makeText(getActivity().getApplicationContext(),data.getExtras().getString("results").toString(),Toast.LENGTH_LONG).show();
-        if (requestCode == CHOOSE_FILE_IMAGE) {
-                final Bundle extras = data.getExtras();
-            if (extras != null) {
-                //Get image
-
-                final Bitmap newProfilePic = extras.getParcelable("data");
-                Uri imageURI = getImageUri(getActivity().getApplicationContext(),newProfilePic);
-                path = getPathFromURI(imageURI);
-                final File f = new File(path);
-                Future uploading = Ion.with(getActivity().getApplicationContext())
-                        .load("http://totnghiep.herokuapp.com/upload")
-                        .progress(new ProgressCallback() {@Override
-                            public void onProgress(long downloaded, long total) {
-                                int percent =(int)(downloaded*100/total);
-                                Log.d("TAG","" + percent);
-                                chooseImgBtn .setProgress(percent-1);
-                            }
-                        })
-                        .setMultipartParameter("_id", globalUser.getCur_user().get_id())
-                        .setMultipartFile("image", f)
-                        .asString()
-                        .withResponse()
-                        .setCallback(new FutureCallback<Response<String>>() {
-                            @Override
-                            public void onCompleted(Exception e, Response<String> result) {
-                                    Ion.getDefault(getActivity().getApplicationContext()).getCache().clear();
-                                    Ion.getDefault(getActivity().getApplicationContext()).getBitmapCache().clear();
-                                    avatar.setImageBitmap(newProfilePic);
-                                    chooseImgBtn .setProgress(100);
-                                    deleteImage(f);
-                                    Handler handler = new Handler();
-                                    handler.postDelayed(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            chooseImgBtn.setVisibility(View.GONE);
-                                            chooseImgBtn .setProgress(0);
-                                        }
-                                    }, 1000);
-                            }
-                        });
-
-            }
-        }
-
-        else if(requestCode == 101){
+        //       Toast.makeText(getActivity().getApplicationContext(),data.getExtras().getString("results").toString(),Toast.LENGTH_LONG).show();
+        if(requestCode == 101){
             setContentToView();
         }
 
     }
 
-    public void deleteImage(File fdelete) {
-        if (fdelete.exists()) {
-            if (fdelete.delete()) {
-                Log.e("-->", "file Deleted :");
-            } else {
-                Log.e("-->", "file not Deleted :");
-            }
-        }
-    }
 
-    public Uri getImageUri(Context inContext, Bitmap inImage) {
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
-        return Uri.parse(path);
-    }
 
-    public String getPathFromURI(Uri uri) {
-        Cursor cursor = getActivity().getContentResolver().query(uri, null, null, null, null);
-        cursor.moveToFirst();
-        int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
-        return cursor.getString(idx);
-    }
-    public void pickImage(int req_code) {
-        Intent intent = new Intent(Intent.ACTION_PICK,
-                MediaStore.Images.Media.INTERNAL_CONTENT_URI);
-        intent.setType("image/*");
-        intent.putExtra("crop", "true");
-        intent.putExtra("scale", true);
-        intent.putExtra("outputX", 512);
-        intent.putExtra("outputY", 512);
-        intent.putExtra("aspectX", 1);
-        intent.putExtra("aspectY", 1);
-        intent.putExtra("return-data", true);
-        startActivityForResult(intent, req_code);
-    }
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
