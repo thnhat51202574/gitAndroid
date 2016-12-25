@@ -38,6 +38,7 @@ public class AddMemberEventActivity extends AppCompatActivity {
     private EditText searchEdittext;
     private GridView gvAvatar;
     private ArrayList<String> ListmemUser;
+
     private ArrayList<String> ListmemUser_id,ListmemUser_avatar;
     GlobalUserClass globalUser;
     ImageAddapter adapter_listmember;
@@ -46,8 +47,17 @@ public class AddMemberEventActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_member_event);
         ListmemUser = new ArrayList<>();
+
+
         ListmemUser_id = new ArrayList<>();
         ListmemUser_avatar = new ArrayList<>();
+
+        final Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            ListmemUser_id = extras.getStringArrayList("arListIdMember");
+            ListmemUser_avatar = extras.getStringArrayList("ArListMemAvatar");
+        }
+
         list_frient_search = (ListView) findViewById(R.id.list_frient_search);
         searchEdittext = (EditText) findViewById(R.id.searchNameInput);
         gvAvatar = (GridView) findViewById(R.id.listAvatarUser);
@@ -59,7 +69,7 @@ public class AddMemberEventActivity extends AppCompatActivity {
 
         if((listfriend.size())>0) {
             MemberEventCustomListview adapter
-                    = new MemberEventCustomListview(getApplicationContext(), R.layout.friend_in_event_add,listfriend);
+                    = new MemberEventCustomListview(getApplicationContext(), R.layout.friend_in_event_add,listfriend,ListmemUser_id);
             list_frient_search.setAdapter(adapter);
             adapter.setOnDataChangeListener(new MemberEventCustomListview.OnDataChangeListener(){
                 @Override
@@ -139,7 +149,7 @@ public class AddMemberEventActivity extends AppCompatActivity {
             }
 
             MemberEventCustomListview adapter
-                    = new MemberEventCustomListview(getApplicationContext(), R.layout.friend_in_event_add,friends);
+                    = new MemberEventCustomListview(getApplicationContext(), R.layout.friend_in_event_add,friends,ListmemUser_id);
             list_frient_search.setAdapter(adapter);
             adapter.setOnDataChangeListener(new MemberEventCustomListview.OnDataChangeListener(){
                 @Override

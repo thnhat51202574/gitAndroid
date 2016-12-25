@@ -71,7 +71,7 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
     private LatLng startaddress_LatLgn,destination_LatLgn;
     private GridView gvlistMember;
     private ArrayList<User> ArrayMember;
-    private ArrayList<String> ArListMemAvatar;
+    private ArrayList<String> ArListMemAvatar,arListIdMember;
     private JSONArray JSONListMember,JSONStartLocs,JSONEndLocs;
     ProgressDialog progressDialog;
     DatePickerDialog.OnDateSetListener from_dateListener,to_dateListener;
@@ -94,6 +94,7 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
 //        AddEventURL = "http://172.16.1.101:3000/api/event";
         ArrayMember = new ArrayList<>();
         ArListMemAvatar = new ArrayList<>();
+        arListIdMember = new ArrayList<>();
         JSONListMember = new JSONArray();
         JSONStartLocs = new JSONArray();
         JSONEndLocs = new JSONArray();
@@ -285,6 +286,8 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
         findViewById(R.id.Addmemberbtn).setOnClickListener(new View.OnClickListener() {
             public  void onClick(View v) {
                 Intent intent = new Intent(AddEventActivity.this, AddMemberEventActivity.class);
+                intent.putExtra("arListIdMember",arListIdMember);
+                intent.putExtra("ArListMemAvatar",ArListMemAvatar);
                 startActivityForResult(intent,ADD_MEMBER_REQUEST);
                 overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
             }
@@ -326,11 +329,15 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
             EndAddress.setText(address);
         }
         else if (requestCode == ADD_MEMBER_REQUEST) {
+            JSONListMember = new JSONArray();
+            arListIdMember = new ArrayList<>();
+            ArListMemAvatar = new ArrayList<>();
             ArrayList<String> ListMember = data.getStringArrayListExtra("listMember");
             ArrayList<String> ListAvatar = data.getStringArrayListExtra("listAvatar");
             for (int i = 0;i < ListMember.size(); i++) {
                 JSONListMember.put(ListMember.get(i));
                 ArListMemAvatar.add(ListAvatar.get(i));
+                arListIdMember.add(ListMember.get(i));
             }
             ImageAddapter adapter_listmember
                     = new ImageAddapter(getApplicationContext(), R.layout.single_image_gridview,ArListMemAvatar);

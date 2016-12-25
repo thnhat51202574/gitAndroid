@@ -2,6 +2,7 @@ package layout;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -19,7 +20,9 @@ import android.widget.Toast;
 
 import com.dd.CircularProgressButton;
 import com.example.a51202_000.testbug.EditprofileAcitivity;
+import com.example.a51202_000.testbug.MainActivity;
 import com.example.a51202_000.testbug.R;
+import com.example.a51202_000.testbug.UnLoginActivity;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 import com.koushikdutta.ion.ProgressCallback;
@@ -31,6 +34,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.concurrent.Future;
 
+import at.markushi.ui.CircleButton;
 import globalClass.GlobalUserClass;
 
 import static android.app.Activity.RESULT_OK;
@@ -48,7 +52,6 @@ public class ProfileFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    GlobalUserClass globalUser;
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
@@ -58,7 +61,9 @@ public class ProfileFragment extends Fragment {
     private CircularProgressButton chooseImgBtn;
     private int CHOOSE_FILE_IMAGE = 2;
     private String SERVER_PATH ="http://totnghiep.herokuapp.com";
+    private CircleButton logout;
     String path;
+    GlobalUserClass globalUser;
     public ProfileFragment() {
         // Required empty public constructor
     }
@@ -103,26 +108,22 @@ public class ProfileFragment extends Fragment {
         txtAddress = (TextView) rootView.findViewById(R.id.txtAddressFg);
         txtBrithday = (TextView) rootView.findViewById(R.id.txtBirthdayFg);
         txtPhone = (TextView) rootView.findViewById(R.id.txtPhoneFg);
-
+        logout = (CircleButton) rootView.findViewById(R.id.logout);
 
         globalUser = (GlobalUserClass) getActivity().getApplicationContext();
-
+        logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //log out user
+                SharedPreferences pref = getActivity().getApplicationContext().getSharedPreferences("MyPref", 0);
+                pref.edit().clear().commit();
+                globalUser = null;
+                Intent intent = new Intent(getActivity(), UnLoginActivity.class);
+                startActivity(intent);
+                getActivity().finish();
+            }
+        });
         setContentToView();
-//        chooseImgBtn.setIndeterminateProgressMode(true);
-//        avatar.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                chooseImgBtn.setVisibility(View.VISIBLE);
-//            }
-//        });
-//        chooseImgBtn.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                chooseImgBtn .setProgress(0);
-//                pickImage(CHOOSE_FILE_IMAGE);
-//            }
-//        });
-
         return rootView;
     }
 

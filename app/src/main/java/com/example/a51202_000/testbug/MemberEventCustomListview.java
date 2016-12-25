@@ -14,6 +14,7 @@ import android.widget.Toast;
 import com.mikhaellopez.circularimageview.CircularImageView;
 import com.squareup.picasso.Picasso;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import Model.User;
@@ -26,6 +27,7 @@ public class MemberEventCustomListview extends ArrayAdapter<User> {
     ArrayList<User> users;
     Context context;
     ArrayList<User> arUserReturn;
+    ArrayList<String> mArListId;
     int resource;
 
     public interface OnDataChangeListener{
@@ -37,12 +39,13 @@ public class MemberEventCustomListview extends ArrayAdapter<User> {
     public void setOnDataChangeListener(OnDataChangeListener onDataChangeListener){
         mOnDataChangeListener = onDataChangeListener;
     }
-    public MemberEventCustomListview(Context context, int resource, ArrayList<User> objects) {
+    public MemberEventCustomListview(Context context, int resource, ArrayList<User> objects,ArrayList<String> listCurId) {
         super(context, resource, objects);
         this.users = objects;
         this.context = context;
         this.resource = resource;
         this.arUserReturn = new ArrayList<>();
+        this.mArListId = listCurId;
     }
     static class ViewHolder {
         TextView Frient_name;
@@ -63,6 +66,9 @@ public class MemberEventCustomListview extends ArrayAdapter<User> {
             h.Frient_name = (TextView)  convertView.findViewById(R.id.friend_name);
             h.Avatar =(CircularImageView) convertView.findViewById(R.id.frient_avatar);
             h.friendcheckbox = (CheckBox) convertView.findViewById(R.id.checkUser);
+            if(this.mArListId.contains(user.get_id())) {
+                h.friendcheckbox.setChecked(true);
+            }
             h.friendcheckbox.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

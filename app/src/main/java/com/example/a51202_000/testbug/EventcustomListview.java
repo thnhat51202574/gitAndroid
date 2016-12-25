@@ -19,6 +19,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import Model.Event;
+import at.markushi.ui.CircleButton;
 
 /**
  * Created by 51202_000 on 01/11/2016.
@@ -51,7 +52,8 @@ public class EventcustomListview extends ArrayAdapter<Event> {
     }
     static class ViewHolder {
         TextView name,date1,date2,time_start,date_start,count_member;
-        ImageButton btn1,btn2;
+        ImageButton btn1;
+        CircleButton btn2;
     }
     @NonNull
     @Override
@@ -70,7 +72,7 @@ public class EventcustomListview extends ArrayAdapter<Event> {
             h.count_member = (TextView) convertView.findViewById(R.id.event_num_member);
             h.name = (TextView) convertView.findViewById(R.id.event_name);
             h.btn1 = (ImageButton) convertView.findViewById(R.id.event_edit_btn);
-            h.btn2 = (ImageButton) convertView.findViewById(R.id.event_delete_btn);
+            h.btn2 = (CircleButton) convertView.findViewById(R.id.event_delete_btn);
             convertView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

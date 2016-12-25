@@ -1,13 +1,19 @@
 package com.example.a51202_000.testbug;
 
 import android.Manifest;
+import android.app.Activity;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.LocationManager;
+import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -16,6 +22,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -64,7 +71,6 @@ public class MainTabActivity extends AppCompatActivity implements HomeFragment.c
     ProfileFragment profileFragment;
     FriendFrament friendFragment;
     GlobalUserClass globalUser;
-    MaterialSearchView searchView;
     private static final int INITIAL_REQUEST=1337;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,7 +88,6 @@ public class MainTabActivity extends AppCompatActivity implements HomeFragment.c
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setLogo(R.mipmap.ic_launcher);
         setSupportActionBar(toolbar);
-        searchView = (MaterialSearchView) findViewById(R.id.search_view);
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
@@ -101,6 +106,7 @@ public class MainTabActivity extends AppCompatActivity implements HomeFragment.c
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
         fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setVisibility(View.INVISIBLE);
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
@@ -113,9 +119,13 @@ public class MainTabActivity extends AppCompatActivity implements HomeFragment.c
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 mViewPager.setCurrentItem(tab.getPosition());
-                animateFab(tab.getPosition());
+                if (tab.getPosition() == 0) {
+                    fab.setVisibility(View.INVISIBLE);
+                } else {
+                    fab.setVisibility(View.VISIBLE);
+                    animateFab(tab.getPosition());
+                }
             }
-
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
 
@@ -154,9 +164,6 @@ public class MainTabActivity extends AppCompatActivity implements HomeFragment.c
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_search, menu);
-        MenuItem item = menu.findItem(R.id.action_search);
-        searchView.setMenuItem(item);
         return true;
     }
     protected void animateFab(final int position) {
@@ -296,5 +303,7 @@ public class MainTabActivity extends AppCompatActivity implements HomeFragment.c
         public void addPage(Fragment f) {
             fragments.add(f);
         }
-    }
+    }//returns true if the GpsProviderIsDisabled
+    //false otherwise
+
 }

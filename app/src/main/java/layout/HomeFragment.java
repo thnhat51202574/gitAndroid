@@ -3,12 +3,17 @@ package layout;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -219,13 +224,17 @@ public class HomeFragment extends Fragment implements GoogleMap.OnMarkerClickLis
                     // for ActivityCompat#requestPermissions for more details.
                     return;
                 }
-                mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                        mGoogleApiClient);
-                LatLng mylocation =new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mylocation , 14));
-                getNearestLocationTask nearestLocationTask = new getNearestLocationTask(getActivity(),googleMap,mLastLocation,HomeFragment.this);
-                nearestLocationTask.execute("http://totnghiep.herokuapp.com/api/nearestAddress");
-                googleMap.setOnMarkerClickListener(HomeFragment.this);
+                if(!EnableGPSIfPossible()) {
+                    mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                            mGoogleApiClient);
+                    if(!(mLastLocation == null)) {
+                        LatLng mylocation = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+                        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mylocation, 14));
+                        getNearestLocationTask nearestLocationTask = new getNearestLocationTask(getActivity(), googleMap, mLastLocation, HomeFragment.this);
+                        nearestLocationTask.execute("http://totnghiep.herokuapp.com/api/nearestAddress");
+                        googleMap.setOnMarkerClickListener(HomeFragment.this);
+                    }
+                }
             }
         });
     }
@@ -234,25 +243,30 @@ public class HomeFragment extends Fragment implements GoogleMap.OnMarkerClickLis
     public boolean onMarkerClick(Marker marker){
         image_progressbar.setVisibility(View.VISIBLE);
         Address choose_address = this.listAddressbyMaker.get(marker);
-        address_name.setText(choose_address.getName());
-        address_rate.setText(String.valueOf(choose_address.getRate()));
-        address_position.setText(choose_address.getAddress());
-        address_phone.setText(choose_address.getPhone());
-        address_detail.setText(choose_address.getdetail());
-        address_type.setText("Nhà hàng");
+        if(!(choose_address==null)) {
+            address_name.setText(choose_address.getName());
+            address_rate.setText(String.valueOf(choose_address.getRate()));
+            address_position.setText(choose_address.getAddress());
+            address_phone.setText(choose_address.getPhone());
+            address_detail.setText(choose_address.getdetail());
+            address_type.setText("Nhà hàng");
 
-        String url ="http://totnghiep.herokuapp.com"+ choose_address.getArImage();
-        Picasso.with(getActivity()).load(url).error(R.drawable.no_images).into(address_picture, new com.squareup.picasso.Callback() {
-            @Override
-            public void onSuccess() {
-                image_progressbar.setVisibility(View.GONE);
-            }
-            @Override
-            public void onError() {
-                image_progressbar.setVisibility(View.GONE);
-            }
-        });
-        slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+            String url = "http://totnghiep.herokuapp.com" + choose_address.getArImage();
+            Picasso.with(getActivity()).load(url).error(R.drawable.no_images).into(address_picture, new com.squareup.picasso.Callback() {
+                @Override
+                public void onSuccess() {
+                    image_progressbar.setVisibility(View.GONE);
+                }
+
+                @Override
+                public void onError() {
+                    image_progressbar.setVisibility(View.GONE);
+                }
+            });
+            slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+        }   else {
+            slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
+        }
         return false;
     }
 
@@ -282,5 +296,33 @@ public class HomeFragment extends Fragment implements GoogleMap.OnMarkerClickLis
         Toast.makeText(getActivity(),Text,Toast.LENGTH_LONG).show();
 //        textView.setText(Text);
     }
+    private boolean EnableGPSIfPossible()
+    {
+        final LocationManager manager = (LocationManager) getActivity().getSystemService( Context.LOCATION_SERVICE );
+        if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+            buildAlertMessageNoGps();
+            return true;
+        }
+        return false;
+    }
 
+    private  void buildAlertMessageNoGps()
+    {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setMessage("Vị trí của bạn chưa được bật. Vui lòng bật vị trí?")
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface d, int id) {
+                        startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                        d.dismiss();
+                    }})
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface d, int id) {
+                        d.cancel();
+                    }
+                });
+
+        final AlertDialog alert = builder.create();
+        alert.show();
+    }
 }

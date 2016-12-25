@@ -196,9 +196,11 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
             try{
-                if(checkLogin(result) == true) {
-                    Toast.makeText(getApplicationContext(), "login sucess", Toast.LENGTH_LONG).show();
-                    JSONObject resultJSON= new JSONObject(result.toString());
+                JSONObject resultJSON= new JSONObject(result.toString());
+                String flag = resultJSON.getString("CODE");
+                String message = resultJSON.getString("message");
+                if (flag.equals("SUCCESS")) {
+                    Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
                     JSONObject user = resultJSON.getJSONObject("user");
                     String _id = user.getString("_id");
                     String userName = user.getString("username");
@@ -215,8 +217,12 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             }, 3000);
                 }
-                else
-                    Toast.makeText(getApplicationContext(),"Có lỗi xảy ra", Toast.LENGTH_LONG).show();
+                else {
+                    Toast.makeText(getApplicationContext(),message, Toast.LENGTH_LONG).show();
+                    if(progressDialog!=null) {
+                        progressDialog.dismiss();
+                    }
+                }
             }catch(JSONException ex)
             {
                 ex.printStackTrace();

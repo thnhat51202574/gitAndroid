@@ -288,7 +288,8 @@ public class EditprofileAcitivity extends AppCompatActivity {
                         .setCallback(new FutureCallback<Response<String>>() {
                             @Override
                             public void onCompleted(Exception e, Response<String> result) {
-
+//                                String link = result.getResult();
+//                                globalUser.getCur_user().setAvatarLink();
                                 Ion.getDefault(getApplicationContext()).getCache().clear();
                                 Ion.getDefault(getApplicationContext()).getBitmapCache().clear();
                                 avatar.setImageBitmap(newProfilePic);
