@@ -122,9 +122,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     {
         try {
             mSocket = IO.socket("http://totnghiep.herokuapp.com/");
-            Log.e("TAG", "success ...............: ");
         } catch (URISyntaxException e) {
-            Log.e("TAG", "erorsocket ...............: " + e.toString());
         }
     }
     @Override
@@ -156,10 +154,8 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 if(b) {
                     watchlocation_flag = true;
-                    Log.d("CHECK","CHECKED");
                 } else {
                     watchlocation_flag = false;
-                    Log.d("CHECK","UNCHECKED");
                 }
             }
         });
@@ -424,7 +420,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     }
     private void updateUI() throws JSONException {
 
-        Log.e("TAG", "UI update initiated .............");
         if (null != mCurrentLocation) {
             String lat = String.valueOf(mCurrentLocation.getLatitude());
             String lng = String.valueOf(mCurrentLocation.getLongitude());
@@ -444,8 +439,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             double distance2Route = MDistance.minDistance(cur_event.getArLocs(),myLocation);
 
             info_detail.setText(String.valueOf(distance2Route));
-
-            System.out.println("distance = " + distance2Route);
 
             try {
 
@@ -649,12 +642,13 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                 @Override
                 public void run() {
                     final JSONObject data = (JSONObject) args[0];
-                    new AlertDialog.Builder(MapsActivity.this)
-                    .setMessage("Có người đi lạc. Cả đội tập trung vào địa điểm được đánh dấu nhé.")
-                    .setCancelable(false)
-                    .setPositiveButton("Có", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            //draw new address
+//                    new AlertDialog.Builder(MapsActivity.this)
+//                    .setMessage("Có người đi lạc. Cả đội tập trung vào địa điểm được đánh dấu nhé.")
+//                    .setCancelable(false)
+//                    .setPositiveButton("Có", new DialogInterface.OnClickListener() {
+//                        public void onClick(DialogInterface dialog, int id) {
+//                            //draw new address
+                            info_warning.setText("Cả đội tập trung điểm đánh dấu nhé");
                             Address nearStopAddress = null;
                             try {
                                 nearStopAddress = new Address(data.getJSONObject("address"));
@@ -673,9 +667,9 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
-                        }
-                    })
-                    .show();
+//                        }
+//                    })
+//                    .show();
 
                 }
             });
@@ -708,7 +702,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
         @Override
         public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-            Log.d("test: ", "bitmap loaded");
             mbitmap = getCircularBitmap(bitmap);
 //            mMarker.setIcon(BitmapDescriptorFactory.fromBitmap(getCircularBitmap(bitmap)));
         }
