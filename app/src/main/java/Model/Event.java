@@ -33,10 +33,19 @@ public class Event {
     private String event_description;
     private String StringJson;
     private List<LatLng> arLocs;
+    private int mindistance;
     private boolean isowner;
 
     public List<LatLng> getArLocs() {
         return arLocs;
+    }
+
+    public int getMindistance() {
+        return mindistance;
+    }
+
+    public void setMindistance(int mindistance) {
+        this.mindistance = mindistance;
     }
 
     public Event(JSONObject object, String stringEvent, boolean owner) throws JSONException, ParseException {
@@ -122,6 +131,10 @@ public class Event {
             String stringPoints = object.getString("points");
             arLocs = DirectionFinder.decodePolyLine(stringPoints);
         } else {arLocs = new ArrayList<>();}
+
+        if((object.has("mindistance")) && (!object.isNull("mindistance"))){
+            this.mindistance = object.getInt("mindistance");
+        } else {this.mindistance = 50;}
 
 
         this.StringJson = stringEvent;

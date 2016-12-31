@@ -164,6 +164,16 @@ public class MainTabActivity extends AppCompatActivity implements HomeFragment.c
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_setting, menu);
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_setting:
+
+                break;
+        }
         return true;
     }
     protected void animateFab(final int position) {

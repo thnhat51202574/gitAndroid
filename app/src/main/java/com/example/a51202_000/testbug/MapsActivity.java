@@ -445,7 +445,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                 JSONObject dataInsert = new JSONObject();
                 dataInsert.put("lng",lng);
                 dataInsert.put("lat",lat);
-                if(distance2Route > MIN_DISTANCE_TO_ALERT) {
+                if(distance2Route >= cur_event.getMindistance()) {
                     dataInsert.put("isOutofRoad",true);
                 } else {
                     dataInsert.put("isOutofRoad",false);
@@ -550,27 +550,27 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                             newmarker.setPosition(myLocation);
                             newmarker.setIcon(BitmapDescriptorFactory.fromBitmap(bitmap_marker_));
                         }
-                        if(cur_event.isowner(globalUser.getCur_user().get_id())) {
-                            if (isOutofRoad) {
-                                info_warning.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View view) {
+                        if (isOutofRoad) {
+                            info_warning.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    if(cur_event.isowner(globalUser.getCur_user().get_id())) {
                                         if (arUserOutofRoad.size() > 0)
                                             showDialog(arUserOutofRoad);
                                     }
-                                });
-
-                                if (!arUserOutofRoad.contains(socket_user)) {
-                                    arUserOutofRoad.add(socket_user);
                                 }
-                                info_warning.setText(arUserOutofRoad.size() + "thành viên đang bị lạc!");
+                            });
 
-                            } else {
-                                if (arUserOutofRoad.contains(socket_user)) {
-                                    arUserOutofRoad.remove(socket_user);
-                                    info_detail.setText(username + "đã trở lại đúng đường ");
-                                    info_warning.setText("");
-                                }
+                            if (!arUserOutofRoad.contains(socket_user)) {
+                                arUserOutofRoad.add(socket_user);
+                            }
+                            info_warning.setText(arUserOutofRoad.size() + "thành viên đang bị lạc!");
+
+                        } else {
+                            if (arUserOutofRoad.contains(socket_user)) {
+                                arUserOutofRoad.remove(socket_user);
+                                info_detail.setText(username + "đã trở lại đúng đường ");
+                                info_warning.setText("");
                             }
                         }
                     } catch (JSONException e) {

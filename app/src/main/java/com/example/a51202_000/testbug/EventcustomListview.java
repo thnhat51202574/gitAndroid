@@ -33,13 +33,27 @@ public class EventcustomListview extends ArrayAdapter<Event> {
     public interface OnDataChangeListener{
         public void onClick(int Position);
     }
+    public interface OnEditMemberEvent{
+        public void onClick(int Position,Event event);
+    }
     public interface OnDeleteListener{
         public void onBeginDelete(int Position);
     }
+    public interface OnexitEventListener{
+        public void onExitClick(int Position, Event event);
+    }
     OnDataChangeListener onItemclickListener;
     OnDeleteListener mListenerDelete;
+    OnexitEventListener mListenerExit;
+    OnEditMemberEvent mListenerEditMember;
     public void setOnEachItemChangeListener(OnDataChangeListener onDataChangeListener){
         onItemclickListener = onDataChangeListener;
+    }
+    public void setOnEditMemberListener(OnEditMemberEvent onEditMemberListener) {
+        mListenerEditMember = onEditMemberListener;
+    }
+    public void setOnexitItemListener(OnexitEventListener onexitItemListener) {
+        mListenerExit = onexitItemListener;
     }
     public void setOnDeleteItemListener(OnDeleteListener onDeleteItemListener) {
         mListenerDelete = onDeleteItemListener;
@@ -52,8 +66,8 @@ public class EventcustomListview extends ArrayAdapter<Event> {
     }
     static class ViewHolder {
         TextView name,date1,date2,time_start,date_start,count_member;
-        ImageButton btn1;
-        CircleButton btn2;
+        CircleButton btn1,btn2,exit_btn;
+
     }
     @NonNull
     @Override
@@ -71,8 +85,9 @@ public class EventcustomListview extends ArrayAdapter<Event> {
             h.date_start = (TextView) convertView.findViewById(R.id.event_date_start);
             h.count_member = (TextView) convertView.findViewById(R.id.event_num_member);
             h.name = (TextView) convertView.findViewById(R.id.event_name);
-            h.btn1 = (ImageButton) convertView.findViewById(R.id.event_edit_btn);
+            h.btn1 = (CircleButton) convertView.findViewById(R.id.event_edit_btn);
             h.btn2 = (CircleButton) convertView.findViewById(R.id.event_delete_btn);
+            h.exit_btn = (CircleButton) convertView.findViewById(R.id.event_out_btn);
             convertView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -82,7 +97,7 @@ public class EventcustomListview extends ArrayAdapter<Event> {
             h.btn1.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Toast.makeText(context, "Không đồng ý kết bạn với" + event.get_id(), Toast.LENGTH_SHORT).show();
+                    mListenerEditMember.onClick(position,event);
                 }
             });
             h.btn2.setOnClickListener(new View.OnClickListener() {
@@ -92,6 +107,13 @@ public class EventcustomListview extends ArrayAdapter<Event> {
                     mListenerDelete.onBeginDelete(position);
                 }
             });
+            h.exit_btn.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                    mListenerExit.onExitClick(position,event);
+                }
+            });
             convertView.setTag(h);
         } else {
             h =(ViewHolder) convertView.getTag();
@@ -99,9 +121,11 @@ public class EventcustomListview extends ArrayAdapter<Event> {
         if(!event.isowner()) {
             h.btn1.setVisibility(View.GONE);
             h.btn2.setVisibility(View.GONE);
+            h.exit_btn.setVisibility(View.VISIBLE);
         } else {
             h.btn1.setVisibility(View.VISIBLE);
             h.btn2.setVisibility(View.VISIBLE);
+            h.exit_btn.setVisibility(View.GONE);
         }
         Date  dateStarttime = event.getEvent_startTime();
         String Date_inWeek = new SimpleDateFormat("EE").format(dateStarttime);

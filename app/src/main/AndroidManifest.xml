@@ -16,7 +16,7 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
-    <uses-permission android:name="android.permission.CALL_PHONE"/>
+    <uses-permission android:name="android.permission.CALL_PHONE" />
 
     <application
         android:name="globalClass.GlobalUserClass"
@@ -39,9 +39,9 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <activity android:name=".MainActivity">
-        </activity>
-        <activity android:name=".MapsActivity"
+        <activity android:name=".MainActivity"></activity>
+        <activity
+            android:name=".MapsActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
@@ -115,9 +115,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".AddFriendActivity"
+        <activity
+            android:name=".AddFriendActivity"
             android:label="Thêm bạn bè"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity android:name=".AddMoreOptionEventActivity"
+            android:label="Thiết lập"
+            android:theme="@style/AddEventActionbar">
+
         </activity>
     </application>
 

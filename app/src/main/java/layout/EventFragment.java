@@ -26,6 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.a51202_000.testbug.AddEventActivity;
+import com.example.a51202_000.testbug.AddMemberEventActivity;
 import com.example.a51202_000.testbug.EditprofileAcitivity;
 import com.example.a51202_000.testbug.EventcustomListview;
 import com.example.a51202_000.testbug.ImageAddapter;
@@ -61,6 +62,8 @@ import java.util.concurrent.Future;
 import Model.Event;
 import Model.User;
 import globalClass.GlobalUserClass;
+import AsyncTask.exitEventTask;
+import AsyncTask.editUserTask;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -68,14 +71,10 @@ public class EventFragment extends Fragment{
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final int ADDEVENTCODE = 307;
+    private int ADD_MEMBER_REQUEST = 5120;
     private SwipeRefreshLayout swipeContainer;
     // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-    private SlidingUpPanelLayout slidingLayout;
-    private Button btnShow;
-    private Button btnHide;
-    private TextView textView;
+    private String curent_event_id;
     EventcustomListview adapter;
     ArrayList<Event> events;
     GlobalUserClass globalUser;
@@ -116,6 +115,7 @@ public class EventFragment extends Fragment{
         globalUser = (GlobalUserClass) getActivity().getApplicationContext();
         lv_event = (ListView) rootView.findViewById(R.id.list_event);
         events = new ArrayList<>();
+        curent_event_id="";
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -216,11 +216,33 @@ public class EventFragment extends Fragment{
                 new ReadEventJSON().execute("http://totnghiep.herokuapp.com/api/event/createdby/");
                 swipeContainer.setRefreshing(false);
             }
+        } else if (requestCode == ADD_MEMBER_REQUEST) {
+            JSONArray JSONListMember = new JSONArray();
+            ArrayList<String> arListIdMember = new ArrayList<>();
+            ArrayList<String> ArListMemAvatar = new ArrayList<>();
+            ArrayList<String> ListMember = data.getStringArrayListExtra("listMember");
+            ArrayList<String> ListAvatar = data.getStringArrayListExtra("listAvatar");
+            for (int i = 0;i < ListMember.size(); i++) {
+                JSONListMember.put(ListMember.get(i));
+                ArListMemAvatar.add(ListAvatar.get(i));
+                arListIdMember.add(ListMember.get(i));
+            }
+            editUserTask editTask = new editUserTask(curent_event_id,JSONListMember);
+            editTask.setOnExitEventListener(new editUserTask.OnEditMemberListener() {
+                @Override
+                public void editMemberEventSuccess() {
+                    refreshListEvent();
+                }
+
+                @Override
+                public void editMemberEventFail() {
+
+                }
+            });
+            editTask.execute("http://totnghiep.herokuapp.com/api/event/edit");
+
         }
 
-    }
-    public void receiveMess(String Text) {
-        textView.setText(Text);
     }
 
     class ReadEventJSON extends AsyncTask<String, Integer,String> {
@@ -284,6 +306,51 @@ public class EventFragment extends Fragment{
                             .setPositiveButton("Có", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
                                     new DeleteEvent(event).execute("http://totnghiep.herokuapp.com/api/event/");
+                                }
+                            })
+                            .setNegativeButton("Không", null)
+                            .show();
+                }
+            });
+            adapter.setOnEditMemberListener(new EventcustomListview.OnEditMemberEvent() {
+                @Override
+                public void onClick(int Position, Event event) {
+                    Intent intent = new Intent(getActivity(), AddMemberEventActivity.class);
+                    ArrayList<String> arListIdMember,ArListMemAvatar;
+                    arListIdMember = new  ArrayList();
+                    ArListMemAvatar = new  ArrayList();
+                    ArrayList<User> listMember = event.getList_member();
+                    for (int i = 0;i < listMember.size();i++){
+                        arListIdMember.add(listMember.get(i).get_id());
+                        ArListMemAvatar.add(listMember.get(i).getAvatarLink());
+                    }
+                    intent.putExtra("arListIdMember",arListIdMember);
+                    intent.putExtra("ArListMemAvatar",ArListMemAvatar);
+                    curent_event_id = event.get_id();
+                    startActivityForResult(intent,ADD_MEMBER_REQUEST);
+                }
+            });
+            adapter.setOnexitItemListener(new EventcustomListview.OnexitEventListener() {
+                @Override
+                public void onExitClick(int Position,final Event event) {
+                    new AlertDialog.Builder(getActivity())
+                            .setMessage("Bạn muốn thoát sự kiện " + event.getEvent_name())
+                            .setCancelable(false)
+                            .setPositiveButton("Có", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    exitEventTask exitTask = new exitEventTask(globalUser.getCur_user().get_id(),event.get_id());
+                                    exitTask.setOnExitEventListener(new exitEventTask.OnExitSuccess() {
+                                        @Override
+                                        public void exitEventSuccess() {
+                                            refreshListEvent();
+                                        }
+
+                                        @Override
+                                        public void exitEventFail() {
+
+                                        }
+                                    });
+                                    exitTask.execute("http://totnghiep.herokuapp.com/api/event/exit");
                                 }
                             })
                             .setNegativeButton("Không", null)

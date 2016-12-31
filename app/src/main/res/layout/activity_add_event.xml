@@ -220,6 +220,13 @@
                 android:gravity="top"
                 android:weightSum="1">
                 <at.markushi.ui.CircleButton
+                    android:id="@+id/more_option"
+                    android:layout_width="54dip"
+                    android:layout_height="54dip"
+                    app:cb_color="#18ba4f"
+                    android:src="@drawable/ic_settings_white"
+                    app:cb_pressedRingWidth="8dip" />
+                <at.markushi.ui.CircleButton
                     android:id="@+id/Addmemberbtn"
                     android:layout_width="54dip"
                     android:layout_height="54dip"

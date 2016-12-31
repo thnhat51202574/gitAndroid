@@ -60,6 +60,7 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
     private int PLACE_PICKER_REQUEST = 101;
     private int PLACE_DESTINATION_PICKER_REQUEST = 102;
     private int ADD_MEMBER_REQUEST = 103;
+    private int ADD_OPTIONS_REQUEST = 104;
     private DatePicker datePicker;
     private Calendar calendar;
     private ImageView mapViewDemo;
@@ -73,6 +74,7 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
     private ArrayList<User> ArrayMember;
     private ArrayList<String> ArListMemAvatar,arListIdMember;
     private JSONArray JSONListMember,JSONStartLocs,JSONEndLocs;
+    private int mindistance;
     ProgressDialog progressDialog;
     DatePickerDialog.OnDateSetListener from_dateListener,to_dateListener;
     TimePickerDialog.OnTimeSetListener from_timeListener, to_timeListener;
@@ -105,6 +107,7 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
         TimeStart = (EditText) findViewById(R.id.TimeStart);
         arStopAddressId = new  ArrayList<>();
         points = "";
+        mindistance = 50;
         from_dateListener = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePickerDialog view, int year_, int monthOfYear, int dayOfMonth) {
@@ -289,7 +292,16 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
                 intent.putExtra("arListIdMember",arListIdMember);
                 intent.putExtra("ArListMemAvatar",ArListMemAvatar);
                 startActivityForResult(intent,ADD_MEMBER_REQUEST);
-                overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+//                overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+            }
+        });
+        findViewById(R.id.more_option).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(AddEventActivity.this, AddMoreOptionEventActivity.class);
+                intent.putExtra("CODE","event");
+                intent.putExtra("mindistance",String.valueOf(mindistance));
+                startActivityForResult(intent,ADD_OPTIONS_REQUEST);
             }
         });
     }
@@ -343,6 +355,9 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
                     = new ImageAddapter(getApplicationContext(), R.layout.single_image_gridview,ArListMemAvatar);
             gvlistMember.setAdapter(adapter_listmember);
 
+        } else if(requestCode == ADD_OPTIONS_REQUEST) {
+            int result_distance = data.getIntExtra("distance",mindistance);
+            mindistance = result_distance;
         }
     }
 
@@ -544,6 +559,7 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
                 dataInsert.put("endLocs",JSONEndLocs);
                 dataInsert.put("description",EventDescription.getText());
                 dataInsert.put("points",points);
+                dataInsert.put("distance",mindistance);
                 String toserver = dataInsert.toString();
                 //initialize and config request , then connect the server.
                 URL url = new URL(urlPath);

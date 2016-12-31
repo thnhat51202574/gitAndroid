@@ -73,15 +73,9 @@ public class MemberEventCustomListview extends ArrayAdapter<User> {
                 @Override
                 public void onClick(View v) {
                     if(h.friendcheckbox.isChecked()) {
-                        h.friendcheckbox.setChecked(false);
-                        if(mOnDataChangeListener != null){
-                            mOnDataChangeListener.onUserRemove(user);
-                        }
+                        mOnDataChangeListener.onUserAdd(user);
                     } else {
-                        h.friendcheckbox.setChecked(true);
-                        if(mOnDataChangeListener != null){
-                            mOnDataChangeListener.onUserAdd(user);
-                        }
+                        mOnDataChangeListener.onUserRemove(user);
                     }
                 }
             });
