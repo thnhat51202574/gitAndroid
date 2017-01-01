@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.provider.Settings;
@@ -64,6 +65,7 @@ public class MainTabActivity extends AppCompatActivity implements HomeFragment.c
     /**
      * The {@link ViewPager} that will host the section contents.
      */
+    SharedPreferences pref;
     private ViewPager mViewPager;
     FloatingActionButton fab;
     HomeFragment homeFragment;
@@ -71,7 +73,10 @@ public class MainTabActivity extends AppCompatActivity implements HomeFragment.c
     ProfileFragment profileFragment;
     FriendFrament friendFragment;
     GlobalUserClass globalUser;
+    int distance;
+    int timetoRest;
     private static final int INITIAL_REQUEST=1337;
+    private static final int ADD_OPTIONS_DISTANCE = 51;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -96,6 +101,18 @@ public class MainTabActivity extends AppCompatActivity implements HomeFragment.c
         eventFragment = new EventFragment();
         profileFragment = new ProfileFragment();
         friendFragment = new FriendFrament();
+
+        pref = getApplicationContext().getSharedPreferences("MyPref", 0);
+        distance = pref.getInt("distance", 1000);
+        if(distance <=0 ){
+            distance = 1000;
+        }
+        timetoRest = pref.getInt("timetoRest", 3600);
+        if(timetoRest <=0 ){
+            timetoRest = 3600;
+        }
+
+
         //set frament to each tab
         mSectionsPagerAdapter.addPage(homeFragment);
         mSectionsPagerAdapter.addPage(eventFragment);
@@ -159,23 +176,45 @@ public class MainTabActivity extends AppCompatActivity implements HomeFragment.c
                 }
             }
         });
-
     }
+
+    protected void onActivityResult(int requestCode,int resultCode,Intent data) {
+        if(resultCode != RESULT_OK) {
+            return;
+        }
+        if(requestCode == ADD_OPTIONS_DISTANCE) {
+            int result_distance = data.getIntExtra("distance",distance);
+            int result_time = data.getIntExtra("timetoRest",timetoRest);
+            timetoRest = result_time;
+            distance = result_distance;
+            SharedPreferences.Editor editor = pref.edit();
+            editor.putInt("distance", distance);
+            editor.putInt("timetoRest", timetoRest);
+            editor.commit();
+        }
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_setting, menu);
         return true;
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_setting:
-
+                Intent intent = new Intent(MainTabActivity.this, AddMoreOptionEventActivity.class);
+                intent.putExtra("CODE","GENERAL");
+                intent.putExtra("mindistance",String.valueOf(distance));
+                intent.putExtra("timetoRest",String.valueOf(timetoRest));
+                startActivityForResult(intent,ADD_OPTIONS_DISTANCE);
                 break;
         }
         return true;
     }
+
     protected void animateFab(final int position) {
         final int[] colorIntArray = {R.color.hindfocus,R.color.btnbackground,R.color.orange,R.color.orange};
         final int[] iconIntArray = {R.drawable.ic_home_black_24dp, R.drawable.fab_ic_add, R.drawable.fab_ic_add,R.drawable.fab_ic_edit};

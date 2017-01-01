@@ -18,6 +18,8 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
+import Model.Address;
+
 /**
  * Created by 51202_000 on 12/11/2016.
  */
@@ -28,11 +30,13 @@ public class DirectionFinder {
     private DirectionFinderListener listener;
     private String origin;
     private String destination;
+    private ArrayList<Address> arListAddress;
 
-    public DirectionFinder(DirectionFinderListener listener, String origin, String destination) {
+    public DirectionFinder(DirectionFinderListener listener, String origin, String destination,ArrayList<Address> marListAddress) {
         this.listener = listener;
         this.origin = origin;
         this.destination = destination;
+        this.arListAddress = marListAddress;
     }
 
     public void execute() throws UnsupportedEncodingException {
@@ -43,8 +47,16 @@ public class DirectionFinder {
     private String createUrl() throws UnsupportedEncodingException {
         String urlOrigin = URLEncoder.encode(origin, "utf-8");
         String urlDestination = URLEncoder.encode(destination, "utf-8");
-
-        return DIRECTION_URL_API + "origin=" + urlOrigin + "&destination=" + urlDestination + "&key=" + GOOGLE_API_KEY;
+        String urlwaypoints = "";
+        if(this.arListAddress.size() > 0) {
+            for (int i = 0 ; i < this.arListAddress.size(); i++) {
+                Address cur_address = this.arListAddress.get(i);
+                String locs = String.valueOf(cur_address.getLocs().latitude) + "," +String.valueOf(cur_address.getLocs().longitude);
+                urlwaypoints += "|" + locs;
+            }
+            urlwaypoints = "&waypoints=optimize:true" + URLEncoder.encode(urlwaypoints, "utf-8");
+        }
+        return DIRECTION_URL_API + "origin=" + urlOrigin + "&destination=" + urlDestination + urlwaypoints +"&key=" + GOOGLE_API_KEY;
     }
 
     private class DownloadRawData extends AsyncTask<String, Void, String> {
@@ -100,39 +112,65 @@ public class DirectionFinder {
 
             JSONObject overview_polylineJson = jsonRoute.getJSONObject("overview_polyline");
             JSONArray jsonLegs = jsonRoute.getJSONArray("legs");
-            JSONObject jsonLeg = jsonLegs.getJSONObject(0);
-            JSONObject jsonDistance = jsonLeg.getJSONObject("distance");
-            JSONObject jsonDuration = jsonLeg.getJSONObject("duration");
-            JSONObject jsonEndLocation = jsonLeg.getJSONObject("end_location");
-            JSONObject jsonStartLocation = jsonLeg.getJSONObject("start_location");
 
-            route.distance = new Distance(jsonDistance.getString("text"), jsonDistance.getInt("value"));
-            route.duration = new Duration(jsonDuration.getString("text"), jsonDuration.getInt("value"));
-            route.endAddress = jsonLeg.getString("end_address");
-            route.startAddress = jsonLeg.getString("start_address");
-            route.startLocation = new LatLng(jsonStartLocation.getDouble("lat"), jsonStartLocation.getDouble("lng"));
-            route.endLocation = new LatLng(jsonEndLocation.getDouble("lat"), jsonEndLocation.getDouble("lng"));
-            route.points = decodePolyLine(overview_polylineJson.getString("points"));
-            routes.add(route);
-            JSONArray stepObj = jsonLegs.getJSONObject(0).getJSONArray("steps");
-            for (int idx = 0; idx < stepObj.length(); idx++) {
-                Route route_ = new Route();
-                JSONObject jsoneachStep = stepObj.getJSONObject(idx);
-                JSONObject each_polylineJson = jsoneachStep.getJSONObject("polyline");
-                JSONObject jsoneachDistance = jsoneachStep.getJSONObject("distance");
-                JSONObject jsoneachDuration = jsoneachStep.getJSONObject("duration");
-                JSONObject jsoneachEndLocation = jsoneachStep.getJSONObject("end_location");
-                JSONObject jsoneachStartLocation = jsoneachStep.getJSONObject("start_location");
+            JSONObject jsonDistance = new JSONObject();
+            JSONObject jsonDuration = new JSONObject();
+            JSONObject jsonEndLocation = new JSONObject();
+            JSONObject jsonStartLocation = new JSONObject();
+            int distance_value, duration_value;
+            String distance_text, duration_text;
+            distance_value = duration_value = 0;
+            distance_text = duration_text = "";
 
-                route_.distance = new Distance(jsoneachDistance.getString("text"), jsoneachDistance.getInt("value"));
-                route_.duration = new Duration(jsoneachDuration.getString("text"), jsoneachDuration.getInt("value"));
-                route_.endAddress = "";
-                route_.startAddress = "";
-                route_.startLocation = new LatLng(jsoneachStartLocation.getDouble("lat"), jsoneachStartLocation.getDouble("lng"));
-                route_.endLocation = new LatLng(jsoneachEndLocation.getDouble("lat"), jsoneachEndLocation.getDouble("lng"));
-                route_.points = decodePolyLine(each_polylineJson.getString("points"));
-                arRoutes.add(route_);
+            for (int legid = 0; legid < jsonLegs.length() ; legid++) {
+                JSONObject jsonLeg = jsonLegs.getJSONObject(legid);
+                jsonDistance = jsonLeg.getJSONObject("distance");
+                jsonDuration = jsonLeg.getJSONObject("duration");
+                distance_value += jsonDistance.getInt("value");
+                duration_value += jsonDuration.getInt("value");
+                if(legid == 0) {
+                    jsonStartLocation = jsonLeg.getJSONObject("start_location");
+                    route.startAddress = jsonLeg.getString("start_address");
+                    route.startLocation = new LatLng(jsonStartLocation.getDouble("lat"), jsonStartLocation.getDouble("lng"));
+                }
+                if(legid == (jsonLegs.length() - 1)) {
+                    jsonEndLocation = jsonLeg.getJSONObject("end_location");
+                    route.endAddress = jsonLeg.getString("end_address");
+                    route.endLocation = new LatLng(jsonEndLocation.getDouble("lat"), jsonEndLocation.getDouble("lng"));
+                }
             }
+
+            distance_text = String.format("%.1f", (float) distance_value/1000) + " km";
+            duration_text = String.valueOf((float) duration_value/1000) + " phút";
+
+            route.distance = new Distance(distance_text, distance_value);
+            route.duration = new Duration(duration_text, duration_value);
+            route.points = decodePolyLine(overview_polylineJson.getString("points"));
+            route.arArrayAddress = this.arListAddress;
+            routes.add(route);
+
+            for (int legid = 0; legid < jsonLegs.length() ; legid++) {
+                JSONArray stepObj = jsonLegs.getJSONObject(legid).getJSONArray("steps");
+                for (int idx = 0; idx < stepObj.length(); idx++) {
+                    Route route_ = new Route();
+                    JSONObject jsoneachStep = stepObj.getJSONObject(idx);
+                    JSONObject each_polylineJson = jsoneachStep.getJSONObject("polyline");
+                    JSONObject jsoneachDistance = jsoneachStep.getJSONObject("distance");
+                    JSONObject jsoneachDuration = jsoneachStep.getJSONObject("duration");
+                    JSONObject jsoneachEndLocation = jsoneachStep.getJSONObject("end_location");
+                    JSONObject jsoneachStartLocation = jsoneachStep.getJSONObject("start_location");
+
+                    route_.distance = new Distance(jsoneachDistance.getString("text"), jsoneachDistance.getInt("value"));
+                    route_.duration = new Duration(jsoneachDuration.getString("text"), jsoneachDuration.getInt("value"));
+                    route_.endAddress = "";
+                    route_.startAddress = "";
+                    route_.startLocation = new LatLng(jsoneachStartLocation.getDouble("lat"), jsoneachStartLocation.getDouble("lng"));
+                    route_.endLocation = new LatLng(jsoneachEndLocation.getDouble("lat"), jsoneachEndLocation.getDouble("lng"));
+                    route_.points = decodePolyLine(each_polylineJson.getString("points"));
+                    arRoutes.add(route_);
+                }
+            }
+
             points = overview_polylineJson.getString("points");
 
         }

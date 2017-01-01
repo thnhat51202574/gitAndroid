@@ -2,6 +2,7 @@ package AsyncTask;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
@@ -48,6 +49,7 @@ public class getNearestLocationTask extends AsyncTask<String, Void, String> {
     GoogleMap googleMap;
     Location  currentLocation;
     ProgressDialog progressDialog;
+    SharedPreferences pref;
     private OnTaskCompleted listener;
 
     public interface OnTaskCompleted {
@@ -107,9 +109,12 @@ public class getNearestLocationTask extends AsyncTask<String, Void, String> {
         StringBuilder result = new StringBuilder();
         BufferedReader bufferedReader = null;
         try {
+            pref = ActivityContext.getSharedPreferences("MyPref", 0);
             String latitude = String.valueOf(currentLocation.getLatitude());
             String longtitude = String.valueOf(currentLocation.getLongitude());
-            String distance = "1";
+            int distance_int = pref.getInt("distance", 1000);
+            float distance_km = (float) distance_int/1000;
+            String distance = String.valueOf(String.valueOf(distance_km));
             urlpath +="?lon="+longtitude+"&lat="+latitude+"&distance=" + distance;
             URL url = new URL(urlpath);
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();

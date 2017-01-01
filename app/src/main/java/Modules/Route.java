@@ -1,7 +1,11 @@
 package Modules;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import Model.Address;
+
 /**
  * Created by 51202_000 on 12/11/2016.
  */
@@ -11,6 +15,16 @@ public class Route {
     public Duration duration;
     public String endAddress;
     public LatLng endLocation;
+    public ArrayList<Address> arArrayAddress;
+
+    public ArrayList<Address> getArArrayAddress() {
+        return arArrayAddress;
+    }
+
+    public void setArArrayAddress(ArrayList<Address> arArrayAddress) {
+        this.arArrayAddress = arArrayAddress;
+    }
+
     public String startAddress;
     public LatLng startLocation;
 

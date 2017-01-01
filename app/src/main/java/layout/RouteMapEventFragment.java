@@ -62,9 +62,8 @@ import Modules.Route;
 public class RouteMapEventFragment extends Fragment implements GoogleMap.OnMarkerClickListener,DirectionFinderListener, EventRouterFinderListener {
     private List<Marker> originMarkers = new ArrayList<>();
     private List<Marker> destinationMarkers = new ArrayList<>();
-    private List<Marker> stopMarkers = new ArrayList<>();
+    private List<Marker> addressMarker = new ArrayList<>();
     private List<Polyline> polylinePaths = new ArrayList<>();
-    static private ArrayList<String> ListAddressId;
     static private HashMap<Marker,Address> ListAddressChoose;
     private HashMap<String,Marker> mMarkerbyid;
     private ProgressDialog progressDialog;
@@ -88,6 +87,8 @@ public class RouteMapEventFragment extends Fragment implements GoogleMap.OnMarke
     ImageView address_picture;
     private View image_progressbar;
     TextView address_name, address_rate, address_position, address_phone, address_type, address_detail,idaddresshidde;
+    LatLng StartAddress;
+    LatLng Destination;
     public RouteMapEventFragment() {
         // Required empty public constructor
     }
@@ -118,7 +119,6 @@ public class RouteMapEventFragment extends Fragment implements GoogleMap.OnMarke
         }
         ListAddressChoose = new HashMap<>();
         mMarkerbyid = new HashMap<>();
-        ListAddressId = new ArrayList();
 
     }
 
@@ -139,7 +139,7 @@ public class RouteMapEventFragment extends Fragment implements GoogleMap.OnMarke
         address_detail = (TextView) rootView.findViewById(R.id.detailContent);
         idaddresshidde = (TextView) rootView.findViewById(R.id.idaddresshidde);
         slidingLayout = (SlidingUpPanelLayout) rootView.findViewById(R.id.sliding_layout);
-
+        addressMarker = new ArrayList<>();
         //some "demo" event
 //        slidingLayout.setPanelSlideListener(onSlideListener());
         slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
@@ -157,8 +157,8 @@ public class RouteMapEventFragment extends Fragment implements GoogleMap.OnMarke
             e.printStackTrace();
         }
         AddEventActivity addEventActivity = (AddEventActivity) getActivity();
-        final LatLng StartAddress = addEventActivity.getStartaddress();
-        final LatLng Destination = addEventActivity.getDestination();
+        StartAddress = addEventActivity.getStartaddress();
+        Destination = addEventActivity.getDestination();
         try {
             MapsInitializer.initialize(getActivity().getApplicationContext());
         } catch (Exception e) {
@@ -177,7 +177,7 @@ public class RouteMapEventFragment extends Fragment implements GoogleMap.OnMarke
                 String origin = String.valueOf(StartAddress.latitude) + "," +String.valueOf(StartAddress.longitude);
                 String destination_str = String.valueOf(Destination.latitude) + "," +String.valueOf(Destination.longitude);
                 try {
-                    new DirectionFinder(RouteMapEventFragment.this, origin, destination_str).execute();
+                    new DirectionFinder(RouteMapEventFragment.this, origin, destination_str, ((AddEventActivity) getActivity()).arStopAddressObj).execute();
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
@@ -257,6 +257,11 @@ public class RouteMapEventFragment extends Fragment implements GoogleMap.OnMarke
                 marker.remove();
             }
         }
+        if (addressMarker != null) {
+            for (Marker marker : addressMarker) {
+                marker.remove();
+            }
+        }
 
         if (polylinePaths != null) {
             for (Polyline polyline:polylinePaths ) {
@@ -305,12 +310,9 @@ public class RouteMapEventFragment extends Fragment implements GoogleMap.OnMarke
 
     @Override
     public void onEventRouterFinderFinish(ArrayList<EventRoute> arEventRoutes) {
-        stopMarkers = new ArrayList<>();
+//        stopMarkers = new ArrayList<>();
         for (int i = 0; i < arEventRoutes.size(); i++) {
             EventRoute eachRoute = arEventRoutes.get(i);
-            stopMarkers.add(googleMap.addMarker(new MarkerOptions()
-//                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.start_marker))
-                    .position(eachRoute.getEndLocation())));
             ArrayList<Address>  listAdderss = eachRoute.getAddressAroundLastLocation();
             for (int idx = 0; idx < listAdderss.size(); idx++) {
                 Address eachAddress = listAdderss.get(idx);
@@ -319,8 +321,13 @@ public class RouteMapEventFragment extends Fragment implements GoogleMap.OnMarke
 
                 marker.icon(BitmapDescriptorFactory.fromResource(R.drawable.restaurant_marker));
                 Marker _marker = googleMap.addMarker(marker);
+                addressMarker.add(_marker);
                 ListAddressChoose.put(_marker,eachAddress);
+                if(((AddEventActivity) getActivity()).arStopAddressId.contains(eachAddress.get_id())) {
+                    _marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.stop_marker));
+                }
                 mMarkerbyid.put(eachAddress.get_id(),_marker);
+
             }
         }
         progressDialog.dismiss();
@@ -369,7 +376,7 @@ public class RouteMapEventFragment extends Fragment implements GoogleMap.OnMarke
                 public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState,
                                                 SlidingUpPanelLayout.PanelState newState) {
                     if(newState.toString().equals("EXPANDED")) {
-                        if(ListAddressId.contains(choose_address.get_id())) {
+                        if(((AddEventActivity) getActivity()).arStopAddressId.contains(choose_address.get_id())) {
                             panel.findViewById(R.id.OkBtnAdd).setVisibility(View.GONE);
                             panel.findViewById(R.id.CancelBtnAdd).setVisibility(View.VISIBLE);
                         } else {
@@ -378,40 +385,32 @@ public class RouteMapEventFragment extends Fragment implements GoogleMap.OnMarke
                         }
                         panel.findViewById(R.id.OkBtnAdd).setOnClickListener(new View.OnClickListener(){
                             public void onClick(View v) {
-                                Double Lastlng;
-                                Double Lastlat;
-                                Marker LastMarker;
-                                Lastlng = marker.getPosition().longitude;
-                                Lastlat = marker.getPosition().latitude;
-                                LatLng LastPosition = new LatLng(Lastlat,Lastlng);
-                                marker.remove();
-                                LastMarker = googleMap.addMarker(new MarkerOptions().position(LastPosition)
-                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.stop_marker)).title(choose_address.getName()));
-
-                                RouteMapEventFragment.ListAddressChoose.put(LastMarker,choose_address);
+//                                marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.stop_marker));
                                 slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
-                                ListAddressId.add(choose_address.get_id());
-                                if(!((AddEventActivity) getActivity()).arStopAddressId.contains(choose_address.get_id()))
+                                if(!((AddEventActivity) getActivity()).arStopAddressId.contains(choose_address.get_id())) {
                                     ((AddEventActivity) getActivity()).arStopAddressId.add(choose_address.get_id());
+                                    ((AddEventActivity) getActivity()).arStopAddressObj.add(choose_address);
+                                }
+                                //update polyline
+                                updateRoute();
                             }
                         });
                         panel.findViewById(R.id.CancelBtnAdd).setOnClickListener(new View.OnClickListener(){
                             public void onClick(View v) {
-                                Double Lastlng;
-                                Double Lastlat;
-                                Marker LastMarker;
-                                Lastlng = marker.getPosition().longitude;
-                                Lastlat = marker.getPosition().latitude;
-                                LatLng LastPosition = new LatLng(Lastlat,Lastlng);
-                                marker.remove();
-                                LastMarker = googleMap.addMarker(new MarkerOptions().position(LastPosition)
-                                        .icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons("restaurant",50,50))));
-
-                                RouteMapEventFragment.ListAddressChoose.put(LastMarker,choose_address);
+//                                marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.restaurant_marker));
                                 slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
-                                ListAddressId.remove(choose_address.get_id());
-                                if(((AddEventActivity) getActivity()).arStopAddressId.contains(choose_address.get_id()))
-                                ((AddEventActivity) getActivity()).arStopAddressId.remove(choose_address.get_id());
+                                if(((AddEventActivity) getActivity()).arStopAddressId.contains(choose_address.get_id())) {
+                                    ((AddEventActivity) getActivity()).arStopAddressId.remove(choose_address.get_id());
+                                    ArrayList<Address> tmp = ((AddEventActivity) getActivity()).arStopAddressObj;
+                                    for (int idex = 0;idex < tmp.size(); idex ++) {
+                                        if (tmp.get(idex).get_id().equals(choose_address.get_id())) {
+                                            ((AddEventActivity) getActivity()).arStopAddressObj.remove(idex);
+                                            break;
+                                        }
+                                    }
+                                }
+                                //update polyline
+                                updateRoute();
                             }
                         });
                     }
@@ -419,6 +418,17 @@ public class RouteMapEventFragment extends Fragment implements GoogleMap.OnMarke
             });
         }
         return false;
+    }
+    private void updateRoute() {
+        String origin = String.valueOf(StartAddress.latitude) + "," +String.valueOf(StartAddress.longitude);
+        String destination_str = String.valueOf(Destination.latitude) + "," +String.valueOf(Destination.longitude);
+        //remove old marker;
+
+        try {
+            new DirectionFinder(RouteMapEventFragment.this, origin, destination_str, ((AddEventActivity) getActivity()).arStopAddressObj).execute();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
     }
 
 }

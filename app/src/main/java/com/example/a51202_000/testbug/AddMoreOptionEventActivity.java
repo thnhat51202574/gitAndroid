@@ -6,13 +6,17 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class AddMoreOptionEventActivity extends AppCompatActivity {
     EditText mindistanceEditext;
+    View layouttime;
+    EditText timetoRest;
     String mindistance;
+    String time;
     String CODE;
     TextView labeldistance;
     @Override
@@ -21,18 +25,27 @@ public class AddMoreOptionEventActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add_more_option_event);
         labeldistance =(TextView) findViewById(R.id.labeldistance);
         mindistanceEditext = (EditText) findViewById(R.id.mindistance);
+        timetoRest = (EditText) findViewById(R.id.timetorest);
+        layouttime = (View) findViewById(R.id.timelayout);
+        time = "3600";
         final Bundle extras = getIntent().getExtras();
         if (extras != null) {
             mindistance = extras.getString("mindistance");
             CODE = extras.getString("CODE");
             mindistanceEditext.setText(mindistance);
+            if (CODE.equals("GENERAL")) {
+                time = extras.getString("timetoRest");
+                timetoRest.setText(time);
+            }
         } else {
             mindistanceEditext.setText("1000");
         }
         if(CODE.equals("event")) {
             labeldistance.setText("Khoảng cách cảnh báo:");
+            layouttime.setVisibility(View.GONE);
         } else {
             labeldistance.setText("Bán kính tìm địa điểm:");
+            layouttime.setVisibility(View.VISIBLE);
         }
 
     }
@@ -49,7 +62,9 @@ public class AddMoreOptionEventActivity extends AppCompatActivity {
                 if(validate()) {
                     Intent output  = new Intent();
                     output.putExtra("distance",Integer.parseInt(mindistanceEditext.getText().toString()));
-//                output.putStringArrayListExtra("listAvatar",ListmemUser_avatar);
+                    if (CODE.equals("GENERAL")) {
+                        output.putExtra("timetoRest",Integer.parseInt(timetoRest.getText().toString()));
+                    }
                     setResult(RESULT_OK,output);
                     finish();
                 }

@@ -1,6 +1,7 @@
 package Modules;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.JsonArray;
@@ -29,6 +30,8 @@ public class EventRouteFinder {
     HashMap<Route,ArrayList<Address>> ListAddress = new HashMap<>();
     private List<Route> arRoute;
     private EventRouterFinderListener listener;
+    private int timetoRest;
+    SharedPreferences pref;
     private Context mcontext;
     public EventRouteFinder(EventRouterFinderListener listener, List<Route> arParamsRoute, Context context) {
         this.listener = listener;
@@ -41,8 +44,10 @@ public class EventRouteFinder {
         getAroundLocation aroundLocation = new getAroundLocation(arRoute, new getAroundLocation.OnArrountCompleted() {
             @Override
             public void getListAddress(HashMap<Route,ArrayList<Address>> result) {
+                pref = mcontext.getSharedPreferences("MyPref", 0);
                 ListAddress = result;
-                getDistanceAfterTime(600);
+                timetoRest = pref.getInt("timetoRest", 3600);
+                getDistanceAfterTime(timetoRest);
             }
         });
         aroundLocation.execute("http://totnghiep.herokuapp.com/api/ListAddressByLocation");

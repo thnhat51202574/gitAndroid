@@ -49,6 +49,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.TimeZone;
 
+import Model.Address;
 import Model.User;
 import globalClass.GlobalUserClass;
 import layout.FriendFrament;
@@ -81,6 +82,7 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
     String AddEventURL;
     Button OkButton;
     static public ArrayList<String> arStopAddressId;
+    static public ArrayList<Address> arStopAddressObj;
     static private String points;
     static public void setPoints(String mPoints) {
         points = mPoints;
@@ -106,6 +108,7 @@ public class AddEventActivity extends AppCompatActivity implements RouteMapEvent
         DateStart = (EditText) findViewById(R.id.DateStart);
         TimeStart = (EditText) findViewById(R.id.TimeStart);
         arStopAddressId = new  ArrayList<>();
+        arStopAddressObj = new ArrayList<>();
         points = "";
         mindistance = 50;
         from_dateListener = new DatePickerDialog.OnDateSetListener() {
